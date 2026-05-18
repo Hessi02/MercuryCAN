@@ -9,7 +9,7 @@ namespace Generic
 /**
  *  \class      Iterator
  *  \brief      Forward iterator for traversing linked list elements.
- *  \tparam     ContentType Type of the data stored in the container.
+ *  \tparam     ContentType passes the type of the data stored in the container.
  *
  *  The class 'Iterator' provides a lightweight forward iterator implementation
  *  for navigating through the singly linked list used by 'Generic::Container'.

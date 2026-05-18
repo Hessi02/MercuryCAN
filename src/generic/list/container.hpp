@@ -12,7 +12,7 @@ namespace Generic
 /**
  *  \class      Container
  *  \brief      Generic singly linked list container.
- *  \tparam     ContentType Type of the data stored inside the container.
+ *  \tparam     ContentType passes the type of the data stored in the container.
  *
  *  The class `Container` implements a simple generic container using a
  *  singly linked list as its underlying data structure. Each stored value is
