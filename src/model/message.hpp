@@ -1,6 +1,8 @@
 #ifndef __CAN_MODEL_MESSAGE_HPP__
 #define __CAN_MODEL_MESSAGE_HPP__
 
+#include <memory>
+
 #include "signal.hpp"
 #include "../generic/list/container.hpp"
 
@@ -34,7 +36,6 @@ concept FitsIntoCanMessage =
 class Message
 {
 public:
-
     /**
      *  \brief          Initializes instance by creating signals from pointers.
      *  \tparam         SignalDataTypes specifies signals' types variadically.
@@ -74,26 +75,22 @@ public:
 
     /**
      *  \brief      Converts the signals' data to simple byte array.
-     *  \return     A ptr ot an allocated array of type unsigned char.
-     *  \todo       Use unique ptr as return type to pass memory ownership. 
+     *  \return     A unqiue pointer to an allocated array of unsigned chars.
      */
-    unsigned char* getPayloadData(void) {
+    std::unique_ptr<unsigned char[]> getPayloadData(void) {
         unsigned char retWriteIndex = 0;
-        unsigned char* retPtr = new unsigned char[getPayloadSize()];
+        auto retPtr = std::make_unique<unsigned char[]>(getPayloadSize());
 
         for (const AnySignal_t& signal : _signals) {
-            const std::size_t signalSize = std::visit([](auto const& s) {
-                return s.getDataSize();
-            }, signal);
+            const std::size_t signalSize = std::visit(
+                [](auto const& s) { return s.getDataSize(); }, signal);
 
-            void* startPtr = std::visit([](auto& s) {
-                return (void*)s.getDataPtr();
-            }, signal);
-            
-            for (unsigned char i = 0; i < signalSize; i++) {
-                retPtr[retWriteIndex++] = 
+            void* startPtr = std::visit(
+                [](auto& s) { return (void*)s.getDataPtr(); }, signal);
+
+            for (unsigned char i = 0; i < signalSize; i++)
+                retPtr[retWriteIndex++] =
                     ((unsigned char*)startPtr)[signalSize - 1 - i];
-            }
         }
 
         return retPtr;
