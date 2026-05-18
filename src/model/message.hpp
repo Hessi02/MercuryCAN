@@ -19,13 +19,11 @@ namespace Can::Model
  *  is performed at compile-time. 
  */
 template<typename... SignalDataTypes>
-concept FitsIntoCanMessage =
-    ((sizeof(SignalDataTypes) + ...) <= 8);
+concept FitsIntoCanMessage = ((sizeof(SignalDataTypes) + ...) <= 8);
 
 /**
  *  \class      Message
  *  \brief      A message refers to the combination of one or more signals.
- *  \tparam     SignalDataType specifies the signals' types to use.
  * 
  *  The 'Message' class represents a standard CAN message / frame and combines
  *  one or more signals to a contiguous bit sequence which gets physically
