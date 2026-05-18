@@ -36,7 +36,6 @@ class Message
 public:
 
     /**
-     *  \fn             Message
      *  \brief          Initializes instance by creating signals from pointers.
      *  \tparam         SignalDataTypes specifies signals' types variadically.
      *  \param[in]      identifier passes the CAN message's identifier. 
@@ -58,7 +57,6 @@ public:
     }
 
     /**
-     *  \fn         getIdentifier(void) const
      *  \brief      Getter method for the CAN message's identifier.
      *  \return     Message ID represented as unsigned short.
      */
@@ -67,7 +65,6 @@ public:
     }
 
     /**
-     *  \fn         getPayloadSize(void) const
      *  \brief      Getter method for the requiered payload size.
      *  \return     The payload size represented as std::size_t. 
      */
@@ -76,7 +73,6 @@ public:
     }
 
     /**
-     *  \fn         getPayloadData(void)
      *  \brief      Converts the signals' data to simple byte array.
      *  \return     A ptr ot an allocated array of type unsigned char.
      *  \todo       Use unique ptr as return type to pass memory ownership. 

@@ -93,14 +93,26 @@ requires AllowedSignalDataType<SignalDataType>
 class Signal
 {
 public:
+    /**
+     *  \brief          Initializes instance by storing data's memorys address.
+     *  \param[in|out]  signalPtr passes signal's data address as pointer.
+     */
     Signal(SignalDataType* signalPtr) {
         _data = signalPtr;
     }
-   
+  
+    /**
+     *  \brief      Determines the memory size of the underlaying data type.
+     *  \return     The stored data size represented as std::size_t.
+     */
     constexpr std::size_t getDataSize(void) const {
         return sizeof(SignalDataType);
     }
 
+    /**
+     *  \brief      Getter method for access the signals data pointer.
+     *  \return     The stored data pointer using the template parameter's type. 
+     */
     SignalDataType* getDataPtr(void) const {
         return _data;
     }
