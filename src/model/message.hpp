@@ -34,12 +34,6 @@ concept FitsIntoCanMessage = ((sizeof(SignalDataTypes) + ...) <= 8);
 class Message
 {
 public:
-    /**
-     *  \brief          Initializes instance by creating signals from pointers.
-     *  \tparam         SignalDataTypes specifies signals' types variadically.
-     *  \param[in]      identifier passes the CAN message's identifier. 
-     *  \param[in|out]  signalPtrPack passes signals' data ptr as param pack.
-     */
     template<typename... SignalDataTypes>
     requires (AllowedSignalDataType<SignalDataTypes> && ...)
           && FitsIntoCanMessage<SignalDataTypes...>
@@ -55,26 +49,14 @@ public:
         ...);
     }
 
-    /**
-     *  \brief      Getter method for the CAN message's identifier.
-     *  \return     Message ID represented as unsigned short.
-     */
     unsigned short getIdentifier(void) const {
         return _identifier;
     }
 
-    /**
-     *  \brief      Getter method for the requiered payload size.
-     *  \return     The payload size represented as std::size_t. 
-     */
     std::size_t getPayloadSize(void) const {
         return _payloadSize;
     }
 
-    /**
-     *  \brief      Converts the signals' data to simple byte array.
-     *  \return     A unqiue pointer to an allocated array of unsigned chars.
-     */
     std::unique_ptr<unsigned char[]> getPayloadData(void) {
         unsigned char retWriteIndex = 0;
         auto retPtr = std::make_unique<unsigned char[]>(getPayloadSize());

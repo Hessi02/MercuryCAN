@@ -67,3 +67,9 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# Visual Studio Code
+.vscode/
+
+# MacOS
+*.DS_Store

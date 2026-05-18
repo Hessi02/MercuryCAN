@@ -18,13 +18,6 @@ namespace Can::Model
 class CyclicMessage : public Message
 {
 public:
-    /**
-     *  \brief          Initializes base and instance with added cycle time.
-     *  \tparam         SignalDataTypes specifies signals' types variadically.
-     *  \param[in]      identifier passes the CAN message's identifier. 
-     *  \param[in]      cycleTime passes the time between CAN messages on bus.
-     *  \param[in|out]  signalPtrPack passes signals' data ptr as param pack.
-     */
     template<typename... SignalDataTypes>
     requires (AllowedSignalDataType<SignalDataTypes>, ...)
           && FitsIntoCanMessage<SignalDataTypes...>
@@ -36,10 +29,6 @@ public:
           _cycleTime(cycleTime)              
     {}
 
-    /**
-     *  \brief      Getter method for the instance's cycle time.
-     *  \return     Cycle time represented as a unsiged short.
-     */
     unsigned short getCycleTime(void) const {
         return _cycleTime; 
     }
