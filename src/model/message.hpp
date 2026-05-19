@@ -1,8 +1,6 @@
 #ifndef __CAN_MODEL_MESSAGE_HPP__
 #define __CAN_MODEL_MESSAGE_HPP__
 
-#include <memory>
-
 #include "signal.hpp"
 #include "../generic/list/container.hpp"
 
@@ -57,20 +55,23 @@ public:
         return _payloadSize;
     }
 
-    std::unique_ptr<unsigned char[]> getPayloadData(void) {
+    unsigned char* getPayloadData(void) {
         unsigned char retWriteIndex = 0;
-        auto retPtr = std::make_unique<unsigned char[]>(getPayloadSize());
+        unsigned char* retPtr = new unsigned char[getPayloadSize()];
 
         for (const AnySignal_t& signal : _signals) {
-            const std::size_t signalSize = std::visit(
-                [](auto const& s) { return s.getDataSize(); }, signal);
+            const std::size_t signalSize = std::visit([](auto const& s) {
+                return s.getDataSize();
+            }, signal);
 
-            void* startPtr = std::visit(
-                [](auto& s) { return (void*)s.getDataPtr(); }, signal);
-
-            for (unsigned char i = 0; i < signalSize; i++)
-                retPtr[retWriteIndex++] =
+            void* startPtr = std::visit([](auto& s) {
+                return (void*)s.getDataPtr();
+            }, signal);
+            
+            for (unsigned char i = 0; i < signalSize; i++) {
+                retPtr[retWriteIndex++] = 
                     ((unsigned char*)startPtr)[signalSize - 1 - i];
+            }
         }
 
         return retPtr;
