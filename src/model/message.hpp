@@ -56,11 +56,10 @@ public:
     }
 
     unsigned char* getPayloadData(void) {
-        unsigned char retWriteIndex = 0;
-        const std::size_t payloadSize = getPayloadSize();
-        unsigned char* retPtr = new unsigned char[payloadSize];
-        
         const unsigned char signalCount = _signals.length();
+
+        unsigned char retWriteIndex = 0;
+        unsigned char* retPtr = new unsigned char[getPayloadSize()];
 
         for (unsigned char i = 0; i < signalCount; i++) {
             const AnySignal_t& signal = _signals.at(i);
