@@ -57,13 +57,18 @@ public:
 
     unsigned char* getPayloadData(void) {
         unsigned char retWriteIndex = 0;
-        unsigned char* retPtr = new unsigned char[getPayloadSize()];
+        const std::size_t payloadSize = getPayloadSize();
+        unsigned char* retPtr = new unsigned char[payloadSize];
+        
+        const unsigned char signalCount = _signals.length();
 
-        for (const AnySignal_t& signal : _signals) {
+        for (unsigned char i = 0; i < signalCount; i++) {
+            const AnySignal_t& signal = _signals.at(i);
+
             const std::size_t signalSize = std::visit([](auto const& s) {
                 return s.getDataSize();
             }, signal);
-
+            
             void* startPtr = std::visit([](auto& s) {
                 return (void*)s.getDataPtr();
             }, signal);
@@ -73,7 +78,7 @@ public:
                     ((unsigned char*)startPtr)[signalSize - 1 - i];
             }
         }
-
+        
         return retPtr;
     }
 
