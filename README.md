@@ -8,7 +8,7 @@ The library offers classes for receiving and transmitting CAN frames. The follow
 
 ### Transmitting
 
-For transmission, variables are initialized on the stack or heap. Under no circumstances may this memory be deallocated during runtime. In combination with an identifier and timing information, these variables are assembled into a cyclic message. These messages can then be assigned to the transmitter. A maximum of 16 variables can be assigned.
+For transmission, variables are initialized on the stack or heap. Under no circumstances may this memory be deallocated during runtime. In combination with an identifier and timing information, these arbitrary parameters of the constructor are assembled into a cyclic message. These messages can then be assigned to the transmitter.
 
 ```cpp
 unsigned char*  state = new unsigned char(0); 
