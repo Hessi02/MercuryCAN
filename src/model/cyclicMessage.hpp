@@ -6,15 +6,6 @@
 namespace Can::Model
 {
 
-/**
- *  \class      CyclicMessage
- *  \brief      A message that is written to the bus cyclically.
- * 
- *  While the base class only represents a standard CAN frame, this class adds
- *  the timing information for fixed transmitting intervals. Note that this 
- *  class only contains the timing informations while controller and driver 
- *  classes are responsible for execution of the cyclic write operation.
- */
 class CyclicMessage : public Message
 {
 public:

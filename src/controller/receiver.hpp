@@ -1,0 +1,26 @@
+#ifndef __CAN_CONTROLLER_RECEIVER_HPP__
+#define __CAN_CONTROLLER_RECEIVER_HPP__
+
+#include "../model/cyclicMessage.hpp"
+
+namespace Can::Controller
+{
+
+class Receiver 
+{
+public:
+    Receiver(void);
+
+    void addCyclicMessage(Model::CyclicMessage& message);
+
+    void processRxData(const unsigned short& identifier, 
+                       const unsigned char* data,
+                       const std::size_t& dataLength);
+
+private:
+    static inline Generic::Container<Model::CyclicMessage> _cyclicMessages;
+};
+
+}
+
+#endif //__CAN_CONTROLLER_RECEIVER_HPP__

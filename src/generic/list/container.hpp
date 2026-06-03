@@ -9,19 +9,6 @@
 namespace Generic
 {
 
-/**
- *  \class      Container
- *  \brief      Generic singly linked list container.
- *  \tparam     ContentType passes the type of the data stored in the container.
- *
- *  The class `Container` implements a simple generic container using a
- *  singly linked list as its underlying data structure. Each stored value is
- *  wrapped inside an 'Element' object which maintains a pointer to the next
- *  element in the sequence. New elements are appended at the head of the list, 
- *  resulting in a stack-like insertion behavior where the most recently 
- *  inserted element becomes the first element of the container. Memory 
- *  allocation and deallocation of list nodes are handled internally.
- */
 template<typename ContentType>
 class Container
 {

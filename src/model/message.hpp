@@ -7,28 +7,9 @@
 namespace Can::Model
 {
 
-/**
- *  \concept    FitsIntoCanMessage
- *  \brief      Restricts signals to fit into a single CAN frame.
- *  \tparam     SignalDataTypes passes a variadic list of all signal types.
- * 
- *  This concept is used to ensure that the total size of all signal types does
- *  not exceed the standard CAN frame's payload size of eight bytes. The check
- *  is performed at compile-time. 
- */
 template<typename... SignalDataTypes>
 concept FitsIntoCanMessage = ((sizeof(SignalDataTypes) + ...) <= 8);
 
-/**
- *  \class      Message
- *  \brief      A message refers to the combination of one or more signals.
- * 
- *  The 'Message' class represents a standard CAN message / frame and combines
- *  one or more signals to a contiguous bit sequence which gets physically
- *  written to the bus. The class thus represents not only an abstraction and 
- *  combination of signals, but also an interface from the abstract data 
- *  structure to the low-level bit structure that is written to the bus.
- */
 class Message
 {
 public:
@@ -72,13 +53,41 @@ public:
                 return (void*)s.getDataPtr();
             }, signal);
             
-            for (unsigned char i = 0; i < signalSize; i++) {
+            for (unsigned char i = 0; i < signalSize; i++)
                 retPtr[retWriteIndex++] = 
                     ((unsigned char*)startPtr)[signalSize - 1 - i];
-            }
         }
         
         return retPtr;
+    }
+
+    void setPayloadData(
+        const unsigned char* data, 
+        const std::size_t& dataLength) 
+    {
+        const unsigned char signalCount = _signals.length();
+
+        std::size_t readIndex = 0;
+
+        for (unsigned char i = 0; i < signalCount; i++) {
+            AnySignal_t& signal = _signals.at(i);
+
+            const std::size_t signalSize = std::visit([](auto const& s) {
+                return s.getDataSize();
+            }, signal);
+
+            if (readIndex + signalSize > dataLength)
+                return;
+
+            void* startPtr = std::visit([](auto& s) {
+                return (void*)s.getDataPtr();
+            }, signal);
+
+            unsigned char* dst = reinterpret_cast<unsigned char*>(startPtr);
+
+            for (std::size_t b = 0; b < signalSize; b++) 
+                dst[signalSize - 1 - b] = data[readIndex++];
+        }
     }
 
 private:

@@ -6,26 +6,6 @@
 namespace Generic
 {
 
-/**
- *  \class      Iterator
- *  \brief      Forward iterator for traversing linked list elements.
- *  \tparam     ContentType passes the type of the data stored in the container.
- *
- *  The class 'Iterator' provides a lightweight forward iterator implementation
- *  for navigating through the singly linked list used by 'Generic::Container'.
- *  Internally, the iterator stores a pointer to the currently referenced
- *  'Element' object and advances through the list by following the linked
- *  successor nodes.
- *
- *  The iterator supports:
- *
- *  - dereferencing using the `*` operator,
- *  - forward iteration using the prefix increment operator (`++`),
- *  - comparison using the inequality operator (`!=`).
- *
- *  This allows the container to be traversed in a manner compatible with
- *  range-based loops and iterator-style iteration patterns.
- */
 template<typename ContentType>
 class Iterator
 {

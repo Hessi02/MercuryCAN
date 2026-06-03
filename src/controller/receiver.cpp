@@ -1,0 +1,26 @@
+#include "receiver.hpp"
+
+#include "driver.hpp"
+
+Can::Controller::Receiver::Receiver(void) {}
+
+void Can::Controller::Receiver::addCyclicMessage(Model::CyclicMessage& message) {
+    _cyclicMessages.append(message);
+
+    Driver& driver = Driver::getInstance();
+    driver.addRxMessage(message.getIdentifier(), message.getPayloadSize());
+    driver.addReceiverInstance(this);
+}
+
+void Can::Controller::Receiver::processRxData(
+    const unsigned short& identifier, 
+    const unsigned char* data,
+    const std::size_t& dataLength)
+{
+    for (int i = 0; i < _cyclicMessages.length(); i++) {
+        Can::Model::CyclicMessage& message = _cyclicMessages.at(i);
+
+        if (identifier == message.getIdentifier()) 
+            message.setPayloadData(data, dataLength);
+    }
+}
