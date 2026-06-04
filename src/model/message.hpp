@@ -1,31 +1,28 @@
 #ifndef __CAN_MODEL_MESSAGE_HPP__
 #define __CAN_MODEL_MESSAGE_HPP__
 
-#include "signal.hpp"
 #include "../generic/list/container.hpp"
+#include "signal.hpp"
 
-namespace Can::Model
-{
+namespace Can::Model {
 
 template<typename... SignalDataTypes>
 concept FitsIntoCanMessage = ((sizeof(SignalDataTypes) + ...) <= 8);
 
-class Message
-{
+class Message {
 public:
     template<typename... SignalDataTypes>
-    requires (AllowedSignalDataType<SignalDataTypes> && ...)
-          && FitsIntoCanMessage<SignalDataTypes...>
-    Message(
-        const unsigned short identifier,
-        SignalDataTypes*... signalPtrPack)
+        requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
+                    FitsIntoCanMessage<SignalDataTypes...>
+    Message(const unsigned short identifier, SignalDataTypes*... signalPtrPack)
         : _payloadSize((sizeof(SignalDataTypes) + ...)),
-          _identifier(identifier)
-    {
+          _identifier(identifier) {
         (_signals.append(
-            static_cast<AnySignal_t>(
-                Signal<SignalDataTypes>(signalPtrPack))),
-        ...);
+             static_cast<AnySignal_t>(Signal<SignalDataTypes>(signalPtrPack))
+         ),
+         ...);
+
+        _signalCount = _signals.length();
     }
 
     unsigned short getIdentifier(void) const {
@@ -37,65 +34,61 @@ public:
     }
 
     unsigned char* getPayloadData(void) {
-        const unsigned char signalCount = _signals.length();
-
         unsigned char retWriteIndex = 0;
-        unsigned char* retPtr = new unsigned char[getPayloadSize()];
 
-        for (unsigned char i = 0; i < signalCount; i++) {
+        for (unsigned char i = 0; i < _signalCount; i++) {
             const AnySignal_t& signal = _signals.at(i);
 
-            const std::size_t signalSize = std::visit([](auto const& s) {
-                return s.getDataSize();
-            }, signal);
-            
-            void* startPtr = std::visit([](auto& s) {
-                return (void*)s.getDataPtr();
-            }, signal);
-            
+            const std::size_t signalSize = std::visit(
+                [](auto const& s) { return s.getDataSize(); }, signal
+            );
+
+            void* startPtr = std::visit(
+                [](auto& s) { return (void*)s.getDataPtr(); }, signal
+            );
+
             for (unsigned char i = 0; i < signalSize; i++)
-                retPtr[retWriteIndex++] = 
+                _payloadBuffer[retWriteIndex++] =
                     ((unsigned char*)startPtr)[signalSize - 1 - i];
         }
-        
-        return retPtr;
+
+        return _payloadBuffer;
     }
 
     void setPayloadData(
-        const unsigned char* data, 
-        const std::size_t& dataLength) 
-    {
-        const unsigned char signalCount = _signals.length();
-
+        const unsigned char* data, const std::size_t& dataLength
+    ) {
         std::size_t readIndex = 0;
 
-        for (unsigned char i = 0; i < signalCount; i++) {
+        for (unsigned char i = 0; i < _signalCount; i++) {
             AnySignal_t& signal = _signals.at(i);
 
-            const std::size_t signalSize = std::visit([](auto const& s) {
-                return s.getDataSize();
-            }, signal);
+            const std::size_t signalSize = std::visit(
+                [](auto const& s) { return s.getDataSize(); }, signal
+            );
 
             if (readIndex + signalSize > dataLength)
                 return;
 
-            void* startPtr = std::visit([](auto& s) {
-                return (void*)s.getDataPtr();
-            }, signal);
+            void* startPtr = std::visit(
+                [](auto& s) { return (void*)s.getDataPtr(); }, signal
+            );
 
             unsigned char* dst = reinterpret_cast<unsigned char*>(startPtr);
 
-            for (std::size_t b = 0; b < signalSize; b++) 
+            for (std::size_t b = 0; b < signalSize; b++)
                 dst[signalSize - 1 - b] = data[readIndex++];
         }
     }
 
 private:
-    const unsigned char _payloadSize; 
-    const unsigned short _identifier;    
+    const unsigned char _payloadSize;
+    const unsigned short _identifier;
+    unsigned char _signalCount;
     Generic::Container<AnySignal_t> _signals;
+    mutable unsigned char _payloadBuffer[8] = {};
 };
 
 }
 
-#endif //__CAN_MODEL_MESSAGE_HPP__
+#endif  //__CAN_MODEL_MESSAGE_HPP__

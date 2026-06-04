@@ -1,31 +1,30 @@
 #ifndef __CAN_CONTROLLER_TRANSMITTER_HPP__
 #define __CAN_CONTROLLER_TRANSMITTER_HPP__
 
-#include "../model/cyclicMessage.hpp"
 #include "../generic/list/container.hpp"
+#include "../model/cyclicMessage.hpp"
 
-namespace Can::Controller
-{
+namespace Can::Controller {
 
-class Transmitter
-{
+class Transmitter {
 public:
-    Transmitter(void); 
+    Transmitter(void);
 
-    void addMessage(Model::Message& message) const; 
+    void addMessage(Model::Message& message) const;
     void addCyclicMessage(Model::CyclicMessage& message);
     unsigned char getMessageCount(void) const;
-    
+
     static inline void processTransmitCycle(void);
     static inline void incrementTickCount(void);
-    
+
 private:
-    static void activateTimer(void); 
-    
+    static void activateTimer(void);
+
     static inline unsigned long tickCountMs = 0;
+    static inline unsigned char _messageCount = 0;
     static inline Generic::Container<Model::CyclicMessage> _cyclicMessages;
 };
 
 }
 
-#endif //__CAN_CONTROLLER_TRANSMITTER_HPP__
+#endif  //__CAN_CONTROLLER_TRANSMITTER_HPP__

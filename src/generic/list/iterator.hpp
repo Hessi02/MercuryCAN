@@ -3,23 +3,20 @@
 
 #include "element.hpp"
 
-namespace Generic
-{
+namespace Generic {
 
 template<typename ContentType>
-class Iterator
-{
+class Iterator {
 public:
-    Iterator(Element<ContentType>* element)
-        : _currentElement(element)
-    {}
+    Iterator(Element<ContentType>* element) : _currentElement(element) {
+    }
 
     bool operator!=(const Iterator& other) const {
         return (_currentElement != other._currentElement->getNextElement());
     }
 
-    ContentType operator*(void) const { 
-        return _currentElement->getContent(); 
+    ContentType operator*(void) const {
+        return _currentElement->getContent();
     }
 
     const Iterator& operator++(void) {
@@ -33,4 +30,4 @@ private:
 
 }
 
-#endif //__GENERIC_ITERATOR_HPP__
+#endif  //__GENERIC_ITERATOR_HPP__

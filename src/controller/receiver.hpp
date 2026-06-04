@@ -3,24 +3,25 @@
 
 #include "../model/cyclicMessage.hpp"
 
-namespace Can::Controller
-{
+namespace Can::Controller {
 
-class Receiver 
-{
+class Receiver {
 public:
     Receiver(void);
 
     void addCyclicMessage(Model::CyclicMessage& message);
 
-    void processRxData(const unsigned short& identifier, 
-                       const unsigned char* data,
-                       const std::size_t& dataLength);
+    void processRxData(
+        const unsigned short& identifier,
+        const unsigned char* data,
+        const std::size_t& dataLength
+    );
 
 private:
-    static inline Generic::Container<Model::CyclicMessage> _cyclicMessages;
+    unsigned char _messageCount = 0;
+    Generic::Container<Model::CyclicMessage> _cyclicMessages;
 };
 
 }
 
-#endif //__CAN_CONTROLLER_RECEIVER_HPP__
+#endif  //__CAN_CONTROLLER_RECEIVER_HPP__

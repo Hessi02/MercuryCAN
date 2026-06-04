@@ -1,28 +1,25 @@
 #ifndef __GENERIC_ELEMENT_HPP__
 #define __GENERIC_ELEMENT_HPP__
 
-namespace Generic
-{
+namespace Generic {
 
 template<typename ContentType>
-class Element
-{
+class Element {
 public:
     Element(const ContentType& content, Element* nextElement)
-        : _content(content)
-        , _nextElement(nextElement)
-    {}
-
-    ContentType& getContent(void) { 
-        return _content; 
+        : _content(content), _nextElement(nextElement) {
     }
 
-    Element* getNextElement(void) const { 
-        return _nextElement; 
+    ContentType& getContent(void) {
+        return _content;
     }
 
-    void setNextElement(Element* nextElement) { 
-        _nextElement = nextElement; 
+    Element* getNextElement(void) const {
+        return _nextElement;
+    }
+
+    void setNextElement(Element* nextElement) {
+        _nextElement = nextElement;
     }
 
 private:
@@ -32,4 +29,4 @@ private:
 
 }
 
-#endif //__GENERIC_ELEMENT_HPP__
+#endif  //__GENERIC_ELEMENT_HPP__

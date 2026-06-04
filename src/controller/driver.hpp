@@ -3,36 +3,39 @@
 
 #include <cstdlib>
 
-namespace Can::Controller
-{
+namespace Can::Controller {
 
 class Receiver;
 
-class Driver
-{
+class Driver {
 public:
     static Driver& getInstance(void);
 
-    void transmit(const unsigned short& identifier, 
-                  const unsigned char* data,
-                  const std::size_t& payloadLength); 
+    void transmit(
+        const unsigned short& identifier,
+        const unsigned char* data,
+        const std::size_t& payloadLength
+    );
 
-    void receive(const unsigned short& identifier,
-                 const unsigned char* data,
-                 const std::size_t& payloadLength);
+    void receive(
+        const unsigned short& identifier,
+        const unsigned char* data,
+        const std::size_t& payloadLength
+    );
 
-    void addRxMessage(const unsigned short& identifier,
-                      const unsigned char& length);
+    void addRxMessage(
+        const unsigned short& identifier, const unsigned char& length
+    );
 
     void addReceiverInstance(Receiver* recv);
 
 private:
-    void initHardware(void) const; 
+    void initHardware(void) const;
     unsigned char reserveMessageObject(void);
-    void freeMessageObject(const unsigned char& index); 
-    void resetMessageObjects(void) const; 
+    void freeMessageObject(const unsigned char& index);
+    void resetMessageObjects(void) const;
 
-    Driver(void); 
+    Driver(void);
 
     Receiver* _receiver = nullptr;
 
@@ -42,4 +45,4 @@ private:
 
 }
 
-#endif //__CAN_CONTROLLER_DRIVER_HPP__
+#endif  //__CAN_CONTROLLER_DRIVER_HPP__

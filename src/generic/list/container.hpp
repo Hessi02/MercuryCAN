@@ -3,19 +3,18 @@
 
 #include <stdint.h>
 
+#include <cstdlib>
+
 #include "element.hpp"
 #include "iterator.hpp"
 
-namespace Generic
-{
+namespace Generic {
 
 template<typename ContentType>
-class Container
-{
+class Container {
 public:
-    Container(void)
-        : _headOfStack(nullptr)
-    {}
+    Container(void) : _headOfStack(nullptr) {
+    }
 
     virtual ~Container(void) {
         Element<ContentType>* nextElement = _headOfStack;
@@ -28,9 +27,9 @@ public:
     }
 
     void append(const ContentType& value) {
-        Element<ContentType>* newElement = 
+        Element<ContentType>* newElement =
             new Element<ContentType>(value, _headOfStack);
-        
+
         if (newElement)
             _headOfStack = newElement;
     }
@@ -68,14 +67,13 @@ public:
     }
 
     void insert(const ContentType content, const uint8_t& index) {
-        Element<ContentType>* newElement = 
+        Element<ContentType>* newElement =
             new Element<ContentType>(content, _headOfStack);
 
-        if (index > 0) {
+        if (index > 0)
             newElement->setNextElement(elementAt(index - 1));
-        } else {
+        else
             newElement->setNextElement(nullptr);
-        }
 
         if (!(index >= length() - 1)) {
             Element<ContentType>* elementAfter = elementAt(index);
@@ -85,12 +83,12 @@ public:
         }
     }
 
-    Iterator<ContentType> begin(void) { 
-        return Iterator(_headOfStack); 
+    Iterator<ContentType> begin(void) {
+        return Iterator(_headOfStack);
     }
 
-    Iterator<ContentType> end(void) { 
-        return Iterator(elementAt(0)); 
+    Iterator<ContentType> end(void) {
+        return Iterator(elementAt(0));
     }
 
 private:
@@ -99,9 +97,8 @@ private:
 
         Element<ContentType>* elementPointer = _headOfStack;
 
-        for (uint8_t i = 0; i < itertaionsFromTop; i++) {
+        for (uint8_t i = 0; i < itertaionsFromTop; i++)
             elementPointer = elementPointer->getNextElement();
-        }
 
         return elementPointer;
     }
@@ -111,4 +108,4 @@ private:
 
 }
 
-#endif // __GENERIC_CONTAINER_HPP__
+#endif  // __GENERIC_CONTAINER_HPP__

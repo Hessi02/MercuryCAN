@@ -1,7 +1,7 @@
 #include "driver.hpp"
 
-#include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/io.h>
 
 #include "receiver.hpp"
 
@@ -11,10 +11,10 @@ Can::Controller::Driver& Can::Controller::Driver::getInstance(void) {
 }
 
 void Can::Controller::Driver::transmit(
-    const unsigned short& identifier, 
+    const unsigned short& identifier,
     const unsigned char* data,
-    const std::size_t& payloadLength) 
-{
+    const std::size_t& payloadLength
+) {
     if (data) {
         unsigned char messageObject = reserveMessageObject();
 
@@ -31,17 +31,17 @@ void Can::Controller::Driver::transmit(
         CANIDM3 = 0x00;
         CANIDM4 = 0x00;
 
-        for (std::size_t i = 0; i < payloadLength; i++) 
+        for (std::size_t i = 0; i < payloadLength; i++)
             CANMSG = data[i];
 
         CANCDMOB |= (1 << CONMOB0) | (payloadLength & 0x0f);
 
-        while (!(CANSTMOB & (1 << TXOK)));
+        while (!(CANSTMOB & (1 << TXOK)))
+            ;
 
         CANSTMOB = 0x00;
         CANCDMOB = 0x00;
 
-        delete data;
         freeMessageObject(messageObject);
     }
 }
@@ -49,16 +49,15 @@ void Can::Controller::Driver::transmit(
 void Can::Controller::Driver::receive(
     const unsigned short& identifier,
     const unsigned char* data,
-    const std::size_t& payloadLength)
-{
+    const std::size_t& payloadLength
+) {
     if (_receiver)
         _receiver->processRxData(identifier, data, payloadLength);
 }
 
 void Can::Controller::Driver::addRxMessage(
-    const unsigned short& identifier,
-    const unsigned char& length)
-{
+    const unsigned short& identifier, const unsigned char& length
+) {
     unsigned char messageObject = reserveMessageObject();
 
     CANPAGE = (messageObject << 4);
@@ -86,18 +85,13 @@ void Can::Controller::Driver::initHardware(void) const {
     CANGCON = (1 << SWRES);
     CANGCON = (1 << ENASTB);
 
-    while (!(CANGSTA & (1 << ENFG)));
+    while (!(CANGSTA & (1 << ENFG)))
+        ;
 
     CANBT1 = 0x00;
-
-    CANBT2 = (1 << PRS1) |
-             (1 << PRS2);
-
-    CANBT3 = (1 << SMP)   |
-             (1 << PHS10) |
-             (1 << PHS11) |
-             (1 << PHS20) |
-             (1 << PHS21);
+    CANBT2 = (1 << PRS1) | (1 << PRS2);
+    CANBT3 =
+        (1 << SMP) | (1 << PHS10) | (1 << PHS11) | (1 << PHS20) | (1 << PHS21);
 
     resetMessageObjects();
 
@@ -115,7 +109,7 @@ unsigned char Can::Controller::Driver::reserveMessageObject(void) {
         }
     }
 
-    return -1;        
+    return -1;
 }
 
 void Can::Controller::Driver::freeMessageObject(const unsigned char& index) {
@@ -128,9 +122,9 @@ void Can::Controller::Driver::freeMessageObject(const unsigned char& index) {
 void Can::Controller::Driver::resetMessageObjects(void) const {
     for (uint8_t index = 0; index < _messageObjectCount; index++) {
         CANPAGE = (index << 4);
-        CANCDMOB = 0;        
-        CANSTMOB = 0;        
-        
+        CANCDMOB = 0;
+        CANSTMOB = 0;
+
         CANIDT1 = 0;
         CANIDT2 = 0;
         CANIDT3 = 0;
@@ -139,7 +133,7 @@ void Can::Controller::Driver::resetMessageObjects(void) const {
         CANIDM1 = 0;
         CANIDM2 = 0;
         CANIDM3 = 0;
-        CANIDM4 = 0; 
+        CANIDM4 = 0;
     }
 }
 
@@ -153,20 +147,21 @@ ISR(CANIT_vect) {
     CANPAGE = messageObject << 4;
 
     if (CANSTMOB & (1 << RXOK)) {
-        unsigned short identifier = ((unsigned short)CANIDT1 << 3) |
-                                    ((unsigned short)CANIDT2 >> 5);
+        unsigned short identifier =
+            ((unsigned short)CANIDT1 << 3) | ((unsigned short)CANIDT2 >> 5);
 
         unsigned char length = CANCDMOB & 0x0F;
 
         unsigned char data[8];
-        
+
         for (unsigned char i = 0; i < length; ++i)
             data[i] = CANMSG;
 
         CANSTMOB = 0x00;
         CANCDMOB = (1 << CONMOB1) | (length & 0x0F);
 
-        Can::Controller::Driver& driver = Can::Controller::Driver::getInstance();
+        Can::Controller::Driver& driver =
+            Can::Controller::Driver::getInstance();
         driver.receive(identifier, data, length);
     } else {
         CANSTMOB = 0x00;
