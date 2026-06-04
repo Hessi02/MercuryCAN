@@ -28,6 +28,7 @@ public:
     );
 
     void addReceiverInstance(Receiver* recv);
+    void activateTxTimer(void);
 
 private:
     void initHardware(void) const;
