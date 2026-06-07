@@ -2,7 +2,7 @@
 
 #include "controller/driver.hpp"
 
-void Can::Controller::Transmitter::addMessage(Model::Message& message) const {
+void Can::Controller::Transmitter::sendMessage(Model::Message& message) const {
     Driver& driver = Driver::getInstance();
 
     driver.transmit(

@@ -81,10 +81,19 @@ public:
         }
     }
 
+    void setUpdateFlag(const bool& flag) {
+        _updateFlag = flag;
+    }
+
+    bool getUpdateFlag(void) const {
+        return _updateFlag;
+    }
+
 private:
     const unsigned char _payloadSize;
     const unsigned short _identifier;
     unsigned char _signalCount;
+    bool _updateFlag = false;
     Generic::Container<AnySignal_t> _signals;
     mutable unsigned char _payloadBuffer[8] = {};
 };

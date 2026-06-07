@@ -78,7 +78,27 @@ void Can::Controller::Driver::addRxMessage(
         CANIE1 |= (1 << (messageObject - 8));
 }
 
-void Can::Controller::Driver::addReceiverInstance(Receiver* recv) {
+void Can::Controller::Driver::removeRxMessage(
+    const unsigned short& identifier
+) {
+    for (unsigned char index = 0; index < _messageObjectCount; index++) {
+        CANPAGE = (index << 4);
+
+        unsigned short id =
+            ((unsigned short)CANIDT1 << 3) | ((unsigned short)CANIDT2 >> 5);
+
+        if (identifier == id) {
+            freeMessageObject(index);
+
+            if (index < 8)
+                CANIE2 &= ~(1 << index);
+            else
+                CANIE1 &= ~(1 << (index - 8));
+        }
+    }
+}
+
+void Can::Controller::Driver::setReceiverInstance(Receiver* recv) {
     _receiver = recv;
 }
 
@@ -147,6 +167,7 @@ void Can::Controller::Driver::resetMessageObjects(void) const {
 
 Can::Controller::Driver::Driver(void) {
     initHardware();
+    activateTxTimer();
 }
 
 ISR(TIMER0_COMP_vect) {

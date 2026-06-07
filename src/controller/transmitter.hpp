@@ -8,7 +8,7 @@ namespace Can::Controller {
 
 class Transmitter {
 public:
-    void addMessage(Model::Message& message) const;
+    void sendMessage(Model::Message& message) const;
     void addCyclicMessage(Model::CyclicMessage& message);
     unsigned char getMessageCount(void) const;
 

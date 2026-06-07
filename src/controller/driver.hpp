@@ -27,7 +27,9 @@ public:
         const unsigned short& identifier, const unsigned char& length
     );
 
-    void addReceiverInstance(Receiver* recv);
+    void removeRxMessage(const unsigned short& identifier);
+
+    void setReceiverInstance(Receiver* recv);
     void activateTxTimer(void);
 
 private:

@@ -7,6 +7,8 @@ namespace Can::Controller {
 
 class Receiver {
 public:
+    void awaitMessage(Model::Message& message);
+
     void addCyclicMessage(Model::CyclicMessage& message);
 
     void processRxData(

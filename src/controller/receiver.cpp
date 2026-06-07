@@ -2,6 +2,17 @@
 
 #include "controller/driver.hpp"
 
+void Can::Controller::Receiver::awaitMessage(Model::Message& message) {
+    Driver& driver = Driver::getInstance();
+    driver.addRxMessage(message.getIdentifier(), message.getPayloadSize());
+    driver.setReceiverInstance(this);
+
+    while (!message.getUpdateFlag())
+        ;
+
+    driver.removeRxMessage(message.getIdentifier());
+}
+
 void Can::Controller::Receiver::addCyclicMessage(
     Model::CyclicMessage& message
 ) {
@@ -10,7 +21,7 @@ void Can::Controller::Receiver::addCyclicMessage(
 
     Driver& driver = Driver::getInstance();
     driver.addRxMessage(message.getIdentifier(), message.getPayloadSize());
-    driver.addReceiverInstance(this);
+    driver.setReceiverInstance(this);
 }
 
 void Can::Controller::Receiver::processRxData(
@@ -21,7 +32,9 @@ void Can::Controller::Receiver::processRxData(
     for (int i = 0; i < _messageCount; i++) {
         Can::Model::CyclicMessage& message = _cyclicMessages.at(i);
 
-        if (identifier == message.getIdentifier())
+        if (identifier == message.getIdentifier()) {
             message.setPayloadData(data, dataLength);
+            message.setUpdateFlag(true);
+        }
     }
 }
