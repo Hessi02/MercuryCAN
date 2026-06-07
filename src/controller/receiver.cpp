@@ -1,9 +1,6 @@
 #include "receiver.hpp"
 
-#include "driver.hpp"
-
-Can::Controller::Receiver::Receiver(void) {
-}
+#include "controller/driver.hpp"
 
 void Can::Controller::Receiver::addCyclicMessage(
     Model::CyclicMessage& message

@@ -1,7 +1,7 @@
 #ifndef __CAN_MODEL_CYCLIC_MESSAGE_HPP__
 #define __CAN_MODEL_CYCLIC_MESSAGE_HPP__
 
-#include "message.hpp"
+#include "model/message.hpp"
 
 namespace Can::Model {
 

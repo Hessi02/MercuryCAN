@@ -1,8 +1,8 @@
 #ifndef __CAN_MODEL_MESSAGE_HPP__
 #define __CAN_MODEL_MESSAGE_HPP__
 
-#include "../generic/list/container.hpp"
-#include "signal.hpp"
+#include "generic/list/container.hpp"
+#include "model/signal.hpp"
 
 namespace Can::Model {
 

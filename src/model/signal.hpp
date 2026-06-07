@@ -1,6 +1,7 @@
 #ifndef __CAN_MODEL_SIGNAL_HPP__
 #define __CAN_MODEL_SIGNAL_HPP__
 
+#include <type_traits>
 #include <variant>
 
 namespace Can::Model {

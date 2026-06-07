@@ -1,14 +1,12 @@
 #ifndef __CAN_CONTROLLER_RECEIVER_HPP__
 #define __CAN_CONTROLLER_RECEIVER_HPP__
 
-#include "../model/cyclicMessage.hpp"
+#include "model/cyclicMessage.hpp"
 
 namespace Can::Controller {
 
 class Receiver {
 public:
-    Receiver(void);
-
     void addCyclicMessage(Model::CyclicMessage& message);
 
     void processRxData(

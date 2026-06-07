@@ -1,11 +1,6 @@
 #include "transmitter.hpp"
 
-#include "driver.hpp"
-
-Can::Controller::Transmitter::Transmitter(void) {
-    Driver& driver = Driver::getInstance();
-    driver.activateTxTimer();
-}
+#include "controller/driver.hpp"
 
 void Can::Controller::Transmitter::addMessage(Model::Message& message) const {
     Driver& driver = Driver::getInstance();
@@ -32,7 +27,7 @@ void Can::Controller::Transmitter::processTransmitCycle(void) {
     for (unsigned char i = 0; i < _messageCount; i++) {
         Model::CyclicMessage& message = _cyclicMessages.at(i);
 
-        if (0 == tickCountMs++ % message.getCycleTime()) {
+        if (0 == _tickCountMs++ % message.getCycleTime()) {
             Driver& driver = Driver::getInstance();
 
             driver.transmit(
