@@ -1,7 +1,7 @@
 #ifndef __CAN_CONTROLLER_TRANSMITTER_HPP__
 #define __CAN_CONTROLLER_TRANSMITTER_HPP__
 
-#include "generic/list/container.hpp"
+#include "list/container.hpp"
 #include "model/cyclicMessage.hpp"
 
 namespace Can::Controller {

@@ -3,8 +3,8 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
-#include "receiver.hpp"
-#include "transmitter.hpp"
+#include "controller/receiver.hpp"
+#include "controller/transmitter.hpp"
 
 Can::Controller::Driver& Can::Controller::Driver::getInstance(void) {
     static Driver instance;
