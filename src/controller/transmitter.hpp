@@ -18,8 +18,6 @@ public:
     static void incrementTickCount(void);
 
 private:
-    static void activateTimer(void);
-
     static inline unsigned long _tickCountMs = 0;
     static inline unsigned char _messageCount = 0;
     static inline Generic::Container<Model::CyclicMessage> _cyclicMessages;

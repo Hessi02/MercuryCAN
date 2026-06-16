@@ -28,6 +28,7 @@ public:
     );
 
     void removeRxMessage(const unsigned short& identifier);
+    void activateTxTimer(void);
     void setReceiverInstance(Receiver* recv);
 
 private:
