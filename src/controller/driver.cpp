@@ -122,13 +122,6 @@ void Can::Controller::Driver::initHardware(void) const {
     sei();
 }
 
-void Can::Controller::Driver::activateTxTimer(void) {
-    TCCR0A = (1 << WGM01) | (1 << CS01) | (1 << CS00);
-    OCR0A = 249;
-    TIMSK0 = (1 << OCIE0A);
-    sei();
-}
-
 unsigned char Can::Controller::Driver::reserveMessageObject(void) {
     for (unsigned int i = 0; i < _messageObjectCount; i++) {
         if (0 == (_usedMessageObjectMask & (1 << i))) {
@@ -167,11 +160,6 @@ void Can::Controller::Driver::resetMessageObjects(void) const {
 
 Can::Controller::Driver::Driver(void) {
     initHardware();
-    activateTxTimer();
-}
-
-ISR(TIMER0_COMP_vect) {
-    Can::Controller::Transmitter::processTransmitCycle();
 }
 
 ISR(CANIT_vect) {

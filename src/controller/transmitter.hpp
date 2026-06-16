@@ -8,13 +8,18 @@ namespace Can::Controller {
 
 class Transmitter {
 public:
+    Transmitter(void);
+
     void sendMessage(Model::Message& message) const;
     void addCyclicMessage(Model::CyclicMessage& message);
     unsigned char getMessageCount(void) const;
 
     static void processTransmitCycle(void);
+    static void incrementTickCount(void);
 
 private:
+    static void activateTimer(void);
+
     static inline unsigned long _tickCountMs = 0;
     static inline unsigned char _messageCount = 0;
     static inline Generic::Container<Model::CyclicMessage> _cyclicMessages;
