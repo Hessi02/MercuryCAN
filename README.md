@@ -10,16 +10,37 @@ The library offers classes for receiving and transmitting CAN frames. The follow
 
 For transmission, variables are initialized on the stack or heap. Under no circumstances may this memory be deallocated during runtime. In combination with an identifier and timing information, these arbitrary parameters of the constructor are assembled into a cyclic message. These messages can then be assigned to the transmitter.
 
+An example initialization can be structured as follows:
+
 ```cpp
 unsigned char*  state = new unsigned char(0); 
+unsigned char*  rlCtr = new unsigned char(0);
 unsigned short* value = new unsigned short(0);
-    
-Can::Model::CyclicMessage measTxFrame (
-    0x001, 10, state, value         
+
+Can::Model::CyclicMessage stateTxFrame (
+    0x01, 
+    100,  
+    state,
+    rlCtr 
 );
 
-Can::Controller::Transmitter tx; 
+Can::Model::CyclicMessage measTxFrame (
+    0x119,
+    10,   
+    value 
+);
+
+Can::Controller::Transmitter tx;
+tx.addCyclicMessage(stateTxFrame);
 tx.addCyclicMessage(measTxFrame);
+
+BareSignal::MetaObject::connect(
+    &stateTxFrame,
+    &Message::sent,
+    [&](unsigned long long) {
+        rlCtr++;
+    }
+);
 ```
 
 ### Receiving
