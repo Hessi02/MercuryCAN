@@ -2,6 +2,7 @@
 #define __CAN_MODEL_MESSAGE_HPP__
 
 #include "list/container.hpp"
+#include "bareSignal/metaObject.hpp"
 #include "model/signal.hpp"
 
 namespace Can::Model {
@@ -9,7 +10,8 @@ namespace Can::Model {
 template<typename... SignalDataTypes>
 concept FitsIntoCanMessage = ((sizeof(SignalDataTypes) + ...) <= 8);
 
-class Message {
+class Message : public BareSignal::MetaObject
+{
 public:
     template<typename... SignalDataTypes>
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
@@ -87,6 +89,15 @@ public:
 
     bool getUpdateFlag(void) const {
         return _updateFlag;
+    }
+
+signals:
+    void sent(unsigned long tickCountMs) {
+        executeAllCallbacks(this, &Message::sent, tickCountMs);
+    }
+
+    void received(unsigned long tickCountMs) {
+        executeAllCallbacks(this, &Message::received, tickCountMs);
     }
 
 private:

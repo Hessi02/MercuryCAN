@@ -40,12 +40,16 @@ void Can::Controller::Receiver::processRxData(
     const unsigned char* data,
     const std::size_t& dataLength
 ) {
+    Driver& driver = Driver::getInstance();
+    
     for (int i = 0; i < _messageCount; i++) {
         Can::Model::CyclicMessage& message = _cyclicMessages.at(i);
 
         if (identifier == message.getIdentifier()) {
             message.setPayloadData(data, dataLength);
             message.setUpdateFlag(true);
+            
+            emit message.received(driver.getTickCountMs());
         }
     }
 }

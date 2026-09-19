@@ -18,6 +18,8 @@ void Can::Controller::Transmitter::sendMessage(Model::Message& message) const {
         message.getPayloadData(),
         message.getPayloadSize()
     );
+
+    emit message.sent(driver.getTickCountMs());
 }
 
 void Can::Controller::Transmitter::addCyclicMessage(
@@ -32,12 +34,13 @@ unsigned char Can::Controller::Transmitter::getMessageCount(void) const {
 }
 
 void Can::Controller::Transmitter::processTransmitCycle(void) {
-    _tickCountMs++;
+    Driver& driver = Driver::getInstance();
+    driver.incrementTickCountMs();
 
     for (unsigned char i = 0; i < _messageCount; i++) {
         Model::CyclicMessage& message = _cyclicMessages.at(i);
 
-        if (0 == _tickCountMs % message.getCycleTime()) {
+        if (0 == driver.getTickCountMs() % message.getCycleTime()) {
             Driver& driver = Driver::getInstance();
 
             driver.transmit(
@@ -45,12 +48,10 @@ void Can::Controller::Transmitter::processTransmitCycle(void) {
                 message.getPayloadData(),
                 message.getPayloadSize()
             );
+
+            emit message.sent(driver.getTickCountMs());
         }
     }
-}
-
-unsigned long Can::Controller::Transmitter::getTickCount(void) {
-    return _tickCountMs;
 }
 
 ISR(TIMER0_COMP_vect) {

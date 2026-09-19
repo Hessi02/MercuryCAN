@@ -13,12 +13,9 @@ public:
     void sendMessage(Model::Message& message) const;
     void addCyclicMessage(Model::CyclicMessage& message);
     unsigned char getMessageCount(void) const;
-
     static void processTransmitCycle(void);
-    static unsigned long getTickCount(void);
 
 private:
-    static inline unsigned long _tickCountMs = 0;
     static inline unsigned char _messageCount = 0;
     static inline Generic::Container<Model::CyclicMessage> _cyclicMessages;
 };

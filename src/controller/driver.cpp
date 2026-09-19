@@ -102,6 +102,14 @@ void Can::Controller::Driver::setReceiverInstance(Receiver* recv) {
     _receiver = recv;
 }
 
+unsigned long long Can::Controller::Driver::getTickCountMs(void) const {
+    return _tickCountMs;
+}
+
+void Can::Controller::Driver::incrementTickCountMs(void) {
+    _tickCountMs++;
+}
+
 void Can::Controller::Driver::initHardware(void) const {
     CANGCON = (1 << SWRES);
     CANGCON = (1 << ENASTB);

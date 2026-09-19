@@ -34,6 +34,30 @@ public:
             _headOfStack = newElement;
     }
 
+    void push_back(const ContentType& value) {
+        append(value);
+    }
+
+    void remove(const ContentType& value) {
+        Element<ContentType>* previousElement = nullptr;
+        Element<ContentType>* currentElement = _headOfStack;
+
+        while (currentElement) {
+            if (currentElement->getContent() == value) {
+                if (previousElement)
+                    previousElement->setNextElement(currentElement->getNextElement());
+                else
+                    _headOfStack = currentElement->getNextElement();
+
+                delete currentElement;
+                return;
+            }
+
+            previousElement = currentElement;
+            currentElement = currentElement->getNextElement();
+        }
+    }
+
     std::size_t size(void) {
         return sizeof(*this);
     }
