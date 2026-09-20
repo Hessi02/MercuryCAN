@@ -2,6 +2,54 @@
 
 An easy-to-use C++23 CAN library optimized for the AT90CAN128 microcontroller.
 
+## Build
+
+The library uses CMake as its build system. To use this library just clone it and include it to your CMakeLists.txt as follows:
+
+```cmake
+cmake_minimum_required(VERSION 3.10)
+
+project(MyProject LANGUAGES C CXX)
+
+set(CMAKE_C_COMPILER avr-gcc)
+set(CMAKE_CXX_COMPILER avr-g++)
+set(CMAKE_SYSTEM_NAME Generic)
+
+set(CMAKE_C_STANDARD 23)
+set(CMAKE_CXX_STANDARD 23)
+
+set(MCU at90can128)
+set(F_CPU 16000000UL)
+set(BAUD 115200)
+
+add_subdirectory(lib/MercuryCAN)
+
+add_executable(MyTarget
+    src/main.cpp
+)
+
+target_compile_options(MyTarget PRIVATE
+    -mmcu=${MCU}
+    -Ofast
+    -Wall
+    -fno-threadsafe-statics
+)
+
+target_compile_definitions(MyTarget PRIVATE
+    F_CPU=${F_CPU}
+    BAUD=${BAUD}
+)
+
+target_include_directories(MyTarget PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/MercuryCAN/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/MercuryCAN/lib
+)
+
+target_link_libraries(MyTarget PRIVATE
+    MercuryCAN
+)
+```
+
 ## Usage
 
 The library offers classes for receiving and transmitting CAN frames. The following examples show the general use of these classes. Both classes can be used independently of one another. Nevertheless, only one instance of each respective class should exist.
