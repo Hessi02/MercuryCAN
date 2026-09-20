@@ -45,13 +45,18 @@ public:
                 [](auto const& s) { return s.getDataSize(); }, signal
             );
 
-            void* startPtr = std::visit(
-                [](auto& s) { return (void*)s.getDataPtr(); }, signal
+            const volatile unsigned char* startPtr = std::visit(
+                [](auto const& s) -> const volatile unsigned char* {
+                    return reinterpret_cast<const volatile unsigned char*>(
+                        s.getDataPtr()
+                    );
+                },
+                signal
             );
 
             for (unsigned char i = 0; i < signalSize; i++)
                 _payloadBuffer[retWriteIndex++] =
-                    ((unsigned char*)startPtr)[signalSize - 1 - i];
+                    startPtr[signalSize - 1 - i];
         }
 
         return _payloadBuffer;
@@ -72,14 +77,17 @@ public:
             if (readIndex + signalSize > dataLength)
                 return;
 
-            void* startPtr = std::visit(
-                [](auto& s) { return (void*)s.getDataPtr(); }, signal
+            volatile unsigned char* startPtr = std::visit(
+                [](auto& s) -> volatile unsigned char* {
+                    return reinterpret_cast<volatile unsigned char*>(
+                        s.getDataPtr()
+                    );
+                },
+                signal
             );
 
-            unsigned char* dst = reinterpret_cast<unsigned char*>(startPtr);
-
             for (std::size_t b = 0; b < signalSize; b++)
-                dst[signalSize - 1 - b] = data[readIndex++];
+                startPtr[signalSize - 1 - b] = data[readIndex++];
         }
     }
 
@@ -92,6 +100,10 @@ public:
     }
 
 signals:
+    void preSend(unsigned long tickCountMs) {
+        executeAllCallbacks(this, &Message::preSend, tickCountMs);
+    }    
+
     void sent(unsigned long tickCountMs) {
         executeAllCallbacks(this, &Message::sent, tickCountMs);
     }

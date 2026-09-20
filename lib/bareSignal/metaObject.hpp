@@ -42,7 +42,7 @@ public:
              class SenderBase,
              class... ParamPack>
     requires isDerived<SenderBase, Sender>
-    static void connect(const Sender* sender,
+    static void connect(Sender* sender,
                         void(SenderBase::*signal)(ParamPack...),
                         void(*callback)(ParamPack...)
     ) {
@@ -63,21 +63,22 @@ public:
              class... ParamPack>
     requires isDerived<SenderBase, Sender> &&
              isDerived<ReceiverBase, Receiver>
-    static void disconnect(const Sender* sender,
+    static void disconnect(Sender* sender,
                            void(SenderBase::*signal)(ParamPack...),
-                           const Receiver* receiver,
+                           Receiver* receiver,
                            void(ReceiverBase::*callback)(ParamPack...)
     ) {
-        auto& connections = _connections<ParamPack...>;
+        Generic::Container<Connection<ParamPack...>*>& connections = _connections<ParamPack...>;
 
-        for (uint8_t i = 0; i < connections.length(); i++) {
+        for (unsigned char i = 0; i < connections.length(); i++) {
             Connection<ParamPack...>* connection = connections.at(i);
 
             if (connection &&
                 connection->isSender(static_cast<const MetaObject*>(sender)) &&
                 connection->isReceiver(static_cast<const MetaObject*>(receiver)) &&
                 connection->isSignal(static_cast<Connection<ParamPack...>::Signal_t>(signal)) &&
-                connection->isCallback(static_cast<Connection<ParamPack...>::Callback_t>(callback))) {
+                connection->isCallback(static_cast<Connection<ParamPack...>::Callback_t>(callback))) 
+            {
                 delete connection;
                 connections.remove(connection);
                 return;
@@ -89,19 +90,20 @@ public:
              class SenderBase,
              class... ParamPack>
     requires isDerived<SenderBase, Sender>
-    static void disconnect(const Sender* sender,
+    static void disconnect(Sender* sender,
                            void(SenderBase::*signal)(ParamPack...),
                            void(*callback)(ParamPack...)
     ) {
-        auto& connections = _connections<ParamPack...>;
+        Generic::Container<Connection<ParamPack...>*>& connections = _connections<ParamPack...>;
 
-        for (uint8_t i = 0; i < connections.length(); i++) {
+        for (unsigned char i = 0; i < connections.length(); i++) {
             Connection<ParamPack...>* connection = connections.at(i);
 
             if (connection &&
                 connection->isSender(static_cast<const MetaObject*>(sender)) &&
                 connection->isSignal(static_cast<Connection<ParamPack...>::Signal_t>(signal)) &&
-                connection->isCallback(callback)) {
+                connection->isCallback(callback)) 
+            {
                 delete connection;
                 connections.remove(connection);
                 return;

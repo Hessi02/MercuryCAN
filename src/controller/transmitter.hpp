@@ -17,7 +17,7 @@ public:
 
 private:
     static inline unsigned char _messageCount = 0;
-    static inline Generic::Container<Model::CyclicMessage> _cyclicMessages;
+    static inline Generic::Container<Model::CyclicMessage*> _cyclicMessages;
 };
 
 }

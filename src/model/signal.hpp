@@ -24,7 +24,8 @@ struct InVariant {};
 
 template<typename TypeToCheck, typename... AllowedDataTypes>
 struct InVariant<TypeToCheck, std::variant<AllowedDataTypes...>>
-    : std::disjunction<std::is_same<TypeToCheck, AllowedDataTypes>...> {};
+    : std::disjunction<
+          std::is_same<std::remove_cv_t<TypeToCheck>, AllowedDataTypes>...> {};
 
 template<typename SignalDataType>
 concept AllowedSignalDataType =
@@ -57,7 +58,7 @@ struct MakeSignalVariant {
 
 template<typename... DataType>
 struct MakeSignalVariant<std::variant<DataType...>> {
-    using AnyType = std::variant<Signal<DataType>...>;
+    using AnyType = std::variant<Signal<DataType>..., Signal<volatile DataType>...>;
 };
 
 using AnySignal_t = MakeSignalVariant<AllowedSignalTypes_t>::AnyType;

@@ -30,8 +30,8 @@ public:
                Receiver* receiver,
                void(ReceiverBase::*callback)(ParamPack...)
     ) : _sender(sender),
-        _signal(static_cast<Signal_t>(signal)),
         _receiver(receiver),
+        _signal(static_cast<Signal_t>(signal)),
         _callback(static_cast<Callback_t>(callback)),
         _staticCallback(nullptr)
     {}
@@ -43,8 +43,8 @@ public:
                void(SenderBase::*signal)(ParamPack...),
                StaticCallback_t callback
     ) : _sender(sender),
-        _signal(static_cast<Signal_t>(signal)),
         _receiver(nullptr),
+        _signal(static_cast<Signal_t>(signal)),
         _callback(nullptr),
         _staticCallback(callback)
     {}

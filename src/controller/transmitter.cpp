@@ -25,7 +25,7 @@ void Can::Controller::Transmitter::sendMessage(Model::Message& message) const {
 void Can::Controller::Transmitter::addCyclicMessage(
     Model::CyclicMessage& message
 ) {
-    _cyclicMessages.append(message);
+    _cyclicMessages.append(&message);
     _messageCount++;
 }
 
@@ -37,11 +37,13 @@ void Can::Controller::Transmitter::processTransmitCycle(void) {
     Driver& driver = Driver::getInstance();
     driver.incrementTickCountMs();
 
-    for (unsigned char i = 0; i < _messageCount; i++) {
-        Model::CyclicMessage& message = _cyclicMessages.at(i);
+    const unsigned long long tickCountMs = driver.getTickCountMs();
 
-        if (0 == driver.getTickCountMs() % message.getCycleTime()) {
-            Driver& driver = Driver::getInstance();
+    for (unsigned char i = 0; i < _messageCount; i++) {
+        Model::CyclicMessage& message = *_cyclicMessages.at(i);
+
+        if (0 == tickCountMs % message.getCycleTime()) {
+            emit message.preSend(tickCountMs);
 
             driver.transmit(
                 message.getIdentifier(),
@@ -49,7 +51,7 @@ void Can::Controller::Transmitter::processTransmitCycle(void) {
                 message.getPayloadSize()
             );
 
-            emit message.sent(driver.getTickCountMs());
+            emit message.sent(tickCountMs);
         }
     }
 }
