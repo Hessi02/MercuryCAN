@@ -136,13 +136,13 @@ int main(void) {
     Can::Model::CyclicMessage peerFrame(
         0x01,
         1,
-        value
+        &value
     );
 
     Can::Model::CyclicMessage repeatedFrame(
         0x02,
         1,
-        value
+        &value
     );
     
     Can::Controller::Receiver rx;
