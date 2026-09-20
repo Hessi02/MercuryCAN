@@ -13,34 +13,69 @@ For transmission, variables are initialized on the stack or heap. Under no circu
 An example initialization can be structured as follows:
 
 ```cpp
-unsigned char*  state = new unsigned char(0); 
-unsigned char*  rlCtr = new unsigned char(0);
-unsigned short* value = new unsigned short(0);
+static volatile unsigned char systemState    = 0;
+static volatile unsigned long systemTime     = 0;
+static volatile signed short  temperature    = 0;
+static volatile unsigned char rollingCounter = 0;
 
-Can::Model::CyclicMessage stateTxFrame (
-    0x01, 
-    100,  
-    state,
-    rlCtr 
-);
+int main(void) {
 
-Can::Model::CyclicMessage measTxFrame (
-    0x119,
-    10,   
-    value 
-);
+    // BO_ 86 status: 5 Vector__XXX
+	//   SG_ systemState : 0|8@1+ (1,0) [0|10] "" Vector__XXX
+	//   SG_ systemTime : 8|32@1+ (0.001,0) [0|0] "s" Vector__XXX
+    
+    Can::Model::CyclicMessage status(
+        0x56,
+        100,
+        &systemState,
+        &systemTime
+    );
+    
+    BareSignal::MetaObject::connect(
+        &status,
+        &Can::Model::CyclicMessage::Message::preSend,
+        +[](unsigned long) {
+            auto& driver = Can::Controller::Driver::getInstance();
+            systemTime = driver.getTickCountMs();
+        }
+    );
 
-Can::Controller::Transmitter tx;
-tx.addCyclicMessage(stateTxFrame);
-tx.addCyclicMessage(measTxFrame);
+    // BO_ 256 measurement: 3 Vector__XXX
+    //   SG_ temperature : 7|16@0- (0.01,0) [-20|80] "°C" Vector__XXX
+    //   SG_ rollingCounter : 16|8@1+ (1,0) [0|0] "" Vector__XXX
+    
+    Can::Model::CyclicMessage measurement(
+        0x100,         
+        100,          
+        &temperature,
+        &rollingCounter
+    );
 
-BareSignal::MetaObject::connect(
-    &stateTxFrame,
-    &Message::sent,
-    [&](unsigned long long) {
-        rlCtr++;
-    }
-);
+    BareSignal::MetaObject::connect(
+        &measurement,
+        &Can::Model::CyclicMessage::Message::preSend,
+        +[](unsigned long) {
+            static Sensor sensor;
+            temperature = sensor.readTemperature();
+        }
+    );
+
+    BareSignal::MetaObject::connect(
+        &measurement,
+        &Can::Model::CyclicMessage::Message::sent,
+        +[](unsigned long) {
+            rollingCounter += 1;
+        }
+    );
+
+    systemState = 1;
+
+    Can::Controller::Transmitter tx; 
+    tx.addCyclicMessage(status);
+    tx.addCyclicMessage(measurement);
+        
+    while (true) {}
+}
 ```
 
 ### Receiving
@@ -48,12 +83,27 @@ BareSignal::MetaObject::connect(
 The receiving process initially proceeds analogously to the sending process. However, the timing information is derived from the CAN peer and is therefore superfluous as a parameter; consequently, it will likely be removed from the signature. Here, too, it is important that the passed memory region is not deallocated.
 
 ```cpp
-unsigned short* target = new unsigned short(0);
+static volatile unsigned short value = 0;
+
+int main(void) {
+    Can::Model::CyclicMessage peerFrame(
+        0x01,
+        1,
+        value
+    );
+
+    Can::Model::CyclicMessage repeatedFrame(
+        0x02,
+        1,
+        value
+    );
     
-Can::Model::CyclicMessage measRxFrame (
-    0x002, 100, target
-);
-    
-Can::Controller::Receiver rx;
-rx.addCyclicMessage(measRxFrame);
+    Can::Controller::Receiver rx;
+    rx.addCyclicMessage(peerFrame);
+
+    Can::Controller::Transmitter tx;
+    tx.addCyclicMessage(repeatedFrame);
+
+    while (true) {}
+}
 ```
