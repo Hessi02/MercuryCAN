@@ -20,7 +20,6 @@ set(CMAKE_CXX_STANDARD 23)
 
 set(MCU at90can128)
 set(F_CPU 16000000UL)
-set(BAUD 115200)
 
 add_subdirectory(lib/MercuryCAN)
 
