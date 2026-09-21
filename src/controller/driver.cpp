@@ -16,35 +16,35 @@ void Can::Controller::Driver::transmit(
     const unsigned char* data,
     const std::size_t& payloadLength
 ) {
-    if (data) {
-        unsigned char messageObject = reserveMessageObject();
+    if (!data) 
+        return;
 
-        if (0 > messageObject)
-            return;
+    unsigned char messageObject = reserveMessageObject();
 
-        CANPAGE = (messageObject << 4) & 0xff;
+    if (0 > messageObject)
+        return;
 
-        CANIDT1 = (unsigned char)(identifier >> 3);
-        CANIDT2 = (unsigned char)((identifier & 0x07) << 5);
+    CANPAGE = (messageObject << 4) & 0xff;
 
-        CANIDM1 = 0x00;
-        CANIDM2 = 0x00;
-        CANIDM3 = 0x00;
-        CANIDM4 = 0x00;
+    CANIDT1 = (unsigned char)(identifier >> 3);
+    CANIDT2 = (unsigned char)((identifier & 0x07) << 5);
 
-        for (std::size_t i = 0; i < payloadLength; i++)
-            CANMSG = data[i];
+    CANIDM1 = 0x00;
+    CANIDM2 = 0x00;
+    CANIDM3 = 0x00;
+    CANIDM4 = 0x00;
 
-        CANCDMOB = (1 << CONMOB0) | (payloadLength & 0x0f);
+    for (std::size_t i = 0; i < payloadLength; i++)
+        CANMSG = data[i];
 
-        while (!(CANSTMOB & (1 << TXOK)))
-            ;
+    CANCDMOB = (1 << CONMOB0) | (payloadLength & 0x0f);
 
-        CANSTMOB = 0x00;
-        CANCDMOB = 0x00;
+    while (!(CANSTMOB & (1 << TXOK)));
 
-        freeMessageObject(messageObject);
-    }
+    CANSTMOB = 0x00;
+    CANCDMOB = 0x00;
+
+    freeMessageObject(messageObject);
 }
 
 void Can::Controller::Driver::receive(
