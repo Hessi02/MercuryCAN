@@ -7,7 +7,10 @@ namespace Can::Controller {
 
 class Receiver {
 public:
-    bool awaitMessage(Model::Message& message, const unsigned int& timeoutMs = 0);
+    bool awaitMessage(
+        Model::Message& message, 
+        const unsigned int& timeoutMs = 0
+    );
 
     void addCyclicMessage(Model::CyclicMessage& message);
 
