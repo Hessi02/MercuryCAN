@@ -121,7 +121,8 @@ int main(void) {
     tx.addCyclicMessage(status);
     tx.addCyclicMessage(measurement);
         
-    while (true) {}
+    auto& driver = Can::Controller::Driver::getInstance();
+    driver.enterIdleSleep();
 }
 ```
 
@@ -151,6 +152,7 @@ int main(void) {
     Can::Controller::Transmitter tx;
     tx.addCyclicMessage(repeatedFrame);
 
-    while (true) {}
+    auto& driver = Can::Controller::Driver::getInstance();
+    driver.enterIdleSleep();
 }
 ```

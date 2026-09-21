@@ -2,6 +2,7 @@
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include <avr/sleep.h>
 
 #include "controller/receiver.hpp"
 #include "controller/transmitter.hpp"
@@ -76,6 +77,17 @@ void Can::Controller::Driver::addRxMessage(
         CANIE2 |= (1 << messageObject);
     else
         CANIE1 |= (1 << (messageObject - 8));
+}
+
+__attribute__((noreturn))
+void Can::Controller::Driver::enterIdleSleep(void) const {
+    set_sleep_mode(SLEEP_MODE_IDLE);
+
+    while (true) {
+        sleep_enable();
+        sleep_cpu();
+        sleep_disable();
+    }
 }
 
 void Can::Controller::Driver::removeRxMessage(

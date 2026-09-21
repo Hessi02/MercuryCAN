@@ -7,7 +7,8 @@ namespace Can::Controller {
 
 class Receiver;
 
-class Driver {
+class Driver 
+{
 public:
     static Driver& getInstance(void);
 
@@ -24,8 +25,11 @@ public:
     );
 
     void addRxMessage(
-        const unsigned short& identifier, const unsigned char& length
+        const unsigned short& identifier, 
+        const unsigned char& length
     );
+
+    void enterIdleSleep(void) const;
 
     void removeRxMessage(const unsigned short& identifier);
     void activateTxTimer(void);
