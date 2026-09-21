@@ -34,7 +34,7 @@ public:
     void removeRxMessage(const unsigned short& identifier);
     void activateTxTimer(void);
     void setReceiverInstance(Receiver* recv);
-    unsigned long long getTickCountMs(void) const;
+    unsigned long getTickCountMs(void) const;
     void incrementTickCountMs(void);
 
 private:
@@ -47,7 +47,7 @@ private:
 
     Receiver* _receiver = nullptr;
 
-    unsigned long long _tickCountMs = 0;
+    unsigned long _tickCountMs = 0;
     static inline constexpr unsigned char _messageObjectCount = 15;
     static inline unsigned short _usedMessageObjectMask = 0;
 };

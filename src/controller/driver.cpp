@@ -114,7 +114,7 @@ void Can::Controller::Driver::setReceiverInstance(Receiver* recv) {
     _receiver = recv;
 }
 
-unsigned long long Can::Controller::Driver::getTickCountMs(void) const {
+unsigned long Can::Controller::Driver::getTickCountMs(void) const {
     return _tickCountMs;
 }
 

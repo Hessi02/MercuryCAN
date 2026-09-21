@@ -37,7 +37,7 @@ void Can::Controller::Transmitter::processTransmitCycle(void) {
     Driver& driver = Driver::getInstance();
     driver.incrementTickCountMs();
 
-    const unsigned long long tickCountMs = driver.getTickCountMs();
+    const unsigned long tickCountMs = driver.getTickCountMs();
 
     for (unsigned char i = 0; i < _messageCount; i++) {
         Model::CyclicMessage& message = *_cyclicMessages.at(i);
