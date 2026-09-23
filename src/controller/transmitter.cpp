@@ -38,22 +38,33 @@ void Can::Controller::Transmitter::processTransmitCycle(void) {
     driver.incrementTickCountMs();
 
     const unsigned long tickCountMs = driver.getTickCountMs();
+    bool dueMessages[_messageCount] = {};
 
     for (unsigned char i = 0; i < _messageCount; i++) {
         Model::CyclicMessage& message = *_cyclicMessages.at(i);
 
         if (0 == tickCountMs % message.getCycleTime()) {
+            dueMessages[i] = true;
             emit message.preSend(tickCountMs);
-
-            driver.transmit(
-                message.getIdentifier(),
-                message.getPayloadData(),
-                message.getPayloadSize()
-            );
-
-            emit message.sent(tickCountMs);
         }
     }
+
+    for (unsigned char i = 0; i < _messageCount; i++) {
+        if (!dueMessages[i])
+            continue;
+
+        Model::CyclicMessage& message = *_cyclicMessages.at(i);
+
+        driver.transmit(
+            message.getIdentifier(),
+            message.getPayloadData(),
+            message.getPayloadSize()
+        );
+    }
+
+    for (unsigned char i = 0; i < _messageCount; i++) 
+        if (dueMessages[i])
+            emit _cyclicMessages.at(i)->sent(tickCountMs);
 }
 
 ISR(TIMER0_COMP_vect) {
