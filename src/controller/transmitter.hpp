@@ -16,6 +16,22 @@ public:
     static void processTransmitCycle(void);
 
 private:
+    static void processMessage(
+        const unsigned char& index,
+        const unsigned long& tickCountMs,
+        bool* dueMessages
+    );
+
+    static void transmitMessage(
+        const unsigned char& index, const bool* dueMessages
+    );
+
+    static void emitSentMessage(
+        const unsigned char& index,
+        const unsigned long& tickCountMs,
+        const bool* dueMessages
+    );
+    
     static inline unsigned char _messageCount = 0;
     static inline Generic::Container<Model::CyclicMessage*> _cyclicMessages;
 };

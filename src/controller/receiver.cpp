@@ -1,9 +1,13 @@
 #include "receiver.hpp"
 
-#include <util/delay.h>
 #include <controller/driver.hpp>
 
-bool Can::Controller::Receiver::awaitMessage(Model::Message& message, const unsigned int& timeoutMs) {
+#include <util/delay.h>
+
+bool Can::Controller::Receiver::awaitMessage(
+    Model::Message& message, 
+    const unsigned int& timeoutMs
+) {
     Driver& driver = Driver::getInstance();
     driver.addRxMessage(message.getIdentifier(), message.getPayloadSize());
     driver.setReceiverInstance(this);

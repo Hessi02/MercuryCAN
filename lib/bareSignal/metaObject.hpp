@@ -2,9 +2,9 @@
 #define __META_OBJECT_HPP__
 
 #include "../list/container.hpp"
-#include <type_traits>
-
 #include "connection.hpp"
+
+#include <type_traits>
 
 namespace BareSignal 
 {

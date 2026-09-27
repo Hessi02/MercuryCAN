@@ -1,11 +1,11 @@
 #include "driver.hpp"
 
+#include "controller/receiver.hpp"
+#include "controller/transmitter.hpp"
+
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <avr/sleep.h>
-
-#include "controller/receiver.hpp"
-#include "controller/transmitter.hpp"
 
 Can::Controller::Driver& Can::Controller::Driver::getInstance(void) {
     static Driver instance;
@@ -20,32 +20,14 @@ void Can::Controller::Driver::transmit(
     if (!data) 
         return;
 
-    unsigned char messageObject = reserveMessageObject();
+    const unsigned char messageObject = reserveMessageObject();
 
-    if (0 > messageObject)
+    if (_messageObjectCount == messageObject)
         return;
 
-    CANPAGE = (messageObject << 4) & 0xff;
-
-    CANIDT1 = (unsigned char)(identifier >> 3);
-    CANIDT2 = (unsigned char)((identifier & 0x07) << 5);
-
-    CANIDM1 = 0x00;
-    CANIDM2 = 0x00;
-    CANIDM3 = 0x00;
-    CANIDM4 = 0x00;
-
-    for (std::size_t i = 0; i < payloadLength; i++)
-        CANMSG = data[i];
-
-    CANCDMOB = (1 << CONMOB0) | (payloadLength & 0x0f);
-
-    while (!(CANSTMOB & (1 << TXOK)));
-
-    CANSTMOB = 0x00;
-    CANCDMOB = 0x00;
-
-    freeMessageObject(messageObject);
+    configureTransmitMessage(messageObject, identifier);
+    transmitPayload(data, payloadLength);
+    completeTransmission(messageObject);
 }
 
 void Can::Controller::Driver::receive(
@@ -60,12 +42,15 @@ void Can::Controller::Driver::receive(
 void Can::Controller::Driver::addRxMessage(
     const unsigned short& identifier, const unsigned char& length
 ) {
-    unsigned char messageObject = reserveMessageObject();
+    const unsigned char messageObject = reserveMessageObject();
+
+    if (_messageObjectCount == messageObject)
+        return;
 
     CANPAGE = (messageObject << 4);
 
-    CANIDT1 = (unsigned char)(identifier >> 3);
-    CANIDT2 = (unsigned char)(identifier << 5);
+    CANIDT1 = static_cast<unsigned char>(identifier >> 3);
+    CANIDT2 = static_cast<unsigned char>(identifier << 5);
 
     CANIDM1 = 0xFF;
     CANIDM2 = 0xE0;
@@ -96,8 +81,9 @@ void Can::Controller::Driver::removeRxMessage(
     for (unsigned char index = 0; index < _messageObjectCount; index++) {
         CANPAGE = (index << 4);
 
-        unsigned short id =
-            ((unsigned short)CANIDT1 << 3) | ((unsigned short)CANIDT2 >> 5);
+        const unsigned short id =
+            (static_cast<unsigned short>(CANIDT1) << 3) |
+            (static_cast<unsigned short>(CANIDT2) >> 5);
 
         if (identifier == id) {
             freeMessageObject(index);
@@ -112,6 +98,39 @@ void Can::Controller::Driver::removeRxMessage(
 
 void Can::Controller::Driver::setReceiverInstance(Receiver* recv) {
     _receiver = recv;
+}
+
+void Can::Controller::Driver::configureTransmitMessage(
+    const unsigned char& messageObject,
+    const unsigned short& identifier
+) const {
+    CANPAGE = (messageObject << 4) & 0xff;
+    CANIDT1 = static_cast<unsigned char>(identifier >> 3);
+    CANIDT2 = static_cast<unsigned char>((identifier & 0x07) << 5);
+    CANIDM1 = 0x00;
+    CANIDM2 = 0x00;
+    CANIDM3 = 0x00;
+    CANIDM4 = 0x00;
+}
+
+void Can::Controller::Driver::transmitPayload(
+    const unsigned char* data, const std::size_t& payloadLength
+) const {
+    for (std::size_t index = 0; index < payloadLength; index++)
+        CANMSG = data[index];
+
+    CANCDMOB = (1 << CONMOB0) | (payloadLength & 0x0f);
+}
+
+void Can::Controller::Driver::completeTransmission(
+    const unsigned char& messageObject
+) {
+    while (!(CANSTMOB & (1 << TXOK)))
+        ;
+
+    CANSTMOB = 0x00;
+    CANCDMOB = 0x00;
+    freeMessageObject(messageObject);
 }
 
 unsigned long Can::Controller::Driver::getTickCountMs(void) const {
@@ -157,11 +176,11 @@ unsigned char Can::Controller::Driver::reserveMessageObject(void) {
         }
     }
 
-    return -1;
+    return _messageObjectCount;
 }
 
 void Can::Controller::Driver::freeMessageObject(const unsigned char& index) {
-    if (0 > index)
+    if (_messageObjectCount <= index)
         return;
 
     _usedMessageObjectMask &= ~(1 << index);
@@ -195,8 +214,9 @@ ISR(CANIT_vect) {
     CANPAGE = messageObject << 4;
 
     if (CANSTMOB & (1 << RXOK)) {
-        unsigned short identifier =
-            ((unsigned short)CANIDT1 << 3) | ((unsigned short)CANIDT2 >> 5);
+        const unsigned short identifier =
+            (static_cast<unsigned short>(CANIDT1) << 3) |
+            (static_cast<unsigned short>(CANIDT2) >> 5);
 
         unsigned char length = CANCDMOB & 0x0F;
 

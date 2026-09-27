@@ -38,6 +38,14 @@ public:
     void incrementTickCountMs(void);
 
 private:
+    void configureTransmitMessage(
+        const unsigned char& messageObject,
+        const unsigned short& identifier
+    ) const;
+    void transmitPayload(
+        const unsigned char* data, const std::size_t& payloadLength
+    ) const;
+    void completeTransmission(const unsigned char& messageObject);
     void initHardware(void) const;
     unsigned char reserveMessageObject(void);
     void freeMessageObject(const unsigned char& index);

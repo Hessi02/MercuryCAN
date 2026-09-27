@@ -43,25 +43,7 @@ public:
 
         while (currentElement) {
             Element<ContentType>* nextElement = currentElement->getNextElement();
-            Element<ContentType>* previousElement = nullptr;
-            Element<ContentType>* insertionPoint = sortedElements;
-
-            while (insertionPoint &&
-                   !comparator(
-                       insertionPoint->getContent(),
-                       currentElement->getContent()
-                   )) {
-                previousElement = insertionPoint;
-                insertionPoint = insertionPoint->getNextElement();
-            }
-
-            currentElement->setNextElement(insertionPoint);
-
-            if (previousElement)
-                previousElement->setNextElement(currentElement);
-            else
-                sortedElements = currentElement;
-
+            insertSorted(currentElement, sortedElements, comparator);
             currentElement = nextElement;
         }
 
@@ -146,6 +128,27 @@ public:
     }
 
 private:
+    void insertSorted(
+        Element<ContentType>* element,
+        Element<ContentType>*& sortedElements,
+        bool (*comparator)(const ContentType&, const ContentType&)
+    ) {
+        Element<ContentType>* previousElement = nullptr;
+        Element<ContentType>* insertionPoint = sortedElements;
+
+        while (insertionPoint &&
+               !comparator(insertionPoint->getContent(), element->getContent())) {
+            previousElement = insertionPoint;
+            insertionPoint = insertionPoint->getNextElement();
+        }
+
+        element->setNextElement(insertionPoint);
+        if (previousElement)
+            previousElement->setNextElement(element);
+        else
+            sortedElements = element;
+    }
+
     Element<ContentType>* elementAt(const uint8_t& index) const {
         const uint8_t itertaionsFromTop = length() - index - 1;
 
