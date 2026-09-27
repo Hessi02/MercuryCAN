@@ -26,6 +26,14 @@ void Can::Controller::Transmitter::addCyclicMessage(
     Model::CyclicMessage& message
 ) {
     _cyclicMessages.append(&message);
+
+    _cyclicMessages.sort(
+        [](Model::CyclicMessage* const& left,
+           Model::CyclicMessage* const& right) {
+            return left->getIdentifier() < right->getIdentifier();
+        }
+    );
+
     _messageCount++;
 }
 

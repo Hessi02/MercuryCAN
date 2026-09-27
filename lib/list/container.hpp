@@ -2,7 +2,6 @@
 #define __GENERIC_CONTAINER_HPP__
 
 #include <stdint.h>
-
 #include <cstdlib>
 
 #include "element.hpp"
@@ -36,6 +35,37 @@ public:
 
     void push_back(const ContentType& value) {
         append(value);
+    }
+
+    void sort(bool (*comparator)(const ContentType&, const ContentType&)) {
+        Element<ContentType>* sortedElements = nullptr;
+        Element<ContentType>* currentElement = _headOfStack;
+
+        while (currentElement) {
+            Element<ContentType>* nextElement = currentElement->getNextElement();
+            Element<ContentType>* previousElement = nullptr;
+            Element<ContentType>* insertionPoint = sortedElements;
+
+            while (insertionPoint &&
+                   !comparator(
+                       insertionPoint->getContent(),
+                       currentElement->getContent()
+                   )) {
+                previousElement = insertionPoint;
+                insertionPoint = insertionPoint->getNextElement();
+            }
+
+            currentElement->setNextElement(insertionPoint);
+
+            if (previousElement)
+                previousElement->setNextElement(currentElement);
+            else
+                sortedElements = currentElement;
+
+            currentElement = nextElement;
+        }
+
+        _headOfStack = sortedElements;
     }
 
     void remove(const ContentType& value) {
