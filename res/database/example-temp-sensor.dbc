@@ -34,11 +34,10 @@ NS_ :
 BS_:
 
 
-BU_: ACS VCU ACU
+BU_: 
 
 
-
-BO_ 256 measurement: 3 ACS
+BO_ 256 measurement: 3 Vector__XXX
 	SG_ temperature : 7|16@0- (0.01,0) [-20|80] "°C" Vector__XXX
 	SG_ rollingCounter : 16|8@1+ (1,0) [0|0] "" Vector__XXX
 
@@ -46,26 +45,13 @@ BO_ 86 status: 5 Vector__XXX
 	SG_ systemState : 0|8@1+ (1,0) [0|10] "" Vector__XXX
 	SG_ systemTime : 8|32@1+ (0.001,0) [0|0] "s" Vector__XXX
 
-
-
-
-
 CM_ BO_ 256 "Ambient temperature measurement";
 CM_ SG_ 256 temperature "Ambient temperature";
+CM_ SG_ 256 rollingCounter "Self incrementing counter";
 CM_ BO_ 86 "Temperature sensor state";
 CM_ SG_ 86 systemState "Internal system state";
 CM_ SG_ 86 systemTime "Driver tick count";
 
-
-
-
-
-
-
-
-
-
-VAL_ 256 rollingCounter 0 "UNDEFINED" 1 "SYSTEM_INITIALISATION" 2 "NORMAL_MODE" 3 "YELLOW_ERROR" 4 "RED_ERROR" 5 "SYSTEM_SLEEP" ;
 BA_DEF_ BO_  "VFrameFormat" ENUM  "StandardCAN","ExtendedCAN","reserved","J1939PG";
 BA_DEF_  "DatabaseVersion" STRING ;
 BA_DEF_  "BusType" STRING ;
@@ -77,6 +63,3 @@ BA_DEF_DEF_  "ProtocolType" "";
 BA_ "DatabaseVersion" "1.0.0";
 BA_ "BusType" "CAN";
 BA_ "ProtocolType" "";
-
-SIG_VALTYPE_ 128 FrontPressure : 1;
-SIG_VALTYPE_ 128 RearPressure : 1;
