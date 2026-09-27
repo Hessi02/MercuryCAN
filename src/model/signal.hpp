@@ -1,6 +1,6 @@
 /**
  * \file    signal.hpp
- * \brief   Contains header-only implementation for a can signal model class.
+ * \brief   Contains header-only implementation for a CAN Signal model class.
  * 
  * The file contains the 'Signal' class, which can hold various data types. 
  * To this end, various static checks and abstractions are applied, ultimately 
