@@ -1,6 +1,6 @@
 /**
  * \file    signal.hpp
- * \brief   Contains header-only implementation for a CAN Signal model class.
+ * \brief   Contains an header-only implementation for a CAN Signal model class.
  * 
  * The file contains the 'Signal' class, which can hold various data types. 
  * To this end, various static checks and abstractions are applied, ultimately 
@@ -328,8 +328,7 @@ using AnySignal_t = MakeSignalVariant<AllowedSignalTypes_t>::AnyType;
  * \see     Signal
  */
 template<typename SignalDataType>
-concept AllowedSignal =
-    InVariant<SignalDataType, AnySignal_t>::value;
+concept AllowedSignal = InVariant<SignalDataType, AnySignal_t>::value;
 }
 
 #endif  //__CAN_MODEL_SIGNAL_HPP__
