@@ -49,8 +49,8 @@ typedef std::variant<
     unsigned int,
     unsigned long,
     float,
-    double>
-    AllowedSignalTypes_t;
+    double
+> AllowedSignalTypes_t;
 
 
 /**
@@ -156,7 +156,8 @@ concept AllowedSignalDataType =
  */
 template<typename SignalDataType>
     requires AllowedSignalDataType<SignalDataType>
-class Signal {
+class Signal 
+{
 public:
 
     /**
