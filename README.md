@@ -60,12 +60,12 @@ For small, short-running tasks, a synchronous callback can be linked to a so-cal
 The following example shows a complete initialization for a temperature sensor:
 
 ```cpp
-static volatile unsigned char systemState    = 0;
-static volatile unsigned long systemTime     = 0;
-static volatile signed short  temperature    = 0;
-static volatile unsigned char rollingCounter = 0;
-
 int main(void) {
+	volatile unsigned char systemState    = 0;
+	volatile unsigned long systemTime     = 0;
+	volatile signed short  temperature    = 0;
+	volatile unsigned char rollingCounter = 0;
+
     // BO_ 86 status: 5 Vector__XXX
 	//   SG_ systemState : 0|8@1+ (1,0) [0|10] "" Vector__XXX
 	//   SG_ systemTime : 8|32@1+ (0.001,0) [0|0] "s" Vector__XXX
