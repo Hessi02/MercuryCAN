@@ -8,9 +8,56 @@ The library offers classes for receiving and transmitting CAN frames. The follow
 
 ### Transmitting
 
-For transmission, variables are initialized on the stack or heap. Under no circumstances may this memory be deallocated during runtime. In combination with an identifier and timing information, these arbitrary parameters of the constructor are assembled into a cyclic message. These messages can then be assigned to the transmitter.
+For transmission, variables are initialized on the stack or heap. Under no circumstances may this memory be deallocated during usage. By passing an identifier and one ore multiple signal data variables, a single-shot message can be constructed:
 
-An example initialization can be structured as follows:
+```cpp
+void sendXAxisData(volatile long xAcc, volatile long yAcc) {
+    // BO_ 16 accelerations: 8 Vector__XXX
+	//   SG_ xAcc:  0|32@1- (1,0) [0|32000] "mg" Vector__XXX
+	//   SG_ yAcc: 32|32@1- (1,0) [0|32000] "mg" Vector__XXX
+
+    Can::Model::Message accelerations(
+        0x10,
+        &xAcc,
+        &yAcc
+    );
+
+    static Can::Controller::Transmitter tx; 
+    tx.sendMessage(accelerations);
+}
+```
+
+In combination with an additional timing information, these arbitrary parameters of the constructor are assembled into a cyclic message. These messages can then be assigned to the transmitter. The following  example shows an 100 Hz message transmission:
+
+```cpp
+int main(void) {
+    volatile double voltage = 0.0;
+    volatile double current = 0.0;
+
+    // BO_ 18 powerMeasures: 8 Vector__XXX
+	//   SG_ voltage:  0|32@1- (1,0) [0|80] "V" Vector__XXX
+	//   SG_ current: 32|32@1- (1,0) [0|10] "A" Vector__XXX
+    
+    Can::Model::CyclicMessage powerMeasures{
+        0x12,
+        10,
+        &voltage,
+        &current
+    };
+
+    Can::Controller::Transmitter tx;
+    tx.addCyclicMessage(powerMeasures);
+
+    while (true) {
+        voltage = measureVoltage();
+        current = measureCurrent();
+    }
+}
+```
+
+For small, short-running tasks, a synchronous callback can be linked to a so-called signal.
+
+The following example shows a complete initialization for a temperature sensor:
 
 ```cpp
 static volatile unsigned char systemState    = 0;
@@ -19,7 +66,6 @@ static volatile signed short  temperature    = 0;
 static volatile unsigned char rollingCounter = 0;
 
 int main(void) {
-
     // BO_ 86 status: 5 Vector__XXX
 	//   SG_ systemState : 0|8@1+ (1,0) [0|10] "" Vector__XXX
 	//   SG_ systemTime : 8|32@1+ (0.001,0) [0|0] "s" Vector__XXX
@@ -112,7 +158,7 @@ int main(void) {
 
 ## Prerequisites
 
-- avr-gcc 16.1.x
+- avr-gcc >14.2.x
 - avr-libstdcpp
 
 ## Build
