@@ -11,7 +11,7 @@ The library offers classes for receiving and transmitting CAN frames. The follow
 For transmission, variables are initialized on the stack or heap. Under no circumstances may this memory be deallocated during usage. By passing an identifier and one ore multiple signal data variables, a single-shot message can be constructed:
 
 ```cpp
-void sendXAxisData(volatile long xAcc, volatile long yAcc) {
+void sendAccelerationData(volatile long xAcc, volatile long yAcc) {
     // BO_ 16 accelerations: 8 Vector__XXX
 	//   SG_ xAcc:  0|32@1- (1,0) [0|32000] "mg" Vector__XXX
 	//   SG_ yAcc: 32|32@1- (1,0) [0|32000] "mg" Vector__XXX
