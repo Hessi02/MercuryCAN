@@ -1,12 +1,12 @@
-#ifndef __MERCURYCAN_SUPPORT_BARE_SIGNAL_META_OBJECT_HPP__
-#define __MERCURYCAN_SUPPORT_BARE_SIGNAL_META_OBJECT_HPP__
+#ifndef __MERCURYCAN_SUPPORT_SIGNAL_SLOT_META_OBJECT_HPP__
+#define __MERCURYCAN_SUPPORT_SIGNAL_SLOT_META_OBJECT_HPP__
 
 #include "support/list/container.hpp"
 #include "connection.hpp"
 
 #include <type_traits>
 
-namespace BareSignal 
+namespace SignalSlot
 {
 
 #define emit
@@ -136,4 +136,4 @@ private:
 
 }
 
-#endif  // __MERCURYCAN_SUPPORT_BARE_SIGNAL_META_OBJECT_HPP__
+#endif  // __MERCURYCAN_SUPPORT_SIGNAL_SLOT_META_OBJECT_HPP__

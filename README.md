@@ -101,7 +101,7 @@ int main(void) {
         &systemTime
     );
     
-    BareSignal::MetaObject::connect(
+    SignalSlot::MetaObject::connect(
         &status,
         &Can::Model::CyclicMessage::Message::preSend,
         +[](unsigned long) {
@@ -121,7 +121,7 @@ int main(void) {
         &rollingCounter
     );
 
-    BareSignal::MetaObject::connect(
+    SignalSlot::MetaObject::connect(
         &measurement,
         &Can::Model::CyclicMessage::Message::preSend,
         +[](unsigned long) {
@@ -130,7 +130,7 @@ int main(void) {
         }
     );
 
-    BareSignal::MetaObject::connect(
+    SignalSlot::MetaObject::connect(
         &measurement,
         &Can::Model::CyclicMessage::Message::sent,
         +[](unsigned long) {
@@ -212,7 +212,7 @@ bool awaitTorqueMeasurement(volatile long& torque) {
 Signals—such as those triggered upon the receipt of a frame—are also available here for callbacks. These callbacks might also be a method:
 
 ```cpp
-class TemperatureConverter : public BareSignal::MetaObject
+class TemperatureConverter : public SignalSlot::MetaObject
 {
 public:
     double temperatureC;
@@ -235,7 +235,7 @@ int main(void) {
         &conv.temperatureC
     );   
  
-    BareSignal::MetaObject::connect(
+    SignalSlot::MetaObject::connect(
         &measRxFrame,
         &Can::Model::CyclicMessage::Message::received,
         &conv,

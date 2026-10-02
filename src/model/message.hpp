@@ -17,7 +17,7 @@
 #define __MERCURYCAN_MODEL_MESSAGE_HPP__
 
 #include "support/list/container.hpp"
-#include "support/bareSignal/metaObject.hpp"
+#include "support/signalSlot/metaObject.hpp"
 #include "model/signal.hpp"
 
 namespace Can::Model {
@@ -47,7 +47,7 @@ concept FitsIntoCanMessage = ((sizeof(SignalDataTypes) + ...) <= 8);
  * \see     FitsIntoCanMessage
  * \see     Signal
  */
-class Message : public BareSignal::MetaObject
+class Message : public SignalSlot::MetaObject
 {
 public:
     /**

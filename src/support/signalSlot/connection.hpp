@@ -1,12 +1,12 @@
-#ifndef __MERCURYCAN_SUPPORT_BARE_SIGNAL_CONNECTION_HPP__
-#define __MERCURYCAN_SUPPORT_BARE_SIGNAL_CONNECTION_HPP__
+#ifndef __MERCURYCAN_SUPPORT_SIGNAL_SLOT_CONNECTION_HPP__
+#define __MERCURYCAN_SUPPORT_SIGNAL_SLOT_CONNECTION_HPP__
 
 #include <type_traits>
 
 template<class Base, class Derived>
 concept isDerived = std::is_base_of<Base, Derived>::value;
 
-namespace BareSignal 
+namespace SignalSlot
 {
 
 class MetaObject;
@@ -87,4 +87,4 @@ private:
 
 }
 
-#endif  // __MERCURYCAN_SUPPORT_BARE_SIGNAL_CONNECTION_HPP__
+#endif  // __MERCURYCAN_SUPPORT_SIGNAL_SLOT_CONNECTION_HPP__
