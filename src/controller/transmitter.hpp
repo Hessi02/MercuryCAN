@@ -11,28 +11,31 @@ public:
     Transmitter(void);
 
     void sendMessage(Model::Message& message) const;
+
     void addCyclicMessage(Model::CyclicMessage& message);
-    unsigned char getMessageCount(void) const;
+
+    uint8_t getMessageCount(void) const;
+
     static void processTransmitCycle(void);
 
 private:
     static void processMessage(
-        const unsigned char& index,
-        const unsigned long& tickCountMs,
+        const uint8_t& index,
+        const uint32_t& tickCountMs,
         bool* dueMessages
     );
 
     static void transmitMessage(
-        const unsigned char& index, const bool* dueMessages
+        const uint8_t& index, const bool* dueMessages
     );
 
     static void emitSentMessage(
-        const unsigned char& index,
-        const unsigned long& tickCountMs,
+        const uint8_t& index,
+        const uint32_t& tickCountMs,
         const bool* dueMessages
     );
     
-    static inline unsigned char _messageCount = 0;
+    static inline uint8_t _messageCount = 0;
     static inline Generic::Container<Model::CyclicMessage*> _cyclicMessages;
 };
 

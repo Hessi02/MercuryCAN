@@ -44,10 +44,12 @@ typedef std::variant<
     short,
     int,
     long,
+    long long,
     unsigned char,
     unsigned short,
     unsigned int,
     unsigned long,
+    unsigned long long,
     float,
     double
 > AllowedSignalTypes_t;

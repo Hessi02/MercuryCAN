@@ -7,21 +7,18 @@ namespace Can::Controller {
 
 class Receiver {
 public:
-    bool awaitMessage(
-        Model::Message& message, 
-        const unsigned int& timeoutMs = 0
-    );
+    void awaitMessage(Model::Message& message);
 
     void addCyclicMessage(Model::CyclicMessage& message);
 
     void processRxData(
-        const unsigned short& identifier,
-        const unsigned char* data,
+        const uint16_t& identifier,
+        const uint8_t* data,
         const std::size_t& dataLength
     );
 
 private:
-    unsigned char _messageCount = 0;
+    uint8_t _messageCount = 0;
     Generic::Container<Model::CyclicMessage> _cyclicMessages;
 };
 

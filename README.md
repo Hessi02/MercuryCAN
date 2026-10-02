@@ -5,7 +5,6 @@ An easy-to-use C++23 CAN library optimized for the AT90CAN128 microcontroller.
     <img src="res/icons/logo.png" alt="MercuryCAN" width="180">
 </p>
 
-
 ## Prerequisites
 
 Different tools are required for compiling and flashing. A different toolchain may also be used if desired; however, there is no guarantee that all components of the library will be fully functional in that case.
@@ -25,7 +24,7 @@ Different tools are required for compiling and flashing. A different toolchain m
 It includes features such as classes, containers, and other parts of the C++ standard library.
 It is designed for resource-constrained embedded systems, where memory and processing power are limited.
 
-[![GitHub](https://img.shields.io/github/last-commit/modm-io/avr-libstdcpp?logo=github&label=release)](https://github.com/modm-io/avr-libstdcpp)
+[![GitHub](https://img.shields.io/github/last-commit/modm-io/avr-libstdcpp?logo=github&label=commit)](https://github.com/modm-io/avr-libstdcpp)
 
 ## Usage
 
@@ -196,7 +195,7 @@ A single-shot message is available to the user here as well. The respective meth
 The example below shows such an implementation:
 
 ```cpp
-bool awaitTorqueMeasurement(volatile long& torque, const unsigned int& timeoutMs) {
+bool awaitTorqueMeasurement(volatile long& torque) {
     // BO_ 9 trqMeas : 4 Vector__XXX
 	//   SG_ torque : 0|32@1- (0.001,0) [0|75] "Nm" Vector__XXX
     
@@ -206,7 +205,7 @@ bool awaitTorqueMeasurement(volatile long& torque, const unsigned int& timeoutMs
     );
 
     static Receiver rx;
-    return rx.awaitMessage(trqMeas, timeoutMs);
+    return rx.awaitMessage(trqMeas);
 }
 ```
 
@@ -220,7 +219,7 @@ public:
     double temperatureF;
 
     void onTemperatureReceived(unsigned long tickCountMs) {
-        _temperatureF = _temperatureC * 9 / 5 + 32;
+        temperatureF = temperatureC * 9 / 5 + 32;
     }
 };
 

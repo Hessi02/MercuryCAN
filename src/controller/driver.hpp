@@ -2,6 +2,7 @@
 #define __CAN_CONTROLLER_DRIVER_HPP__
 
 #include <cstdlib>
+#include <stdint.h>
 
 namespace Can::Controller {
 
@@ -10,54 +11,36 @@ class Receiver;
 class Driver 
 {
 public:
-    static Driver& getInstance(void);
+    static Driver* getInstance(void);
 
-    void transmit(
-        const unsigned short& identifier,
-        const unsigned char* data,
+    virtual void transmit(
+        const uint16_t& identifier,
+        const uint8_t* data,
         const std::size_t& payloadLength
-    );
+    ) = 0;
 
-    void receive(
-        const unsigned short& identifier,
-        const unsigned char* data,
+    virtual void receive(
+        const uint16_t& identifier,
+        const uint8_t* data,
         const std::size_t& payloadLength
-    );
+    ) = 0;
 
-    void addRxMessage(
-        const unsigned short& identifier, 
-        const unsigned char& length
-    );
+    virtual void addRxMessage(
+        const uint16_t& identifier, 
+        const uint8_t& length
+    ) = 0;
 
-    void enterIdleSleep(void) const;
+    virtual void enterIdleSleep(void) const = 0;
 
-    void removeRxMessage(const unsigned short& identifier);
-    void activateTxTimer(void);
-    void setReceiverInstance(Receiver* recv);
-    unsigned long getTickCountMs(void) const;
-    void incrementTickCountMs(void);
+    virtual void removeRxMessage(const uint16_t& identifier) = 0;
 
-private:
-    void configureTransmitMessage(
-        const unsigned char& messageObject,
-        const unsigned short& identifier
-    ) const;
-    void transmitPayload(
-        const unsigned char* data, const std::size_t& payloadLength
-    ) const;
-    void completeTransmission(const unsigned char& messageObject);
-    void initHardware(void) const;
-    unsigned char reserveMessageObject(void);
-    void freeMessageObject(const unsigned char& index);
-    void resetMessageObjects(void) const;
+    virtual void activateTxTimer(void) = 0;
 
-    Driver(void);
+    virtual void setReceiverInstance(Receiver* recv) = 0;
 
-    Receiver* _receiver = nullptr;
+    virtual uint32_t getTickCountMs(void) const = 0;
 
-    unsigned long _tickCountMs = 0;
-    static inline constexpr unsigned char _messageObjectCount = 15;
-    static inline unsigned short _usedMessageObjectMask = 0;
+    virtual void incrementTickCountMs(void) = 0;
 };
 
 }

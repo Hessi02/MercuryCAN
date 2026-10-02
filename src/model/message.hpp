@@ -66,7 +66,7 @@ public:
     template<typename... SignalDataTypes>
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
                     FitsIntoCanMessage<SignalDataTypes...>
-    Message(const unsigned short identifier, SignalDataTypes*... signalPtrPack)
+    Message(const uint16_t identifier, SignalDataTypes*... signalPtrPack)
         : _payloadSize((sizeof(SignalDataTypes) + ...)),
           _identifier(identifier) {
         (_signals.append(
@@ -82,7 +82,7 @@ public:
      *
      * \return  CAN identifier supplied to the constructor.
      */
-    unsigned short getIdentifier(void) const {
+    uint16_t getIdentifier(void) const {
         return _identifier;
     }
 
@@ -105,9 +105,9 @@ public:
      * \return  Pointer to the serialized payload buffer.
      */
     unsigned char* getPayloadData(void) {
-        unsigned char retWriteIndex = 0;
+        uint8_t retWriteIndex = 0;
 
-        for (unsigned char index = 0; index < _signalCount; index++)
+        for (uint8_t index = 0; index < _signalCount; index++)
             appendSignalPayload(_signals.at(index), retWriteIndex);
 
         return _payloadBuffer;
@@ -124,11 +124,11 @@ public:
      * \param   dataLength passes the number of available payload bytes.
      */
     void setPayloadData(
-        const unsigned char* data, const std::size_t& dataLength
+        const uint8_t* data, const std::size_t& dataLength
     ) {
         std::size_t readIndex = 0;
 
-        for (unsigned char index = 0; index < _signalCount; index++) {
+        for (uint8_t index = 0; index < _signalCount; index++) {
             if (!applySignalPayload(
                     _signals.at(index), data, dataLength, readIndex
                 ))
@@ -162,7 +162,7 @@ signals:
      *
      * \param   tickCountMs passes the elapsed tick count in milliseconds.
      */
-    void preSend(unsigned long tickCountMs) {
+    void preSend(uint32_t tickCountMs) {
         executeAllCallbacks(this, &Message::preSend, tickCountMs);
     }    
 
@@ -171,7 +171,7 @@ signals:
      *
      * \param   tickCountMs passes the elapsed tick count in milliseconds.
      */
-    void sent(unsigned long tickCountMs) {
+    void sent(uint32_t tickCountMs) {
         executeAllCallbacks(this, &Message::sent, tickCountMs);
     }
 
@@ -180,7 +180,7 @@ signals:
      *
      * \param   tickCountMs passes the elapsed tick count in milliseconds.
      */
-    void received(unsigned long tickCountMs) {
+    void received(uint32_t tickCountMs) {
         executeAllCallbacks(this, &Message::received, tickCountMs);
     }
 
@@ -196,15 +196,15 @@ private:
      * \param   writeIndex passes the payload write index and updates the next.
      */
     void appendSignalPayload(
-        const AnySignal_t& signal, unsigned char& writeIndex
+        const AnySignal_t& signal, uint8_t& writeIndex
     ) const {
         const std::size_t signalSize = std::visit(
             [](auto const& value) { return value.getDataSize(); }, signal
         );
 
-        const volatile unsigned char* startPtr = std::visit(
-            [](auto const& value) -> const volatile unsigned char* {
-                return reinterpret_cast<const volatile unsigned char*>(
+        const volatile uint8_t* startPtr = std::visit(
+            [](auto const& value) -> const volatile uint8_t* {
+                return reinterpret_cast<const volatile uint8_t*>(
                     value.getDataPtr()
                 );
             }, signal
@@ -230,7 +230,7 @@ private:
      */
     bool applySignalPayload(
         AnySignal_t& signal,
-        const unsigned char* data,
+        const uint8_t* data,
         const std::size_t& dataLength,
         std::size_t& readIndex
     ) {
@@ -241,9 +241,9 @@ private:
         if (readIndex + signalSize > dataLength)
             return false;
 
-        volatile unsigned char* startPtr = std::visit(
-            [](auto& value) -> volatile unsigned char* {
-                return reinterpret_cast<volatile unsigned char*>(
+        volatile uint8_t* startPtr = std::visit(
+            [](auto& value) -> volatile uint8_t* {
+                return reinterpret_cast<volatile uint8_t*>(
                     value.getDataPtr()
                 );
             }, signal
@@ -258,17 +258,17 @@ private:
     /**
      * \brief   Total size of the message's signal data in bytes.
      */
-    const unsigned char _payloadSize;
+    const uint8_t _payloadSize;
 
     /**
      * \brief   CAN identifier associated with this message.
      */
-    const unsigned short _identifier;
+    const uint16_t _identifier;
 
     /**
      * \brief   Number of signal references stored in _signals.
      */
-    unsigned char _signalCount;
+    uint8_t _signalCount;
 
     /**
      * \brief   Explicitly managed flag indicating a message update.
@@ -285,7 +285,7 @@ private:
      *
      * The buffer has the maximum supported CAN payload capacity of eight bytes.
      */
-    mutable unsigned char _payloadBuffer[8] = {};
+    mutable uint8_t _payloadBuffer[8] = {};
 };
 
 }

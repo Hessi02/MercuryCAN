@@ -11,19 +11,19 @@ public:
         requires(AllowedSignalDataType<SignalDataTypes>, ...) &&
                     FitsIntoCanMessage<SignalDataTypes...>
     CyclicMessage(
-        const unsigned short& identifier,
-        const unsigned short& cycleTime,
+        const uint16_t& identifier,
+        const uint16_t& cycleTime,
         SignalDataTypes*... signalReferences
     )
         : Message(identifier, signalReferences...), _cycleTime(cycleTime) {
     }
 
-    unsigned short getCycleTime(void) const {
+    uint16_t getCycleTime(void) const {
         return _cycleTime;
     }
 
 private:
-    const unsigned short _cycleTime;
+    const uint16_t _cycleTime;
 };
 
 }

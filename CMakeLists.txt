@@ -7,6 +7,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 add_library(MercuryCAN
             src/controller/driver.cpp 
+            src/controller/avrDriver.cpp
             src/controller/transmitter.cpp 
             src/controller/receiver.cpp
 )
