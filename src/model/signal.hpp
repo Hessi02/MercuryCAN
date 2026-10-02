@@ -12,8 +12,8 @@
  * SPDX-License-Identifier: Apache-2.0 
  */
 
-#ifndef __CAN_MODEL_SIGNAL_HPP__
-#define __CAN_MODEL_SIGNAL_HPP__
+#ifndef __MERCURYCAN_MODEL_SIGNAL_HPP__
+#define __MERCURYCAN_MODEL_SIGNAL_HPP__
 
 #include <type_traits>
 #include <variant>
@@ -334,4 +334,4 @@ template<typename SignalDataType>
 concept AllowedSignal = InVariant<SignalDataType, AnySignal_t>::value;
 }
 
-#endif  //__CAN_MODEL_SIGNAL_HPP__
+#endif  // __MERCURYCAN_MODEL_SIGNAL_HPP__

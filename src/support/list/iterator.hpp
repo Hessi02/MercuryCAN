@@ -1,5 +1,5 @@
-#ifndef __GENERIC_ITERATOR_HPP__
-#define __GENERIC_ITERATOR_HPP__
+#ifndef __MERCURYCAN_SUPPORT_LIST_ITERATOR_HPP__
+#define __MERCURYCAN_SUPPORT_LIST_ITERATOR_HPP__
 
 #include "element.hpp"
 
@@ -30,4 +30,4 @@ private:
 
 }
 
-#endif  //__GENERIC_ITERATOR_HPP__
+#endif  // __MERCURYCAN_SUPPORT_LIST_ITERATOR_HPP__

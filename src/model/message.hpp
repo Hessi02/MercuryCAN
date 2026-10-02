@@ -13,11 +13,11 @@
  * SPDX-License-Identifier: Apache-2.0 
  */
 
-#ifndef __CAN_MODEL_MESSAGE_HPP__
-#define __CAN_MODEL_MESSAGE_HPP__
+#ifndef __MERCURYCAN_MODEL_MESSAGE_HPP__
+#define __MERCURYCAN_MODEL_MESSAGE_HPP__
 
-#include "list/container.hpp"
-#include "bareSignal/metaObject.hpp"
+#include "support/list/container.hpp"
+#include "support/bareSignal/metaObject.hpp"
 #include "model/signal.hpp"
 
 namespace Can::Model {
@@ -290,4 +290,4 @@ private:
 
 }
 
-#endif  //__CAN_MODEL_MESSAGE_HPP__
+#endif  // __MERCURYCAN_MODEL_MESSAGE_HPP__

@@ -1,5 +1,5 @@
-#ifndef __CAN_CONTROLLER_RECEIVER_HPP__
-#define __CAN_CONTROLLER_RECEIVER_HPP__
+#ifndef __MERCURYCAN_CONTROLLER_RECEIVER_HPP__
+#define __MERCURYCAN_CONTROLLER_RECEIVER_HPP__
 
 #include <model/cyclicMessage.hpp>
 
@@ -24,4 +24,4 @@ private:
 
 }
 
-#endif  //__CAN_CONTROLLER_RECEIVER_HPP__
+#endif  // __MERCURYCAN_CONTROLLER_RECEIVER_HPP__

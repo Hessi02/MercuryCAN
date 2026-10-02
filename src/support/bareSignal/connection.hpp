@@ -1,5 +1,5 @@
-#ifndef __CONNECTION_HPP__
-#define __CONNECTION_HPP__
+#ifndef __MERCURYCAN_SUPPORT_BARE_SIGNAL_CONNECTION_HPP__
+#define __MERCURYCAN_SUPPORT_BARE_SIGNAL_CONNECTION_HPP__
 
 #include <type_traits>
 
@@ -87,4 +87,4 @@ private:
 
 }
 
-#endif //__CONNECTION_HPP__
+#endif  // __MERCURYCAN_SUPPORT_BARE_SIGNAL_CONNECTION_HPP__

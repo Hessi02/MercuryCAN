@@ -1,7 +1,7 @@
-#ifndef __META_OBJECT_HPP__
-#define __META_OBJECT_HPP__
+#ifndef __MERCURYCAN_SUPPORT_BARE_SIGNAL_META_OBJECT_HPP__
+#define __MERCURYCAN_SUPPORT_BARE_SIGNAL_META_OBJECT_HPP__
 
-#include "../list/container.hpp"
+#include "support/list/container.hpp"
 #include "connection.hpp"
 
 #include <type_traits>
@@ -136,4 +136,4 @@ private:
 
 }
 
-#endif //__META_OBJECT_HPP__
+#endif  // __MERCURYCAN_SUPPORT_BARE_SIGNAL_META_OBJECT_HPP__

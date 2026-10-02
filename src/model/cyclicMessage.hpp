@@ -1,5 +1,5 @@
-#ifndef __CAN_MODEL_CYCLIC_MESSAGE_HPP__
-#define __CAN_MODEL_CYCLIC_MESSAGE_HPP__
+#ifndef __MERCURYCAN_MODEL_CYCLIC_MESSAGE_HPP__
+#define __MERCURYCAN_MODEL_CYCLIC_MESSAGE_HPP__
 
 #include "model/message.hpp"
 
@@ -28,4 +28,4 @@ private:
 
 }
 
-#endif  //__CAN_MODEL_CYCLIC_MESSAGE_HPP__
+#endif  // __MERCURYCAN_MODEL_CYCLIC_MESSAGE_HPP__

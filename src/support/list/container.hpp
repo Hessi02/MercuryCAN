@@ -1,5 +1,5 @@
-#ifndef __GENERIC_CONTAINER_HPP__
-#define __GENERIC_CONTAINER_HPP__
+#ifndef __MERCURYCAN_SUPPORT_LIST_CONTAINER_HPP__
+#define __MERCURYCAN_SUPPORT_LIST_CONTAINER_HPP__
 
 #include <stdint.h>
 #include <cstdlib>
@@ -165,4 +165,4 @@ private:
 
 }
 
-#endif  // __GENERIC_CONTAINER_HPP__
+#endif  // __MERCURYCAN_SUPPORT_LIST_CONTAINER_HPP__

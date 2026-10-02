@@ -1,5 +1,5 @@
-#ifndef __GENERIC_ELEMENT_HPP__
-#define __GENERIC_ELEMENT_HPP__
+#ifndef __MERCURYCAN_SUPPORT_LIST_ELEMENT_HPP__
+#define __MERCURYCAN_SUPPORT_LIST_ELEMENT_HPP__
 
 namespace Generic {
 
@@ -29,4 +29,4 @@ private:
 
 }
 
-#endif  //__GENERIC_ELEMENT_HPP__
+#endif  // __MERCURYCAN_SUPPORT_LIST_ELEMENT_HPP__

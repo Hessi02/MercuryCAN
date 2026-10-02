@@ -1,5 +1,5 @@
-#ifndef __CAN_CONTROLLER_DRIVER_HPP__
-#define __CAN_CONTROLLER_DRIVER_HPP__
+#ifndef __MERCURYCAN_CONTROLLER_DRIVER_HPP__
+#define __MERCURYCAN_CONTROLLER_DRIVER_HPP__
 
 #include <cstdlib>
 #include <stdint.h>
@@ -45,4 +45,4 @@ public:
 
 }
 
-#endif  //__CAN_CONTROLLER_DRIVER_HPP__
+#endif  // __MERCURYCAN_CONTROLLER_DRIVER_HPP__
