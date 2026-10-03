@@ -3,6 +3,8 @@
 #include <MercuryCAN/driver/driver.hpp>
 
 void Can::Controller::Receiver::awaitMessage(Model::Message& message) {
+    message.setUpdateFlag(false);
+    
     Driver* driver = Driver::getInstance();
     driver->addRxMessage(message.getIdentifier(), message.getPayloadSize());
     driver->setReceiverInstance(this);
