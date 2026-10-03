@@ -9,4 +9,4 @@ add_library(MercuryCAN
             src/controller/receiver.cpp
 )
 
-target_include_directories(MercuryCAN PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(MercuryCAN PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
