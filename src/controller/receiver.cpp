@@ -1,6 +1,6 @@
 #include "controller/receiver.hpp"
 
-#include <controller/driver.hpp>
+#include <driver/driver.hpp>
 
 void Can::Controller::Receiver::awaitMessage(Model::Message& message) {
     Driver* driver = Driver::getInstance();

@@ -1,6 +1,6 @@
 #include "controller/transmitter.hpp"
 
-#include "controller/driver.hpp"
+#include "driver/driver.hpp"
 
 Can::Controller::Transmitter::Transmitter(void) {
     Driver* driver = Driver::getInstance();

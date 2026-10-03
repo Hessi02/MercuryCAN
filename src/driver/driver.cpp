@@ -1,6 +1,6 @@
-#include "controller/driver.hpp"
+#include "driver/driver.hpp"
 
-#include "controller/avrDriver.hpp"
+#include "driver/avrDriver.hpp"
 
 Can::Controller::Driver* Can::Controller::Driver::getInstance(void) {
     static AvrDriver driver;
