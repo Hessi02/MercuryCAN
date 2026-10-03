@@ -1,7 +1,7 @@
 #ifndef __MERCURYCAN_CONTROLLER_MOCK_DRIVER_HPP__
 #define __MERCURYCAN_CONTROLLER_MOCK_DRIVER_HPP__
 
-#include <MercuryCAN/driver/driver.hpp>
+#include <MercuryCAN/driver/driverInterface.hpp>
 
 #include <cstdlib>
 #include <stdint.h>
@@ -10,10 +10,10 @@ namespace Can::Controller {
 
 class Receiver;
 
-class MockDriver : public Driver
+class MockDriver : public DriverInterface
 {
 public:
-    friend Driver;
+    friend DriverInterface;
 
     virtual void transmit(
         const uint16_t& identifier,

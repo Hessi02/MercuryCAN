@@ -222,7 +222,7 @@ ISR(CANIT_vect) {
         CANSTMOB = 0x00;
         CANCDMOB = (1 << CONMOB1) | (length & 0x0F);
 
-        Can::Controller::Driver* driver = Can::Controller::Driver::getInstance();
+        Can::Controller::DriverInterface* driver = Can::Controller::DriverInterface::getInstance();
         driver->receive(identifier, data, length);
     } else {
         CANSTMOB = 0x00;

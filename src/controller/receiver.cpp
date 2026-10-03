@@ -1,11 +1,11 @@
 #include <MercuryCAN/controller/receiver.hpp>
 
-#include <MercuryCAN/driver/driver.hpp>
+#include <MercuryCAN/driver/driverInterface.hpp>
 
 void Can::Controller::Receiver::awaitMessage(Model::Message& message) {
     message.setUpdateFlag(false);
     
-    Driver* driver = Driver::getInstance();
+    DriverInterface* driver = DriverInterface::getInstance();
     driver->addRxMessage(message.getIdentifier(), message.getPayloadSize());
     driver->setReceiverInstance(this);
 
@@ -20,7 +20,7 @@ void Can::Controller::Receiver::addCyclicMessage(
     _cyclicMessages.append(message);
     _messageCount++;
 
-    Driver* driver = Driver::getInstance();
+    DriverInterface* driver = DriverInterface::getInstance();
     driver->addRxMessage(message.getIdentifier(), message.getPayloadSize());
     driver->setReceiverInstance(this);
 }
@@ -30,7 +30,7 @@ void Can::Controller::Receiver::processRxData(
     const uint8_t* data,
     const std::size_t& dataLength
 ) {
-    Driver* driver = Driver::getInstance();
+    DriverInterface* driver = DriverInterface::getInstance();
 
     for (uint8_t i = 0; i < _messageCount; i++) {
         Can::Model::CyclicMessage& message = _cyclicMessages.at(i);

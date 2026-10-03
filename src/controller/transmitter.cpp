@@ -1,14 +1,14 @@
 #include <MercuryCAN/controller/transmitter.hpp>
 
-#include <MercuryCAN/driver/driver.hpp>
+#include <MercuryCAN/driver/driverInterface.hpp>
 
 Can::Controller::Transmitter::Transmitter(void) {
-    Driver* driver = Driver::getInstance();
+    DriverInterface* driver = DriverInterface::getInstance();
     driver->activateTxTimer();
 }
 
 void Can::Controller::Transmitter::sendMessage(Model::Message& message) const {
-    Driver* driver = Driver::getInstance();
+    DriverInterface* driver = DriverInterface::getInstance();
 
     driver->transmit(
         message.getIdentifier(),
@@ -39,7 +39,7 @@ uint8_t Can::Controller::Transmitter::getMessageCount(void) const {
 }
 
 void Can::Controller::Transmitter::processTransmitCycle(void) {
-    Driver* driver = Driver::getInstance();
+    DriverInterface* driver = DriverInterface::getInstance();
     driver->incrementTickCountMs();
 
     const uint32_t tickCountMs = driver->getTickCountMs();
@@ -76,7 +76,7 @@ void Can::Controller::Transmitter::transmitMessage(
     if (!dueMessages[index])
         return;
 
-    Driver* driver = Driver::getInstance();
+    DriverInterface* driver = DriverInterface::getInstance();
     Model::CyclicMessage& message = *_cyclicMessages.at(index);
     driver->transmit(
         message.getIdentifier(),
