@@ -1,5 +1,5 @@
-#ifndef __MERCURYCAN_CONTROLLER_AVR_DRIVER_HPP__
-#define __MERCURYCAN_CONTROLLER_AVR_DRIVER_HPP__
+#ifndef __MERCURYCAN_DRIVER_AVR_DRIVER_HPP__
+#define __MERCURYCAN_DRIVER_AVR_DRIVER_HPP__
 
 #include <MercuryCAN/driver/driverInterface.hpp>
 
@@ -9,6 +9,10 @@
 namespace Can::Controller {
 
 class Receiver;
+
+}
+
+namespace Can::Driver {
 
 class AvrDriver : public DriverInterface
 {
@@ -38,7 +42,7 @@ public:
     
     virtual void activateTxTimer(void) override final;
 
-    virtual void setReceiverInstance(Receiver* recv) override final;
+    virtual void setReceiverInstance(Controller::Receiver* recv) override final;
 
     virtual uint32_t getTickCountMs(void) const override final;
 
@@ -66,7 +70,7 @@ private:
 
     AvrDriver(void);
 
-    Receiver* _receiver = nullptr;
+    Controller::Receiver* _receiver = nullptr;
 
     uint32_t _tickCountMs = 0;
     static inline constexpr uint8_t _messageObjectCount = 15;
@@ -75,4 +79,4 @@ private:
 
 }
 
-#endif  // __MERCURYCAN_CONTROLLER_AVR_DRIVER_HPP__
+#endif  //__MERCURYCAN_DRIVER_AVR_DRIVER_HPP__

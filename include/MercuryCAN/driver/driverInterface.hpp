@@ -12,8 +12,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef __MERCURYCAN_CONTROLLER_DRIVER_INTERFACE_HPP__
-#define __MERCURYCAN_CONTROLLER_DRIVER_INTERFACE_HPP__
+#ifndef __MERCURYCAN_DRIVER_INTERFACE_HPP__
+#define __MERCURYCAN_DRIVER_INTERFACE_HPP__
 
 #include <cstdlib>
 #include <stdint.h>
@@ -21,6 +21,10 @@
 namespace Can::Controller {
 
 class Receiver;
+
+}
+
+namespace Can::Driver {
 
 /**
  * \brief   Defines the interface between the CAN controllers and the driver.
@@ -131,7 +135,7 @@ public:
      *
      * \param   recv passes a pointer to the receiver instance.
      */
-    virtual void setReceiverInstance(Receiver* recv) = 0;
+    virtual void setReceiverInstance(Controller::Receiver* recv) = 0;
 
     /**
      * \brief   Returns the driver's current millisecond tick count.
@@ -156,4 +160,4 @@ public:
 
 }
 
-#endif  //__MERCURYCAN_CONTROLLER_DRIVER_INTERFACE_HPP__
+#endif  //__MERCURYCAN_DRIVER_INTERFACE_HPP__

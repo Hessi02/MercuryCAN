@@ -105,7 +105,7 @@ int main(void) {
         &status,
         &Can::Model::CyclicMessage::Message::preSend,
         +[](unsigned long) {
-            auto& driver = Can::Controller::Driver::getInstance();
+            auto& driver = Can::Driver::DriverInterface::getInstance();
             systemTime = driver.getTickCountMs();
         }
     );
@@ -144,7 +144,7 @@ int main(void) {
     tx.addCyclicMessage(status);
     tx.addCyclicMessage(measurement);
         
-    auto& driver = Can::Controller::DriverInterface::getInstance();
+    auto& driver = Can::Driver::DriverInterface::getInstance();
     driver.enterIdleSleep();
 }
 ```
@@ -185,7 +185,7 @@ int main(void) {
     Can::Controller::Transmitter tx;
     tx.addCyclicMessage(repeatedFrame);
 
-    auto& driver = Can::Controller::DriverInterface::getInstance();
+    auto& driver = Can::Driver::DriverInterface::getInstance();
     driver.enterIdleSleep();
 }
 ```

@@ -1,5 +1,5 @@
-#ifndef __MERCURYCAN_CONTROLLER_MOCK_DRIVER_HPP__
-#define __MERCURYCAN_CONTROLLER_MOCK_DRIVER_HPP__
+#ifndef __MERCURYCAN_DRIVER_MOCK_DRIVER_HPP__
+#define __MERCURYCAN_DRIVER_MOCK_DRIVER_HPP__
 
 #include <MercuryCAN/driver/driverInterface.hpp>
 
@@ -9,6 +9,10 @@
 namespace Can::Controller {
 
 class Receiver;
+
+}
+
+namespace Can::Driver {
 
 class MockDriver : public DriverInterface
 {
@@ -38,7 +42,7 @@ public:
     
     virtual void activateTxTimer(void) override final;
 
-    virtual void setReceiverInstance(Receiver* recv) override final;
+    virtual void setReceiverInstance(Controller::Receiver* recv) override final;
 
     virtual uint32_t getTickCountMs(void) const override final;
 
@@ -47,4 +51,4 @@ public:
 
 }
 
-#endif  // __MERCURYCAN_CONTROLLER_MOCK_DRIVER_HPP__
+#endif  //__MERCURYCAN_DRIVER_MOCK_DRIVER_HPP__

@@ -1,7 +1,7 @@
 #include <MercuryCAN/driver/driverInterface.hpp>
 #include <MercuryCAN/driver/avrDriver.hpp>
 
-Can::Controller::DriverInterface* Can::Controller::DriverInterface::getInstance(void) {
-    static AvrDriver driver;
+Can::Driver::DriverInterface* Can::Driver::DriverInterface::getInstance(void) {
+    static Can::Driver::AvrDriver driver;
     return &driver;
 }

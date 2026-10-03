@@ -6,7 +6,7 @@
 #include <avr/io.h>
 #include <avr/sleep.h>
 
-void Can::Controller::AvrDriver::transmit(
+void Can::Driver::AvrDriver::transmit(
     const uint16_t& identifier,
     const uint8_t* data,
     const std::size_t& payloadLength
@@ -24,7 +24,7 @@ void Can::Controller::AvrDriver::transmit(
     completeTransmission(messageObject);
 }
 
-void Can::Controller::AvrDriver::receive(
+void Can::Driver::AvrDriver::receive(
     const uint16_t& identifier,
     const uint8_t* data,
     const std::size_t& payloadLength
@@ -33,7 +33,7 @@ void Can::Controller::AvrDriver::receive(
         _receiver->processRxData(identifier, data, payloadLength);
 }
 
-void Can::Controller::AvrDriver::addRxMessage(
+void Can::Driver::AvrDriver::addRxMessage(
     const uint16_t& identifier, const uint8_t& length
 ) {
     const uint8_t messageObject = reserveMessageObject();
@@ -59,7 +59,7 @@ void Can::Controller::AvrDriver::addRxMessage(
 }
 
 __attribute__((noreturn))
-void Can::Controller::AvrDriver::enterIdleSleep(void) const {
+void Can::Driver::AvrDriver::enterIdleSleep(void) const {
     set_sleep_mode(SLEEP_MODE_IDLE);
 
     while (true) {
@@ -69,7 +69,7 @@ void Can::Controller::AvrDriver::enterIdleSleep(void) const {
     }
 }
 
-void Can::Controller::AvrDriver::removeRxMessage(
+void Can::Driver::AvrDriver::removeRxMessage(
     const uint16_t& identifier
 ) {
     for (uint8_t index = 0; index < _messageObjectCount; index++) {
@@ -90,11 +90,13 @@ void Can::Controller::AvrDriver::removeRxMessage(
     }
 }
 
-void Can::Controller::AvrDriver::setReceiverInstance(Receiver* recv) {
+void Can::Driver::AvrDriver::setReceiverInstance(
+    Can::Controller::Receiver* recv
+) {
     _receiver = recv;
 }
 
-void Can::Controller::AvrDriver::configureTransmitMessage(
+void Can::Driver::AvrDriver::configureTransmitMessage(
     const uint8_t& messageObject,
     const uint16_t& identifier
 ) const {
@@ -107,7 +109,7 @@ void Can::Controller::AvrDriver::configureTransmitMessage(
     CANIDM4 = 0x00;
 }
 
-void Can::Controller::AvrDriver::transmitPayload(
+void Can::Driver::AvrDriver::transmitPayload(
     const uint8_t* data, const std::size_t& payloadLength
 ) const {
     for (std::size_t index = 0; index < payloadLength; index++)
@@ -116,7 +118,7 @@ void Can::Controller::AvrDriver::transmitPayload(
     CANCDMOB = (1 << CONMOB0) | (payloadLength & 0x0f);
 }
 
-void Can::Controller::AvrDriver::completeTransmission(
+void Can::Driver::AvrDriver::completeTransmission(
     const uint8_t& messageObject
 ) {
     while (!(CANSTMOB & (1 << TXOK)))
@@ -127,15 +129,15 @@ void Can::Controller::AvrDriver::completeTransmission(
     freeMessageObject(messageObject);
 }
 
-uint32_t Can::Controller::AvrDriver::getTickCountMs(void) const {
+uint32_t Can::Driver::AvrDriver::getTickCountMs(void) const {
     return _tickCountMs;
 }
 
-void Can::Controller::AvrDriver::incrementTickCountMs(void) {
+void Can::Driver::AvrDriver::incrementTickCountMs(void) {
     _tickCountMs++;
 }
 
-void Can::Controller::AvrDriver::initHardware(void) const {
+void Can::Driver::AvrDriver::initHardware(void) const {
     CANGCON = (1 << SWRES);
     CANGCON = (1 << ENASTB);
 
@@ -155,14 +157,14 @@ void Can::Controller::AvrDriver::initHardware(void) const {
     sei();
 }
 
-void Can::Controller::AvrDriver::activateTxTimer(void) {
+void Can::Driver::AvrDriver::activateTxTimer(void) {
     TCCR0A = (1 << WGM01) | (1 << CS01) | (1 << CS00);
     OCR0A = 249;
     TIMSK0 = (1 << OCIE0A);
     sei();
 }
 
-uint8_t Can::Controller::AvrDriver::reserveMessageObject(void) {
+uint8_t Can::Driver::AvrDriver::reserveMessageObject(void) {
     for (uint8_t i = 0; i < _messageObjectCount; i++) {
         if (0 == (_usedMessageObjectMask & (1 << i))) {
             _usedMessageObjectMask |= (1 << i);
@@ -173,14 +175,14 @@ uint8_t Can::Controller::AvrDriver::reserveMessageObject(void) {
     return _messageObjectCount;
 }
 
-void Can::Controller::AvrDriver::freeMessageObject(const uint8_t& index) {
+void Can::Driver::AvrDriver::freeMessageObject(const uint8_t& index) {
     if (_messageObjectCount <= index)
         return;
 
     _usedMessageObjectMask &= ~(1 << index);
 }
 
-void Can::Controller::AvrDriver::resetMessageObjects(void) const {
+void Can::Driver::AvrDriver::resetMessageObjects(void) const {
     for (uint8_t index = 0; index < _messageObjectCount; index++) {
         CANPAGE = (index << 4);
         CANCDMOB = 0;
@@ -198,7 +200,7 @@ void Can::Controller::AvrDriver::resetMessageObjects(void) const {
     }
 }
 
-Can::Controller::AvrDriver::AvrDriver(void) {
+Can::Driver::AvrDriver::AvrDriver(void) {
     initHardware();
 }
 
@@ -222,7 +224,8 @@ ISR(CANIT_vect) {
         CANSTMOB = 0x00;
         CANCDMOB = (1 << CONMOB1) | (length & 0x0F);
 
-        Can::Controller::DriverInterface* driver = Can::Controller::DriverInterface::getInstance();
+        Can::Driver::DriverInterface* driver =
+            Can::Driver::DriverInterface::getInstance();
         driver->receive(identifier, data, length);
     } else {
         CANSTMOB = 0x00;
