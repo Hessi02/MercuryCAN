@@ -1,7 +1,7 @@
 #ifndef __MERCURYCAN_CONTROLLER_RECEIVER_HPP__
 #define __MERCURYCAN_CONTROLLER_RECEIVER_HPP__
 
-#include <model/cyclicMessage.hpp>
+#include <MercuryCAN/model/cyclicMessage.hpp>
 
 namespace Can::Controller {
 

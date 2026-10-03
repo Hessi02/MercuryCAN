@@ -16,9 +16,9 @@
 #ifndef __MERCURYCAN_MODEL_MESSAGE_HPP__
 #define __MERCURYCAN_MODEL_MESSAGE_HPP__
 
-#include "support/list/container.hpp"
-#include "support/signalSlot/metaObject.hpp"
-#include "model/signal.hpp"
+#include <MercuryCAN/support/list/container.hpp>
+#include <MercuryCAN/support/signalSlot/metaObject.hpp>
+#include <MercuryCAN/model/signal.hpp>
 
 namespace Can::Model {
 

@@ -1,7 +1,7 @@
-#ifndef __MERCURYCAN_CONTROLLER_MOCK_DRIVER_HPP__
-#define __MERCURYCAN_CONTROLLER_MOCK_DRIVER_HPP__
+#ifndef __MERCURYCAN_CONTROLLER_AVR_DRIVER_HPP__
+#define __MERCURYCAN_CONTROLLER_AVR_DRIVER_HPP__
 
-#include "driver.hpp"
+#include <MercuryCAN/driver/driver.hpp>
 
 #include <cstdlib>
 #include <stdint.h>
@@ -10,7 +10,7 @@ namespace Can::Controller {
 
 class Receiver;
 
-class MockDriver : public Driver
+class AvrDriver : public Driver
 {
 public:
     friend Driver;
@@ -43,8 +43,36 @@ public:
     virtual uint32_t getTickCountMs(void) const override final;
 
     virtual void incrementTickCountMs(void) override final;
+
+private:
+    void configureTransmitMessage(
+        const uint8_t& messageObject,
+        const uint16_t& identifier
+    ) const;
+
+    void transmitPayload(
+        const uint8_t* data, const std::size_t& payloadLength
+    ) const;
+
+    void completeTransmission(const uint8_t& messageObject);
+
+    void initHardware(void) const;
+
+    uint8_t reserveMessageObject(void);
+
+    void freeMessageObject(const uint8_t& index);
+
+    void resetMessageObjects(void) const;
+
+    AvrDriver(void);
+
+    Receiver* _receiver = nullptr;
+
+    uint32_t _tickCountMs = 0;
+    static inline constexpr uint8_t _messageObjectCount = 15;
+    static inline uint16_t _usedMessageObjectMask = 0;
 };
 
 }
 
-#endif  // __MERCURYCAN_CONTROLLER_MOCK_DRIVER_HPP__
+#endif  // __MERCURYCAN_CONTROLLER_AVR_DRIVER_HPP__

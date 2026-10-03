@@ -1,8 +1,8 @@
 #ifndef __MERCURYCAN_SUPPORT_SIGNAL_SLOT_META_OBJECT_HPP__
 #define __MERCURYCAN_SUPPORT_SIGNAL_SLOT_META_OBJECT_HPP__
 
-#include "support/list/container.hpp"
-#include "connection.hpp"
+#include <MercuryCAN/support/list/container.hpp>
+#include <MercuryCAN/support/signalSlot/connection.hpp>
 
 #include <type_traits>
 

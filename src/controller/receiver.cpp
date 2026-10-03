@@ -1,6 +1,6 @@
-#include "controller/receiver.hpp"
+#include <MercuryCAN/controller/receiver.hpp>
 
-#include <driver/driver.hpp>
+#include <MercuryCAN/driver/driver.hpp>
 
 void Can::Controller::Receiver::awaitMessage(Model::Message& message) {
     Driver* driver = Driver::getInstance();

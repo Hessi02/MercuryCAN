@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <cstdlib>
 
-#include "element.hpp"
-#include "iterator.hpp"
+#include <MercuryCAN/support/list/element.hpp>
+#include <MercuryCAN/support/list/iterator.hpp>
 
 namespace Generic {
 

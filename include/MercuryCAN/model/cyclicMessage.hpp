@@ -1,7 +1,7 @@
 #ifndef __MERCURYCAN_MODEL_CYCLIC_MESSAGE_HPP__
 #define __MERCURYCAN_MODEL_CYCLIC_MESSAGE_HPP__
 
-#include "model/message.hpp"
+#include <MercuryCAN/model/message.hpp>
 
 namespace Can::Model {
 

@@ -1,7 +1,7 @@
 #ifndef __MERCURYCAN_SUPPORT_LIST_ITERATOR_HPP__
 #define __MERCURYCAN_SUPPORT_LIST_ITERATOR_HPP__
 
-#include "element.hpp"
+#include <MercuryCAN/support/list/element.hpp>
 
 namespace Generic {
 

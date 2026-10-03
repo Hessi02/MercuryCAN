@@ -1,8 +1,8 @@
 #ifndef __MERCURYCAN_CONTROLLER_TRANSMITTER_HPP__
 #define __MERCURYCAN_CONTROLLER_TRANSMITTER_HPP__
 
-#include "support/list/container.hpp"
-#include "model/cyclicMessage.hpp"
+#include <MercuryCAN/support/list/container.hpp>
+#include <MercuryCAN/model/cyclicMessage.hpp>
 
 namespace Can::Controller {
 

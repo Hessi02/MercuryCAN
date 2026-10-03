@@ -1,7 +1,6 @@
-#include "driver/avrDriver.hpp"
-
-#include "controller/receiver.hpp"
-#include "controller/transmitter.hpp"
+#include <MercuryCAN/driver/avrDriver.hpp>
+#include <MercuryCAN/controller/receiver.hpp>
+#include <MercuryCAN/controller/transmitter.hpp>
 
 #include <avr/interrupt.h>
 #include <avr/io.h>

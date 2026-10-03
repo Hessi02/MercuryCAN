@@ -1,6 +1,6 @@
-#include "controller/transmitter.hpp"
+#include <MercuryCAN/controller/transmitter.hpp>
 
-#include "driver/driver.hpp"
+#include <MercuryCAN/driver/driver.hpp>
 
 Can::Controller::Transmitter::Transmitter(void) {
     Driver* driver = Driver::getInstance();
