@@ -222,6 +222,24 @@ public:
      */
     virtual void incrementTickCountMs(void) override final;
 
+    /**
+     * \brief   Injects a received CAN frame into the mock driver.
+     *
+     * This helper is used by tests to simulate the arrival of a CAN message
+     * without real hardware. The frame is forwarded to the registered receiver
+     * and recorded in the driver's receive trace. The caller retains ownership
+     * of the payload buffer and must keep it valid during the call.
+     *
+     * \param   identifier CAN identifier of the received frame.
+     * \param   data pointer to the payload buffer.
+     * \param   payloadLength number of payload bytes in \p data.
+     */
+    void injectRxFrame(
+        const uint16_t& identifier,
+        const uint8_t* data,
+        const std::size_t& payloadLength
+    );
+
 private:
     /**
      * \brief   Non-owning pointer to the receiver for incoming frames.

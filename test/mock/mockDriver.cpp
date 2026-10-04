@@ -63,5 +63,10 @@ void Can::Driver::MockDriver::incrementTickCountMs(void) {
     _tickCountMs++;
 }
 
-Can::Driver::MockDriver::MockDriver(void) {
+void Can::Driver::MockDriver::injectRxFrame(
+    const uint16_t& identifier,
+    const uint8_t* data,
+    const std::size_t& payloadLength
+) {
+    receive(identifier, data, payloadLength);
 }
