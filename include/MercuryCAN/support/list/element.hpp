@@ -29,4 +29,4 @@ private:
 
 }
 
-#endif  // __MERCURYCAN_SUPPORT_LIST_ELEMENT_HPP__
+#endif  //__MERCURYCAN_SUPPORT_LIST_ELEMENT_HPP__

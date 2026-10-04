@@ -73,4 +73,4 @@ private:
 
 }
 
-#endif  // __MERCURYCAN_MODEL_CYCLIC_MESSAGE_HPP__
+#endif  //__MERCURYCAN_MODEL_CYCLIC_MESSAGE_HPP__

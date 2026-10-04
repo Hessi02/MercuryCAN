@@ -2,9 +2,8 @@
  * \file    avrDriver.hpp
  * \brief   Declares the AVR implementation of the CAN driver interface.
  *
- * AvrDriver provides CAN communication, receive-message configuration,
- * idle sleep, and millisecond timer support using the AVR CAN controller
- * hardware.
+ * AvrDriver provides CAN communication, receive-message configuration, idle 
+ * sleep, and millisecond timer support using the AVR CAN controller hardware.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -233,4 +232,4 @@ private:
 
 }
 
-#endif  // __MERCURYCAN_DRIVER_AVR_DRIVER_HPP__
+#endif  //__MERCURYCAN_DRIVER_AVR_DRIVER_HPP__

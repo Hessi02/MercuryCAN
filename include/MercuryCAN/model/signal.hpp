@@ -334,4 +334,4 @@ template<typename SignalDataType>
 concept AllowedSignal = InVariant<SignalDataType, AnySignal_t>::value;
 }
 
-#endif  // __MERCURYCAN_MODEL_SIGNAL_HPP__
+#endif  //__MERCURYCAN_MODEL_SIGNAL_HPP__

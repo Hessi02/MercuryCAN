@@ -290,4 +290,4 @@ private:
 
 }
 
-#endif  // __MERCURYCAN_MODEL_MESSAGE_HPP__
+#endif  //__MERCURYCAN_MODEL_MESSAGE_HPP__
