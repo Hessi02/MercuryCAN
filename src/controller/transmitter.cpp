@@ -43,7 +43,7 @@ void Can::Controller::Transmitter::processTransmitCycle(void) {
     driver->incrementTickCountMs();
 
     const uint32_t tickCountMs = driver->getTickCountMs();
-    bool dueMessages[_messageCount] = {};
+    bool dueMessages[_messageCount];
 
     for (uint8_t index = 0; index < _messageCount; index++)
         processMessage(index, tickCountMs, dueMessages);
@@ -62,9 +62,11 @@ void Can::Controller::Transmitter::processMessage(
 ) {
     Model::CyclicMessage& message = *_cyclicMessages.at(index);
     const uint16_t cycleTime = message.getCycleTime();
-
-    if (0 == cycleTime || 0 != tickCountMs % cycleTime)
+    
+    if (0 == cycleTime || 0 != tickCountMs % cycleTime) {
+        dueMessages[index] = false;
         return;
+    }
 
     dueMessages[index] = true;
     emit message.preSend(tickCountMs);

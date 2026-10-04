@@ -1,5 +1,4 @@
-#include "mockDriver.hpp"
-
+#include <MercuryCAN/test/mockDriver.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
 
 void Can::Driver::MockDriver::transmit(

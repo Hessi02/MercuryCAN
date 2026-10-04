@@ -1,0 +1,52 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 23,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "host",
+            "displayName": "Mock (GCC)",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/bin/host",
+            "toolchainFile": "${sourceDir}/res/cmake/host-toolchain.cmake",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "MOCK_SOURCES": "ON"
+            }
+        },
+        {
+            "name": "avr",
+            "displayName": "Release (AVR-GCC)",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/bin/avr",
+            "toolchainFile": "${sourceDir}/res/cmake/avr-gcc-toolchain.cmake",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "MOCK_SOURCES": "OFF",
+                "MCU": "at90can128"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "host",
+            "configurePreset": "host"
+        },
+        {
+            "name": "avr",
+            "configurePreset": "avr"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "host",
+            "configurePreset": "host",
+            "output": {
+                "outputOnFailure": true
+            }
+        }
+    ]
+}
