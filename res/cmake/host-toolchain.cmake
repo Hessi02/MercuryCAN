@@ -8,12 +8,12 @@ set(MCU at90can128 CACHE STRING "AVR MCU")
 set(FRQ 16000000UL CACHE STRING "AVR CPU frequency")
 
 set(CMAKE_C_FLAGS
-    "-D__AVR_AT90CAN128__ -DF_CPU=${FRQ} -Ofast -Wall"
+    "-D__AVR_AT90CAN128__ -DF_CPU=${FRQ} -Ofast -Wall -D__USE_MOCK_DRIVER"
     CACHE STRING "AVR compiler flags"
 )
 
 set(CMAKE_CXX_FLAGS
-    "-D__AVR_AT90CAN128__ -DF_CPU=${FRQ} -Ofast -Wall -fno-threadsafe-statics"
+    "-D__AVR_AT90CAN128__ -DF_CPU=${FRQ} -Ofast -Wall -fno-threadsafe-statics -D__USE_MOCK_DRIVER"
     CACHE STRING "AVR compiler flags"
 )
 

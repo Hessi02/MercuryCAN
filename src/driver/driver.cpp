@@ -1,5 +1,10 @@
 #include <MercuryCAN/driver/driverInterface.hpp>
-#include <MercuryCAN/driver/avrDriver.hpp>
+
+#ifdef __USE_MOCK_DRIVER
+    #include <MercuryCAN/test/mockDriver.hpp>
+#else
+    #include <MercuryCAN/driver/avrDriver.hpp>
+#endif
 
 Can::Driver::DriverInterface* Can::Driver::DriverInterface::getInstance(void) {
 #ifdef __USE_MOCK_DRIVER

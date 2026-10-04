@@ -48,6 +48,11 @@ void Can::Driver::MockDriver::removeRxMessage(
 
 }
 
+void Can::Driver::MockDriver::activateTxTimer(void) {
+
+}
+
+
 void Can::Driver::MockDriver::setReceiverInstance(
     Can::Controller::Receiver* recv
 ) {
