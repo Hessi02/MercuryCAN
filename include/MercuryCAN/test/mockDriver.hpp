@@ -14,8 +14,8 @@
  * SPDX-License-Identifier: Apache-2.0 
  */
 
-#ifndef __MOCK_MOCK_DRIVER_HPP__
-#define __MOCK_MOCK_DRIVER_HPP__
+#ifndef __TEST_MOCK_DRIVER_HPP__
+#define __TEST_MOCK_DRIVER_HPP__
 
 #include <MercuryCAN/driver/driverInterface.hpp>
 
@@ -264,4 +264,4 @@ private:
 
 }
 
-#endif //__MOCK_MOCK_DRIVER_HPP__
+#endif //__TEST_MOCK_DRIVER_HPP__
