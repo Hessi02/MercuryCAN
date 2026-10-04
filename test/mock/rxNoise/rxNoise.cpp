@@ -3,7 +3,7 @@
 #include <MercuryCAN/controller/receiver.hpp>
 #include <MercuryCAN/model/cyclicMessage.hpp>
 
-#include <cassert>
+#include <cstdio>
 
 using namespace Can::Model;
 using namespace Can::Driver;
@@ -24,13 +24,18 @@ int main(int argc, char** argv) {
     Receiver rx;
     rx.addCyclicMessage(rxFrame);
 
-    for (uint64_t i = 0; i < UINT64_MAX; i++) {
+    for (uint64_t i = 0; i < 1000; i++) {
+        uint8_t payload[sizeof(i)];
+        for (std::size_t byte = 0; byte < sizeof(i); byte++)
+            payload[sizeof(i) - 1 - byte] =
+                static_cast<uint8_t>(i >> (byte * 8));
+
         MockDriver* driver = static_cast<MockDriver*>(DriverInterface::getInstance());
         
         driver->injectRxFrame(
             recvIdentifier,
-            reinterpret_cast<uint8_t*>(&i),
-            sizeof(i)
+            payload,
+            sizeof(payload)
         );
 
         uint16_t noiseIdentifier = rand() % 0x7ff;
@@ -46,6 +51,14 @@ int main(int argc, char** argv) {
             sizeof(noiseData)
         );
 
-        assert(recvData == i);
+        if (recvData != i) {
+            std::fprintf(
+                stderr,
+                "Received 0x%llx, expected 0x%llx\n",
+                static_cast<unsigned long long>(recvData),
+                static_cast<unsigned long long>(i)
+            );
+            return 1;
+        }
     }
 }
