@@ -639,7 +639,7 @@ Prefer explicit namespace qualification where it improves clarity.
 
 ---
 
-# Use of AI
+# 26. Use of AI
 
 AI may be used to optimize the execution time, correctness, and readability of small code segments, such as individual methods. 
 
