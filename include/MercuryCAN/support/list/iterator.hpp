@@ -36,16 +36,15 @@ public:
     /**
      * \brief   Compares this iterator with another iterator.
      *
-     * The comparison checks whether this iterator's element differs from the
-     * element immediately following \p other. The \p other iterator must
-     * reference a valid element.
+     * The comparison checks whether both iterators refer to different
+     * elements. A null element represents the end of the list.
      *
      * \param   other passes the iterator position to compare against.
      *
      * \return  True if this element differs from the element \p other.
      */
     bool operator!=(const Iterator& other) const {
-        return (_currentElement != other._currentElement->getNextElement());
+        return _currentElement != other._currentElement;
     }
 
     /**

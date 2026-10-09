@@ -3,10 +3,11 @@
  * \brief   Declares the CAN message receiver controller.
  *
  * The Receiver configures the driver to accept registered message identifiers
- * and forwards incoming frames to the matching cyclic messages. For each
- * match, it applies the received payload to the message's signal data, sets
- * its update flag, and emits a received notification with the current
- * millisecond tick count.
+ * and forwards incoming frames to the matching cyclic messages. It keeps
+ * non-owning references, so registered messages must outlive the Receiver.
+ * For each match, it applies the received payload to the message's signal
+ * data, sets its update flag, and emits a received notification with the
+ * current millisecond tick count.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -23,9 +24,10 @@ namespace Can::Controller {
 /**
  * \brief   Configures CAN message reception and processes received data.
  *
- * The Receiver registers cyclic messages with the driver and applies incoming
- * payloads to registered messages whose identifiers match. It also provides
- * a synchronous operation for waiting until a Message's update flag is set.
+ * The Receiver registers non-owning references to cyclic messages with the
+ * driver and applies incoming payloads to registered messages whose
+ * identifiers match. It also provides a synchronous operation for waiting
+ * until a Message's update flag is set.
  *
  * \see     Model::Message
  * \see     Model::CyclicMessage
@@ -49,9 +51,10 @@ public:
     /**
      * \brief   Registers a cyclic message for reception.
      *
-     * Stores the message in the receiver's cyclic message list, configures the
-     * driver to accept its identifier and payload length, and registers this
-     * Receiver to process received frames.
+     * Stores a non-owning reference to the message in the receiver's cyclic
+     * message list, configures the driver to accept its identifier and payload
+     * length, and registers this Receiver to process received frames. The
+     * message must remain alive while it is registered.
      *
      * \param   message passes the cyclic message to register.
      */
@@ -85,7 +88,7 @@ private:
     /**
      * \brief   Stored cyclic messages processed when matching frames arrive.
      */
-    Generic::Container<Model::CyclicMessage> _cyclicMessages;
+    Generic::Container<Model::CyclicMessage*> _cyclicMessages;
 };
 
 }

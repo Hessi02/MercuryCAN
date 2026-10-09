@@ -214,10 +214,10 @@ public:
     /**
      * \brief   Returns the iterator position used to terminate traversal.
      *
-     * \return  Iterator positioned at the list's final indexed element.
+     * \return  End iterator, represented by a null element pointer.
      */
     Iterator<ContentType> end(void) {
-        return Iterator(elementAt(0));
+        return Iterator<ContentType>(nullptr);
     }
 
 private:
