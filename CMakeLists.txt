@@ -10,14 +10,6 @@ if(MOCK_SOURCES)
                 src/controller/receiver.cpp
     )
     target_compile_definitions(MercuryCAN PRIVATE __USE_MOCK_DRIVER)
-
-    enable_testing()
-
-    add_executable(rxNoise test/mock/rxNoise/rxNoise.cpp)
-    target_link_libraries(rxNoise PRIVATE MercuryCAN)
-    target_include_directories(rxNoise PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    add_test(NAME rxNoise COMMAND rxNoise)
-
 else()
     add_library(MercuryCAN
                 src/driver/driver.cpp 
@@ -26,5 +18,9 @@ else()
                 src/controller/receiver.cpp
     )
 endif()
+
+enable_testing()
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
 
 target_include_directories(MercuryCAN PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

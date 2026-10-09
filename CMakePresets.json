@@ -10,7 +10,7 @@
             "name": "mock",
             "displayName": "Mock (GCC)",
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/bin/host",
+            "binaryDir": "${sourceDir}/bin/mock",
             "toolchainFile": "${sourceDir}/res/cmake/host-toolchain.cmake",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
