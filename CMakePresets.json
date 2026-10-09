@@ -7,7 +7,7 @@
     },
     "configurePresets": [
         {
-            "name": "host",
+            "name": "mock",
             "displayName": "Mock (GCC)",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/bin/host",
@@ -32,8 +32,8 @@
     ],
     "buildPresets": [
         {
-            "name": "host",
-            "configurePreset": "host"
+            "name": "mock",
+            "configurePreset": "mock"
         },
         {
             "name": "avr",
@@ -42,8 +42,8 @@
     ],
     "testPresets": [
         {
-            "name": "host",
-            "configurePreset": "host",
+            "name": "mock",
+            "configurePreset": "mock",
             "output": {
                 "outputOnFailure": true
             }
