@@ -1,8 +1,8 @@
 if(MOCK_SOURCES)
-    add_executable(tc_01_ReceiveWithNoise ${CMAKE_CURRENT_SOURCE_DIR}/mock/tc_01_ReceiveWithNoise/main.cpp)
-    target_link_libraries(tc_01_ReceiveWithNoise PRIVATE MercuryCAN)
-    target_include_directories(tc_01_ReceiveWithNoise PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    add_test(NAME tc_01_ReceiveWithNoise COMMAND tc_01_ReceiveWithNoise)
+    add_executable(tc_01_ReceiveSingleShot ${CMAKE_CURRENT_SOURCE_DIR}/mock/tc_01_ReceiveSingleShot/main.cpp)
+    target_link_libraries(tc_01_ReceiveSingleShot PRIVATE MercuryCAN)
+    target_include_directories(tc_01_ReceiveSingleShot PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    add_test(NAME tc_01_ReceiveSingleShot COMMAND tc_01_ReceiveSingleShot)
 
     add_executable(tc_02_TransmitSingleShot ${CMAKE_CURRENT_SOURCE_DIR}/mock/tc_02_TransmitSingleShot/main.cpp)
     target_link_libraries(tc_02_TransmitSingleShot PRIVATE MercuryCAN)

@@ -1,3 +1,17 @@
+/**
+ * \file    main.cpp (tc_02_TransmitSingleShot)
+ * \brief   Tests the Transmitter::sendMessage() method using mock driver class. 
+ *
+ * The test firstly initializes a typical Message, a Transmittr and get's the 
+ * singleton MockDriver class. Then the sendMessage() method is called. 
+ * Afterwards the identifier and payload are checked. If the message is sent 
+ * correctly, the test returns successful - output to stderr if not.
+ *
+ * \copyright Copyright (C) 2026 Luca Hesselbrock
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <MercuryCAN/test/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
@@ -5,17 +19,15 @@
 
 #include <iostream>
 
-using namespace Can::Model;
-using namespace Can::Driver;
-using namespace Can::Controller;
-
 int main(int argc, char** argv) {
-    MockDriver* driver = static_cast<MockDriver*>(DriverInterface::getInstance());
+    auto* driver = static_cast<Can::Driver::MockDriver*>(
+        Can::Driver::DriverInterface::getInstance()
+    );
    
-    Transmitter tx;
+    Can::Controller::Transmitter tx;
 
     constexpr uint16_t identifier = 1;
-    uint64_t payload = 0x0123456789ABCDEF;
+    uint64_t testData = 0x0123456789abcdef;
 
     if (0 < driver->txTrace.size()) {
         std::cerr << "TX trace not empty before message was sent!" << std::endl;
@@ -29,12 +41,12 @@ int main(int argc, char** argv) {
         }
     }
     
-    Message testMessage(
+    Can::Model::Message txFrame(
         identifier,
-        &payload
+        &testData
     );
 
-    tx.sendMessage(testMessage);
+    tx.sendMessage(txFrame);
 
     if (0 == driver->txTrace.size()) {
         std::cerr << "No frame was sent!" << std::endl;
@@ -50,18 +62,18 @@ int main(int argc, char** argv) {
             return 5;
         }
 
-        if (sizeof(payload) != event.payload.size()) {
-            std::cerr << "Wrong payload size was sent!" << std::endl;
+        if (sizeof(testData) != event.payload.size()) {
+            std::cerr << "Wrong testData size was sent!" << std::endl;
             return 6;
         }
 
-        for (std::size_t byte = 0; byte < sizeof(payload); byte++) {
+        for (std::size_t byte = 0; byte < sizeof(testData); byte++) {
             const uint8_t expectedByte = static_cast<uint8_t>(
-                payload >> ((sizeof(payload) - 1 - byte) * 8)
+                testData >> ((sizeof(testData) - 1 - byte) * 8)
             );
 
             if (expectedByte != event.payload[byte]) {
-                std::cerr << "Wrong payload byte at index " << byte
+                std::cerr << "Wrong testData byte at index " << byte
                           << "!" << std::endl;
                 return 7;
             }
