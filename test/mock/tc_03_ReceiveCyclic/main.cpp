@@ -3,7 +3,7 @@
  * \brief   Tests the Receiver's cyclic receive mechanism using mock driver. 
  *
  * The test firstly initializes a typical CyclicMessage, a Receiver and get's 
- * the  singleton MockDriver class. Then the injected RX message input is 
+ * the singleton MockDriver class. Then the injected RX message input is 
  * compared to the observed data output. If the message is received correctly, 
  * the test returns successful - output to stderr if not.
  *
