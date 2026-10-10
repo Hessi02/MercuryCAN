@@ -56,9 +56,14 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    if (!rxFrame.getUpdateFlag()) {
+        std::cerr << "Message update flag was not set!" << std::endl;
+        return 2;
+    }
+
     if (identifier != driver->rxTrace.back().identifier) {
         std::cerr << "Received frame with wrong identifier!" << std::endl;
-        return 2;
+        return 3;
     }
 
     return 0;

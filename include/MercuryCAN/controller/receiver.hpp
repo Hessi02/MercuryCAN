@@ -19,6 +19,8 @@
 
 #include <MercuryCAN/model/cyclicMessage.hpp>
 
+#include <atomic>
+
 namespace Can::Controller {
 
 /**
@@ -38,9 +40,10 @@ public:
      * \brief   Waits synchronously for a message update.
      *
      * Clears the message's update flag, configures the driver to receive its
-     * identifier, and registers this Receiver with the driver. The method
-     * blocks until the message's update flag becomes true, then removes that
-     * identifier from the driver's receive configuration.
+     * identifier, and registers this Receiver with the driver. Incoming frames
+     * matching the message are copied into it. The method blocks until the
+     * complete receive callback has finished, then removes the identifier from
+     * the driver's receive configuration.
      *
      * \warning This method has no timeout and can block indefinitely! 
      *
@@ -80,6 +83,16 @@ public:
     );
 
 private:
+    /**
+     * \brief   Message currently awaited by awaitMessage(), if any.
+     */
+    std::atomic<Model::Message*> _awaitedMessage{nullptr};
+
+    /**
+     * \brief   Signals that the awaited frame has been fully processed.
+     */
+    std::atomic<bool> _awaitMessageReceived{false};
+
     /**
      * \brief   Number of cyclic messages registered with this receiver.
      */

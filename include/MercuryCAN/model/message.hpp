@@ -20,6 +20,8 @@
 #include <MercuryCAN/support/signalSlot/metaObject.hpp>
 #include <MercuryCAN/model/signal.hpp>
 
+#include <atomic>
+
 namespace Can::Model {
 
 /**
@@ -144,7 +146,7 @@ public:
      * \param   flag passes the new flag value.
      */
     void setUpdateFlag(const bool& flag) {
-        _updateFlag = flag;
+        _updateFlag.store(flag, std::memory_order_release);
     }
 
     /**
@@ -153,7 +155,7 @@ public:
      * \return  True if the flag is set; otherwise false.
      */
     bool getUpdateFlag(void) const {
-        return _updateFlag;
+        return _updateFlag.load(std::memory_order_acquire);
     }
 
 signals:
@@ -273,7 +275,7 @@ private:
     /**
      * \brief   Explicitly managed flag indicating a message update.
      */
-    bool _updateFlag = false;
+    std::atomic<bool> _updateFlag{false};
 
     /**
      * \brief   Non-owning references to the signals contained in this message.
