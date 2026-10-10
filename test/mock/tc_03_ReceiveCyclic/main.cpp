@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     );
 
     constexpr uint16_t identifier = 0x123;
-    uint8_t byte = 0;
+    volatile uint8_t byte = 0;
 
     Can::Model::CyclicMessage rxFrame(
         identifier,

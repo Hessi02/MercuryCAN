@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 
     constexpr uint16_t identifier = 0x100;
     constexpr uint8_t testData = 0xaa;
-    uint8_t byte = 0;
+    volatile uint8_t byte = 0;
 
     Can::Model::Message rxFrame(
         identifier,

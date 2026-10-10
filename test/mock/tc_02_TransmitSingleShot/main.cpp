@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     Can::Controller::Transmitter tx;
 
     constexpr uint16_t identifier = 1;
-    uint64_t testData = 0x0123456789abcdef;
+    volatile uint64_t testData = 0x0123456789abcdef;
 
     if (0 < driver->txTrace.size()) {
         std::cerr << "TX trace not empty before message was sent!" << std::endl;
