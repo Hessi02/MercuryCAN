@@ -1,3 +1,15 @@
+/**
+ * \file    main.cpp (brakelight example)
+ * \brief   Demonstrates a CAN-controlled brake light.
+ *
+ * Receives brake pressure measurements and thresholds, then updates the
+ * brake light state when either measured pressure exceeds its threshold.
+ *
+ * \copyright Copyright (C) 2026 Luca Hesselbrock
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <MercuryCAN/controller/receiver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
 
