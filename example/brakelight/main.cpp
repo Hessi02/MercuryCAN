@@ -7,7 +7,8 @@ int main(void) {
     volatile uint8_t  brakelightState = 0;
     volatile uint16_t brakePressureFrontMPa;
     volatile uint16_t brakePressureRearMPa;
-    volatile uint16_t brakePressureThreshold;
+    volatile uint16_t brakePressureThresholdFrontMPa;
+    volatile uint16_t brakePressureThresholdRearMPa;
 
     Can::Controller::Receiver rx;
     Can::Controller::Transmitter tx;
@@ -31,7 +32,8 @@ int main(void) {
     
     Can::Model::Message rxBrakeThreshold(
         0x120,
-        &brakePressureThreshold
+        &brakePressureThresholdFrontMPa,
+        &brakePressureThresholdRearMPa
     );
 
     rx.awaitMessage(rxBrakeThreshold);
@@ -39,8 +41,8 @@ int main(void) {
     DDRA |= 1;
 
     while (true) {
-        if (brakePressureThreshold < brakePressureFrontMPa || 
-            brakePressureThreshold < brakePressureRearMPa
+        if (brakePressureThresholdFrontMPa < brakePressureFrontMPa || 
+            brakePressureThresholdRearMPa  < brakePressureRearMPa
         ) {
             brakelightState |= (1 << 1);
             PORTA |= 1;
