@@ -2,6 +2,12 @@
  * \file    main.cpp (tc_13_ReceiveWithTimeout)
  * \brief   Tests successful and expired Receiver::awaitMessage() timeouts.
  * 
+ * This testcase checks whether the timeout functionality of the awaitMessage()
+ * method of the Receiver class works properly. Therfore a message is awaited 
+ * and then received before the timeout is expired. In the next step a message
+ * is awaited but not injected via mock class. This shall expect in the intended 
+ * behavior - otherwise output to stderr and return value unequal to zero.
+ * 
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -20,9 +26,9 @@ int main(int argc, char** argv) {
         Can::Driver::DriverInterface::getInstance()
     );
 
-    constexpr uint16_t identifier = 0x234;
+    constexpr uint16_t identifier  = 0x234;
     constexpr uint8_t receivedByte = 0x5a;
-    volatile uint8_t byteToRecv = 0;
+    volatile uint8_t byteToRecv    = 0;
 
     Can::Model::Message rxFrame(
         identifier, 
@@ -61,7 +67,7 @@ int main(int argc, char** argv) {
         std::cerr << "awaitMessage() succeeded without receiving!" << std::endl;
         return 3;
     }
-    
+
     const auto elapsed = std::chrono::steady_clock::now() - start;
 
     if (elapsed < std::chrono::milliseconds(timeoutMs)) {
