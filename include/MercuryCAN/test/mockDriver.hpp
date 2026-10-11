@@ -19,7 +19,10 @@
 
 #include <MercuryCAN/driver/driverInterface.hpp>
 
+#include <atomic>
 #include <chrono>
+#include <mutex>
+#include <thread>
 #include <vector>
 
 namespace Can::Driver
@@ -29,13 +32,15 @@ namespace Can::Driver
  * \brief   Test double for the MercuryCAN driver interface.
  *
  * Provides a controllable driver for tests without CAN hardware. Frame activity 
- * is exposed through txTrace and rxTrace, and the tick count can be advanced 
- * explicitly with incrementTickCountMs().
+ * is exposed through txTrace and rxTrace. Cyclic transmissions are processed
+ * by a background timer thread after activateTxTimer() is called.
  */
 class MockDriver : public DriverInterface
 {
 public:
     friend DriverInterface;
+
+    ~MockDriver();
     
     /**
      * \brief   Snapshot of a CAN frame observed by the mock driver.
@@ -166,17 +171,23 @@ public:
      */
     virtual void removeRxMessage(const uint16_t& identifier) override final;
     
-    /** 
-     * \brief   Implements activation of the transmit timer for tests. 
-     * 
-     * This method simulates the activation of a timer used for cyclic 
-     * transmissions in the mock driver. In the context of testing, it allows 
-     * tests to verify that the driver correctly starts the timer when 
-     * requested. The method does not perform any actual timing operations, but 
-     * it can be used to assert that the library's logic for activating the 
-     * transmit timer behaves as expected.
+    /**
+     * \brief   Starts the mock's 1-ms cyclic transmission timer.
+     *
+     * A background thread periodically calls the Transmitter's process cycle,
+     * matching the timer interrupt behavior of the AVR driver. Repeated calls
+     * do not start additional timer threads.
      */
     virtual void activateTxTimer(void) override final;
+
+    /**
+     * \brief   Stops the cyclic transmission timer and waits for its worker.
+     *
+     * Tests can call this method before inspecting traces or destroying
+     * registered messages. The timer is stopped automatically when the driver
+     * is destroyed.
+     */
+    void stopTxTimer(void);
 
     /**
      * \brief   Sets the receiver to which incoming frames are forwarded.
@@ -199,26 +210,18 @@ public:
      * 
      * This method provides the current tick count in milliseconds, which can be
      * used by tests to verify the timing behavior of the driver. The tick count
-     * is advanced explicitly by calling incrementTickCountMs(), allowing tests 
-     * to simulate the passage of time and verify that the library's timing 
-     * logic behaves as expected. The method returns the current value of the
-     * _tickCountMs member variable, which is updated by the mock driver during
-     * testing.
+     * is advanced by the cyclic timer or explicitly by calling
+     * incrementTickCountMs().
      *
      * \return  Current tick count in milliseconds.
      */
     virtual uint32_t getTickCountMs(void) const override final;
 
-    /** 
-     * \brief   Advances the mock driver's millisecond tick count by one. 
-     * 
-     * This method simulates the passage of time in the mock driver by 
-     * incrementing the _tickCountMs member variable by one millisecond. Tests 
-     * can use this method to control the timing behavior of the driver and 
-     * verify that the library's timing logic behaves as expected. The method 
-     * does not perform any actual timing operations, but it allows tests to 
-     * simulate the passage of time and verify that the driver correctly handles 
-     * timing-related events, such as cyclic transmissions and timeouts.
+    /**
+     * \brief   Advances the mock driver's millisecond tick count by one.
+     *
+     * This method allows tests to advance time manually. The active cyclic
+     * transmission timer also advances the count once per timer cycle.
      */
     virtual void incrementTickCountMs(void) override final;
 
@@ -249,7 +252,22 @@ private:
     /**
      * \brief   Number of elapsed timer ticks, counted in milliseconds.
      */
-    uint32_t _tickCountMs = 0;
+    std::atomic<uint32_t> _tickCountMs = 0;
+
+    /**
+     * \brief   Indicates whether the cyclic transmission worker is running.
+     */
+    std::atomic<bool> _txTimerRunning = false;
+
+    /**
+     * \brief   Serializes timer startup and shutdown.
+     */
+    std::mutex _txTimerMutex;
+
+    /**
+     * \brief   Background worker that drives cyclic transmission processing.
+     */
+    std::thread _txTimerThread;
 
     /**
      * \brief   Number of message objects available in the AVR CAN controller.

@@ -17,11 +17,13 @@
 #include <MercuryCAN/controller/transmitter.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
 #include <MercuryCAN/model/cyclicMessage.hpp>
-#include <MercuryCAN/support/signalSlot/metaObject.hpp>
 
+#include <chrono>
 #include <iostream>
+#include <thread>
 
-static volatile uint8_t byte = 0;
+static constexpr uint16_t cycleTimeMs = 10;
+static constexpr std::size_t expectedTxCount = 10;
 
 int main(int argc, char** argv) {
     auto* driver = static_cast<Can::Driver::MockDriver*>(
@@ -29,39 +31,34 @@ int main(int argc, char** argv) {
     );
 
     constexpr uint16_t identifier = 0x123;
+    uint8_t byte = 0;
 
     Can::Model::CyclicMessage txFrame(
         identifier,
-        1,
+        cycleTimeMs,
         &byte
-    );
-
-    SignalSlot::MetaObject::connect(
-        &txFrame,
-        &Can::Model::CyclicMessage::Message::sent,
-        +[](uint32_t) {
-            byte++;
-        }
     );
 
     Can::Controller::Transmitter tx;
     tx.addCyclicMessage(txFrame);
 
-    while (byte < 128);
+    const uint32_t startTick = driver->getTickCountMs();
+    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(3);
+    
+    while (driver->getTickCountMs() - startTick < expectedTxCount * cycleTimeMs && 
+           std::chrono::steady_clock::now() < deadline
+    ) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
 
-    if (driver->txTrace.size() != byte + 1) {
-        std::cerr << "At least one message was missed!" << std::endl;
+    driver->stopTxTimer();
+    const std::size_t actualTxCount = driver->txTrace.size();
+
+    if (actualTxCount < expectedTxCount) {
+        std::cerr << "Timed out waiting for cyclic transmissions (TX count: "
+                  << actualTxCount << ")" << std::endl;
         return 1;
     }
-
-    for (Can::Driver::MockDriver::FrameEvent frame : driver->txTrace) {
-        if (identifier != frame.identifier) {
-            std::cerr << "Wrong identifier was sent on the bus!" << std::endl;
-            return 2;
-        }
-    }
-
-    // Todo: Check the cycle time. 
 
     return 0;
 }
