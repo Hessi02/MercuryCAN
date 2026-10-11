@@ -1,0 +1,28 @@
+name: CMake on a single platform
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure CMake
+      run: cmake --fresh --preset mock
+
+    - name: Build
+      run: cmake --build --preset mock
+
+    - name: Test
+      working-directory: ${{github.workspace}}/bin
+      run: ctest --preset mock
+
