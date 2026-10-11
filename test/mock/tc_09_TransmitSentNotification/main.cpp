@@ -16,19 +16,13 @@
 
 #include <iostream>
 
-Can::Driver::MockDriver* driver = nullptr;
 
-static unsigned int sentCount        = 0;
-static uint32_t sentTick             = 0;
-static std::size_t traceSizeWhenSent = 0;
+static Can::Driver::MockDriver* driver = nullptr;
+static unsigned int sentCount          = 0;
+static uint32_t sentTick               = 0;
+static std::size_t traceSizeWhenSent   = 0;
 
-void onSent(uint32_t tickCountMs) {
-    sentCount++;
-    sentTick = tickCountMs;
-    traceSizeWhenSent = driver->txTrace.size();
-}
-
-int main() {
+int main(int argc, char** argv) {
     driver = static_cast<Can::Driver::MockDriver*>(
         Can::Driver::DriverInterface::getInstance()
     );
@@ -46,30 +40,28 @@ int main() {
     SignalSlot::MetaObject::connect(
         &frame,
         &Can::Model::Message::sent,
-        &onSent
+        +[](uint32_t tickCountMs) {
+            sentCount++;
+            sentTick = tickCountMs;
+            traceSizeWhenSent = driver->txTrace.size();
+        }
     );
 
     const uint32_t expectedTick = driver->getTickCountMs();
     tx.sendMessage(frame);
 
     if (1 != sentCount) {
-        std::cerr << "Single-shot transmission did not emit exactly one "
-                  << "sent notification!" << std::endl;
-
+        std::cerr << "Signal did not emit exactly once!" << std::endl;
         return 1;
     }
 
     if (expectedTick != sentTick) {
-        std::cerr << "Sent notification carried the wrong tick count!"
-                  << std::endl;
-
+        std::cerr << "Sent signal carried wrong tick count!" << std::endl;
         return 2;
     }
 
     if (1 != traceSizeWhenSent || 1 != driver->txTrace.size()) {
-        std::cerr << "Sent notification did not occur after the frame was "
-                  << "recorded!" << std::endl;
-
+        std::cerr << "Sent signal did not occur after recorded!" << std::endl;
         return 3;
     }
 
@@ -79,9 +71,7 @@ int main() {
         1 != event.payload.size()      ||
         event.payload.front() != value
     ) {
-        std::cerr << "The notified transmission contained incorrect frame "
-                  << "data!" << std::endl;
-
+        std::cerr << "Transmission contained incorrect data!" << std::endl;
         return 4;
     }
 

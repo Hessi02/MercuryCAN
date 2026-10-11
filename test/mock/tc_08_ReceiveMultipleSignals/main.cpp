@@ -16,7 +16,7 @@
 
 #include <iostream>
 
-int main() {
+int main(int argc, char** argv) {
     auto* driver = static_cast<Can::Driver::MockDriver*>(
         Can::Driver::DriverInterface::getInstance()
     );
@@ -44,32 +44,25 @@ int main() {
     );
 
     if (0x1234 != firstSignal || 0x89abcdef != secondSignal)  {
-        std::cerr << "Received payload was not split across signals correctly!"
-                  << std::endl;
-
+        std::cerr << "Received payload was not split correctly!" << std::endl;
         return 1;
     }
 
     if (sizeof(payload) != rxFrame.getPayloadSize()) {
         std::cerr << "Message reported an incorrect payload size!" << std::endl;
-
         return 2;
     }
 
     if (!rxFrame.getUpdateFlag()) {
-        std::cerr << "Received message did not set the update flag!"
-                  << std::endl;
-
+        std::cerr << "Received message did not set update flag!" << std::endl;
         return 3;
     }
 
-    if (1 != driver->rxTrace.size()                      ||
-        identifier != driver->rxTrace.front().identifier ||
+    if (1 != driver->rxTrace.size()                               ||
+        identifier != driver->rxTrace.front().identifier          ||
         sizeof(payload) != driver->rxTrace.front().payload.size() 
     ) {
-        std::cerr << "Mock driver did not record the received frame correctly!"
-                  << std::endl;
-
+        std::cerr << "Mock driver did not record frame correctly!" << std::endl;
         return 4;
     }
 

@@ -35,7 +35,7 @@ namespace Can::Model {
  * \tparam  SignalDataTypes passes the signal data types to check.
  */
 template<typename... SignalDataTypes>
-concept FitsIntoCanMessage = ((sizeof(SignalDataTypes) + ...) <= 8);
+concept FitsIntoCanMessage = (0 + ... + sizeof(SignalDataTypes)) <= 8;
 
 /**
  * \brief   Represents a CAN message and the signals contained in its payload.
@@ -44,7 +44,8 @@ concept FitsIntoCanMessage = ((sizeof(SignalDataTypes) + ...) <= 8);
  * The referenced objects must remain valid for the lifetime of the Message.
  * Payload data is serialized one signal at a time, with each signal's bytes
  * written in reverse order. The total payload size cannot exceed eight bytes as
- * classic CAN is used for transmission.
+ * classic CAN is used for transmission. A message with no signals represents a
+ * valid zero-byte payload.
  *
  * \see     FitsIntoCanMessage
  * \see     Signal
@@ -69,7 +70,7 @@ public:
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
                     FitsIntoCanMessage<SignalDataTypes...>
     Message(const uint16_t identifier, SignalDataTypes*... signalPtrPack)
-        : _payloadSize((sizeof(SignalDataTypes) + ...)),
+        : _payloadSize((0 + ... + sizeof(SignalDataTypes))),
           _identifier(identifier) {
         (_signals.append(
              static_cast<AnySignal_t>(Signal<SignalDataTypes>(signalPtrPack))

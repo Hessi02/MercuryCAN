@@ -25,12 +25,12 @@ int main(int argc, char** argv) {
     );
 
     constexpr uint16_t identifier = 0x123;
-    volatile uint8_t byte = 0;
+    volatile uint8_t byteToRecv = 0;
 
     Can::Model::CyclicMessage rxFrame(
         identifier,
         10,
-        &byte
+        &byteToRecv
     );
 
     Can::Controller::Receiver rx;
@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
             return 1;
         }
 
-        if (byte != i) {
+        if (byteToRecv != i) {
             std::cerr << "Not received injected byte correctly!" << std::endl;
             return 2;
         }

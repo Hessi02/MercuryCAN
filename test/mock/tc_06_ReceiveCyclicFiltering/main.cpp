@@ -20,12 +20,7 @@
 static unsigned int receivedCount = 0;
 static uint32_t receivedTick = 0;
 
-void onReceived(uint32_t tickCountMs) {
-    receivedCount++;
-    receivedTick = tickCountMs;
-}
-
-int main() {
+int main(int argc, char** argv) {
     auto* driver = static_cast<Can::Driver::MockDriver*>(
         Can::Driver::DriverInterface::getInstance()
     );
@@ -42,25 +37,26 @@ int main() {
     SignalSlot::MetaObject::connect(
         &frame,
         &Can::Model::Message::received,
-        &onReceived
+        +[](uint32_t tickCountMs) {
+            receivedCount++;
+            receivedTick = tickCountMs;
+        }
     );
     
     Can::Controller::Receiver rx;
     rx.addCyclicMessage(frame);
         
-    constexpr uint16_t unrelatedIdentifier = 0x124;
-    constexpr uint8_t unrelatedData = 0xaa;
-    
+    constexpr uint16_t noiseIdentifier = 0x124;
+    constexpr uint8_t noiseData = 0xaa;
+
     driver->injectRxFrame(
-        unrelatedIdentifier, 
-        &unrelatedData, 
-        sizeof(unrelatedData)
+        noiseIdentifier, 
+        &noiseData, 
+        sizeof(noiseData)
     );
 
     if (0 != value || frame.getUpdateFlag() || 0 != receivedCount) {
-        std::cerr << "Frame with an unrelated identifier changed the message!"
-                  << std::endl;
-                  
+        std::cerr << "Noise frame changed the message!" << std::endl;
         return 1;
     }
 
@@ -74,20 +70,16 @@ int main() {
     
     if (expectedValue != value) {
         std::cerr << "Matching frame payload was not applied!" << std::endl;
-
         return 2;
     }
 
     if (!frame.getUpdateFlag()) {
         std::cerr << "Matching frame did not set the update flag!" << std::endl;
-
         return 3;
     }
 
     if (1 != receivedCount || driver->getTickCountMs() != receivedTick) {
-        std::cerr << "Matching frame did not emit the expected notification!"
-                  << std::endl;
-
+        std::cerr << "Matching frame did not emit the signal!" << std::endl;
         return 4;
     }
 

@@ -18,27 +18,13 @@
 #include <array>
 #include <iostream>
 
-std::array<uint32_t, 2> preSendTicks{};
-std::array<uint32_t, 2> sentTicks{};
+static std::array<uint32_t, 2> preSendTicks{};
+static std::array<uint32_t, 2> sentTicks{};
 
-std::size_t preSendCount = 0;
-std::size_t sentCount = 0;
+static std::size_t preSendCount = 0;
+static std::size_t sentCount = 0;
 
-void onPreSend(uint32_t tickCountMs) {
-    if (preSendCount < preSendTicks.size())
-        preSendTicks[preSendCount] = tickCountMs;
-
-    preSendCount++;
-}
-
-void onSent(uint32_t tickCountMs) {
-    if (sentCount < sentTicks.size())
-        sentTicks[sentCount] = tickCountMs;
-
-    sentCount++;
-}
-
-int main() {
+int main(int argc, char** argv) {
     auto* driver = static_cast<Can::Driver::MockDriver*>(
         Can::Driver::DriverInterface::getInstance()
     );
@@ -48,20 +34,34 @@ int main() {
 
     constexpr uint16_t identifier = 0x234;
     constexpr uint16_t cycleTimeMs = 2;
+    volatile uint8_t byteToTransmit = 0x7b;
 
-    uint8_t value = 0x7b;
-    Can::Model::CyclicMessage txFrame(identifier, cycleTimeMs, &value);
+    Can::Model::CyclicMessage txFrame(
+        identifier, 
+        cycleTimeMs, 
+        &byteToTransmit
+    );
 
     SignalSlot::MetaObject::connect(
         &txFrame,
         &Can::Model::Message::preSend,
-        &onPreSend
+        +[](uint32_t tickCountMs) {
+            if (preSendCount < preSendTicks.size())
+                preSendTicks[preSendCount] = tickCountMs;
+
+            preSendCount++;
+        }
     );
 
     SignalSlot::MetaObject::connect(
         &txFrame,
         &Can::Model::Message::sent,
-        &onSent
+        +[](uint32_t tickCountMs) {
+            if (sentCount < sentTicks.size())
+                sentTicks[sentCount] = tickCountMs;
+
+            sentCount++;
+        }
     );
 
     tx.addCyclicMessage(txFrame);
@@ -71,31 +71,23 @@ int main() {
         Can::Controller::Transmitter::processTransmitCycle();
 
     if (driver->txTrace.size() != initialTxCount + 2) {
-        std::cerr << "A 2-ms message was not sent exactly twice in 4 cycles!"
-                  << std::endl;
-
+        std::cerr << "Count of transmitted frames is not valid!" << std::endl;
         return 1;
     }
 
     if (2 != preSendCount || 2 != sentCount) {
-        std::cerr << "Cyclic message notifications were not emitted exactly "
-                  << "twice!" << std::endl;
-
+        std::cerr << "Cyclic message's signal count is not valid!" << std::endl;
         return 2;
     }
 
     for (std::size_t index = 0; index < sentTicks.size(); index++) {
         if (preSendTicks[index] != sentTicks[index]) {
-            std::cerr << "preSend and sent notifications used different ticks!"
-                      << std::endl;
-
+            std::cerr << "Both signals used different ticks!" << std::endl;
             return 3;
         }
 
         if (0 != sentTicks[index] % cycleTimeMs) {
-            std::cerr << "Cyclic message was sent outside its interval!"
-                      << std::endl;
-
+            std::cerr << "Sent signal was sent out of interval!" << std::endl;
             return 4;
         }
     }
@@ -103,13 +95,11 @@ int main() {
     for (std::size_t index = initialTxCount; index < driver->txTrace.size(); index++) {
         const Can::Driver::MockDriver::FrameEvent& event = driver->txTrace[index];
 
-        if (identifier != event.identifier ||
-            1 != event.payload.size()      ||
-            event.payload.front() != value
+        if (identifier != event.identifier          ||
+            1 != event.payload.size()               ||
+            event.payload.front() != byteToTransmit
         ) {    
-            std::cerr << "Cyclic transmission contains incorrect frame data!"
-                      << std::endl;
-
+            std::cerr << "Transmission contains incorrect data!" << std::endl;
             return 5;
         }
     }

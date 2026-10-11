@@ -26,11 +26,11 @@ int main(int argc, char** argv) {
    
     Can::Controller::Transmitter tx;
 
-    constexpr uint16_t identifier = 1;
+    constexpr uint16_t identifier = 0x100;
     volatile uint64_t testData = 0x0123456789abcdef;
 
     if (0 < driver->txTrace.size()) {
-        std::cerr << "TX trace not empty before message was sent!" << std::endl;
+        std::cerr << "TX trace filled before message was sent!" << std::endl;
         return 1;
     }
 
@@ -73,8 +73,7 @@ int main(int argc, char** argv) {
             );
 
             if (expectedByte != event.payload[byte]) {
-                std::cerr << "Wrong testData byte at index " << byte
-                          << "!" << std::endl;
+                std::cerr << "Wrong testData payload detected!" << std::endl;
                 return 7;
             }
         }

@@ -18,7 +18,7 @@
 #include <array>
 #include <iostream>
 
-int main() {
+int main(int argc, char** argv) {
     auto* driver = static_cast<Can::Driver::MockDriver*>(
         Can::Driver::DriverInterface::getInstance()
     );
@@ -43,7 +43,6 @@ int main() {
 
     if (1 != driver->txTrace.size()) {
         std::cerr << "Expected exactly one transmitted frame!" << std::endl;
-        
         return 1;
     }
 
@@ -51,21 +50,17 @@ int main() {
 
     if (identifier != event.identifier) {
         std::cerr << "Transmitted frame has the wrong identifier!" << std::endl;
-
         return 2;
     }
 
     if (event.payload.size() != expectedPayload.size()) {
         std::cerr << "Transmitted payload has the wrong size!" << std::endl;
-
         return 3;
     }
 
     for (std::size_t index = 0; index < expectedPayload.size(); index++) {
         if (event.payload[index] != expectedPayload[index]) {
-            std::cerr << "Transmitted payload has an incorrect byte at index "
-                      << index << "!" << std::endl;
-
+            std::cerr << "Transmitted payload has incorrect data!" << std::endl;
             return 4;
         }
     }
