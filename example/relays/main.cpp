@@ -1,3 +1,4 @@
+#include <MercuryCAN/driver/driverInterface.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
 
@@ -28,6 +29,6 @@ int main(void) {
 
     tx.addCyclicMessage(txState);
 
-    auto& driver = Can::Driver::DriverInterface::getInstance();
-    driver.enterIdleSleep();
+    auto* driver = Can::Driver::DriverInterface::getInstance();
+    driver->enterIdleSleep();
 }
