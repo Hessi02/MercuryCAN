@@ -50,6 +50,20 @@ public:
     void awaitMessage(Model::Message& message);
 
     /**
+     * \brief   Waits synchronously for a message update until timeout expired.
+     *
+     * Overloaded awaitMessage() method, returning with false when the message
+     * does not get updated until timeout expired. The method returns with true,
+     * if message is received in time. The driver's millisecond timer is
+     * activated when the timeout is nonzero.
+     *
+     * \param   message passes the message whose update flag is awaited.
+     * \param   timeout passes the duration to wait for a message update in
+     *          milliseconds.
+     */
+    bool awaitMessage(Model::Message& message, const uint32_t& timeout);
+
+    /**
      * \brief   Registers a cyclic message for reception.
      *
      * Stores a non-owning reference to the message in the receiver's cyclic

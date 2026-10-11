@@ -18,6 +18,34 @@ void Can::Controller::Receiver::awaitMessage(Model::Message& message) {
     driver->removeRxMessage(message.getIdentifier());
 }
 
+bool Can::Controller::Receiver::awaitMessage(
+    Model::Message& message,
+    const uint32_t& timeoutMs
+) {
+    message.setUpdateFlag(false);
+
+    _awaitMessageReceived = false;
+    _awaitedMessage = &message;
+
+    Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
+    driver->setReceiverInstance(this);
+    driver->addRxMessage(message.getIdentifier(), message.getPayloadSize());
+
+    if (timeoutMs > 0)
+        driver->activateTxTimer();
+
+    const uint32_t startTick = driver->getTickCountMs();
+    while (!_awaitMessageReceived &&
+           driver->getTickCountMs() - startTick < timeoutMs) {
+    }
+
+    const bool received = _awaitMessageReceived;
+    _awaitedMessage = nullptr;
+    driver->removeRxMessage(message.getIdentifier());
+
+    return received;
+}
+
 void Can::Controller::Receiver::addCyclicMessage(
     Model::CyclicMessage& message
 ) {
