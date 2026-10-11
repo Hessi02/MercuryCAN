@@ -23,6 +23,5 @@ jobs:
       run: cmake --build --preset mock
 
     - name: Test
-      working-directory: ${{github.workspace}}/bin
       run: ctest --preset mock
 
