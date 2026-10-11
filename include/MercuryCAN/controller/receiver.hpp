@@ -19,8 +19,6 @@
 
 #include <MercuryCAN/model/cyclicMessage.hpp>
 
-#include <atomic>
-
 namespace Can::Controller {
 
 /**
@@ -86,12 +84,12 @@ private:
     /**
      * \brief   Message currently awaited by awaitMessage(), if any.
      */
-    std::atomic<Model::Message*> _awaitedMessage{nullptr};
+    Model::Message* volatile _awaitedMessage = nullptr;
 
     /**
      * \brief   Signals that the awaited frame has been fully processed.
      */
-    std::atomic<bool> _awaitMessageReceived{false};
+    volatile bool _awaitMessageReceived = false;
 
     /**
      * \brief   Number of cyclic messages registered with this receiver.

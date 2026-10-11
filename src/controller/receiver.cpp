@@ -5,16 +5,16 @@
 void Can::Controller::Receiver::awaitMessage(Model::Message& message) {
     message.setUpdateFlag(false);
 
-    _awaitMessageReceived.store(false, std::memory_order_relaxed);
-    _awaitedMessage.store(&message, std::memory_order_release);
+    _awaitMessageReceived = false;
+    _awaitedMessage = &message;
     
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
     driver->setReceiverInstance(this);
     driver->addRxMessage(message.getIdentifier(), message.getPayloadSize());
 
-    while (!_awaitMessageReceived.load(std::memory_order_acquire));
+    while (!_awaitMessageReceived);
 
-    _awaitedMessage.store(nullptr, std::memory_order_release);
+    _awaitedMessage = nullptr;
     driver->removeRxMessage(message.getIdentifier());
 }
 
@@ -35,8 +35,7 @@ void Can::Controller::Receiver::processRxData(
     const std::size_t& dataLength
 ) {
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
-    Model::Message* awaitedMessage =
-        _awaitedMessage.load(std::memory_order_acquire);
+    Model::Message* awaitedMessage = _awaitedMessage;
     bool awaitedMessageProcessed = false;
 
     for (uint8_t i = 0; i < _messageCount; i++) {
@@ -61,6 +60,6 @@ void Can::Controller::Receiver::processRxData(
             emit awaitedMessage->received(driver->getTickCountMs());
         }
 
-        _awaitMessageReceived.store(true, std::memory_order_release);
+        _awaitMessageReceived = true;
     }
 }
