@@ -5,8 +5,10 @@
 
 int main(void) {
     volatile uint8_t  brakelightState = 0;
+
     volatile uint16_t brakePressureFrontMPa;
     volatile uint16_t brakePressureRearMPa;
+    
     volatile uint16_t brakePressureThresholdFrontMPa;
     volatile uint16_t brakePressureThresholdRearMPa;
 
