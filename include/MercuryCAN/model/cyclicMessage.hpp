@@ -27,7 +27,8 @@ namespace Can::Model {
  *
  * \see     Message
  */
-class CyclicMessage : public Message {
+class CyclicMessage : public Message 
+{
 public:
     /**
      * \brief   Constructs object from identifier, cycle time and signals.
