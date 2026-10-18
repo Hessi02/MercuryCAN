@@ -60,9 +60,9 @@ public:
              class... ParamPack>
     requires isDerived<SenderBase, Sender> &&
              isDerived<ReceiverBase, Receiver>
-    static void connect(const Sender* sender,
+    static void connect(Sender* sender,
                         void(SenderBase::*signal)(ParamPack...),
-                        const Receiver* receiver,
+                        Receiver* receiver,
                         void(ReceiverBase::*callback)(ParamPack...)
     ) {
         Connection<ParamPack...>* connection = 
@@ -73,7 +73,7 @@ public:
                 callback
             );
         
-        _connections<ParamPack...>.push_back(connection);
+        _connections<ParamPack...>.append(connection);
     }
 
     /**
