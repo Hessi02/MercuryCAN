@@ -10,12 +10,14 @@
  * The parser currently supports exact message-name lookup and validates the
  * parsed identifier, declared payload length, and combined signal data size.
  * It does not parse signal definitions, node assignments, DBC attributes, or
- * cycle times. Message creation returns an empty optional when no supported
+ * cycle times. Message creation returns a null pointer when no supported
  * matching definition is found or when the signal data does not fit.
  *
  * The DBC text and node name are not copied. The DBC text must remain valid
  * and null-terminated while the Database is used; signal data referenced by
  * a returned Message must likewise outlive that Message's use.
+ * The caller owns each successfully returned Message pointer and must delete
+ * it when it is no longer needed.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -87,12 +89,12 @@ public:
      * \param name passes the exact DBC message name to find.
      * \param signalPtrPack passes non-owning pointers to the signal data.
      * 
-     * \return A populated optional when row is found and the signal size fits.
+     * \return A pointer to a heap-allocated message when the row is found. 
      */
     template<typename... SignalDataTypes>
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
                     FitsIntoCanMessage<SignalDataTypes...>
-    std::optional<Message> buildMessage(
+    Message* buildMessage(
         const char* name, 
         SignalDataTypes*... signalPtrPack
     ) const {
@@ -100,16 +102,15 @@ public:
         const std::size_t signalSize = (0 + ... + sizeof(SignalDataTypes));
 
         if (!definition)
-            return std::nullopt;
+            return nullptr;
 
         const bool payloadFits = definition->payloadSize <= _maximumPayloadSize;
         const bool signalDataFits = signalSize == definition->payloadSize;
 
         if (!payloadFits || !signalDataFits) 
-            return std::nullopt;
+            return nullptr;
 
-        return std::optional<Message>(
-            std::in_place, 
+        return new Message(
             definition->identifier, 
             signalPtrPack...
         );

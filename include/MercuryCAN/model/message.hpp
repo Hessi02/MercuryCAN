@@ -54,6 +54,11 @@ class Message : public SignalSlot::MetaObject
 {
 public:
     /**
+     * \brief   Allows derived messages to be destroyed through a base pointer.
+     */
+    virtual ~Message() = default;
+
+    /**
      * \brief   Constructs a message from its identifier and signal references.
      *
      * Each provided signal type must be allowed by AllowedSignalDataType, and 

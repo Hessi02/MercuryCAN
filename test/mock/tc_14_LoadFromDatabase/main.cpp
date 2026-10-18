@@ -10,14 +10,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <MercuryCAN/controller/receiver.hpp>
-#include <MercuryCAN/controller/transmitter.hpp>
 #include <MercuryCAN/model/message.hpp>
-#include <MercuryCAN/model/cyclicMessage.hpp>
 #include <MercuryCAN/model/database.hpp>
 
 #include <cassert>
 #include <cstdint>
+#include <type_traits>
 #include <typeinfo>
 
 namespace {
@@ -39,11 +37,15 @@ constexpr char databaseText[] =
     "BO_ 12: 0 TestNode\n"
     " BO_ 15 IndentedHeader: 0 TestNode\n"
     "BO_ 7 FinalRow: 1 TestNode";
-
 }
 
 int main() {
     constexpr Can::Model::Database database("TestNode", databaseText);
+    static_assert(std::is_same_v<
+        decltype(database.buildMessage("Empty")),
+        Can::Model::Message*
+    >);
+    static_assert(std::has_virtual_destructor_v<Can::Model::Message>);
 
     volatile int32_t wheelSpeed;
     auto msg = database.buildMessage("Telemetry", &wheelSpeed);
@@ -144,6 +146,12 @@ int main() {
     //
     constexpr Can::Model::Database nullDatabase("TestNode", nullptr);
     assert(!nullDatabase.buildMessage("Telemetry", &wheelSpeed));
+
+    delete msg;
+    delete multipleSignals;
+    delete emptyMessage;
+    delete maximumMessage;
+    delete finalMessage;
 
     return 0;
 }
