@@ -1,12 +1,9 @@
 /**
  * \file    main.cpp (tc_14_LoadFromDatabase)
- * \brief   Tests message construction from an in-memory DBC definition.
+ * \brief   Tests DBC message lookup, boundary values, and signal-size checks.
  *
- * Provides a minimal DBC string containing one message and constructs a
- * Database over that text. The test verifies that the matching message's
- * identifier and declared payload length are used, and that construction
- * fails cleanly when the message name is unknown or the signal data exceeds
- * the DBC-declared payload length.
+ * Exercises message lookup against valid, malformed, and boundary DBC rows,
+ * including zero- and maximum-length payloads and combinations of signals.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -19,112 +16,134 @@
 #include <MercuryCAN/model/cyclicMessage.hpp>
 #include <MercuryCAN/model/database.hpp>
 
-#include <iostream>
 #include <cassert>
+#include <cstdint>
+#include <typeinfo>
 
-int main(int argc, char** argv) {
-    constexpr Can::Model::Database database(
-        "TestNode",
-        "VERSION \"\"\n"
-        "\n"
-        "\n"
-        "NS_ : \n"
-        "\t\tNS_DESC_\n"
-        "\t\tCM_\n"
-        "\t\tBA_DEF_\n"
-        "\t\tBA_\n"
-        "\t\tVAL_\n"
-        "\t\tCAT_DEF_\n"
-        "\t\tCAT_\n"
-        "\t\tFILTER\n"
-        "\t\tBA_DEF_DEF_\n"
-        "\t\tEV_DATA_\n"
-        "\t\tENVVAR_DATA_\n"
-        "\t\tSGTYPE_\n"
-        "\t\tSGTYPE_VAL_\n"
-        "\t\tBA_DEF_SGTYPE_\n"
-        "\t\tBA_SGTYPE_\n"
-        "\t\tSIG_TYPE_REF_\n"
-        "\t\tVAL_TABLE_\n"
-        "\t\tSIG_GROUP_\n"
-        "\t\tSIG_VALTYPE_\n"
-        "\t\tSIGTYPE_VALTYPE_\n"
-        "\t\tBO_TX_BU_\n"
-        "\t\tBA_DEF_REL_\n"
-        "\t\tBA_REL_\n"
-        "\t\tBA_DEF_DEF_REL_\n"
-        "\t\tBU_SG_REL_\n"
-        "\t\tBU_EV_REL_\n"
-        "\t\tBU_BO_REL_\n"
-        "\t\tSG_MUL_VAL_\n"
-        "\n"
-        "BS_:\n"
-        "\n"
-        "BU_:\n"
-        "\n"
-        "\n"
-        "\n"
-        "BO_ 12 Telemetry: 4 TestNode\n"
-        "\tSG_ WheelSpeed : 0|32@1- (1,0) [-1500|1500] \"rpm\" Vector__XXX\n"
-        "\n"
-        "\n"
-        "CM_ BO_ 1 \"Vehicle telemetry data\";\n"
-        "CM_ SG_ 1 WheelSpeed \"Wheel speed sensor data.\";\n"
-        "BA_DEF_ BO_  \"VFrameFormat\" ENUM  \"StandardCAN\",\"ExtendedCAN\",\"reserved\",\"J1939PG\";\n"
-        "BA_DEF_  \"DatabaseVersion\" STRING ;\n"
-        "BA_DEF_  \"BusType\" STRING ;\n"
-        "BA_DEF_  \"ProtocolType\" STRING ;\n"
-        "BA_DEF_DEF_  \"VFrameFormat\" \"StandardCAN\";\n"
-        "BA_DEF_DEF_  \"DatabaseVersion\" \"1.0.0\";\n"
-        "BA_DEF_DEF_  \"BusType\" \"CAN\";\n"
-        "BA_DEF_DEF_  \"ProtocolType\" \"\";\n"
-        "BA_ \"DatabaseVersion\" \"1.0.0\";\n"
-        "BA_ \"BusType\" \"CAN\";\n"
-        "BA_ \"ProtocolType\" \"\";"
-    );
+namespace {
+
+constexpr char databaseText[] =
+    "VERSION \"\"\n"
+    "NS_ :\n"
+    "BS_:\n"
+    "BU_:\n"
+    "BO_ 12 Telemetry: 4 TestNode\n"
+    "BO_ 0 Empty: 0 TestNode\n"
+    "BO_ 65535 MaximumIdentifier: 8 TestNode\n"
+    "BO_ 42 MultipleSignals: 4 TestNode\n"
+    "BO_ 65536 IdentifierOverflow: 0 TestNode\n"
+    "BO_ 12 PayloadOverflow: 256 TestNode\n"
+    "BO_ 12 PayloadTooLarge: 9 TestNode\n"
+    "BO_ 4294967296 IdentifierParseOverflow: 0 TestNode\n"
+    "BO_ 12 MissingPayload: TestNode\n"
+    "BO_ 12: 0 TestNode\n"
+    " BO_ 15 IndentedHeader: 0 TestNode\n"
+    "BO_ 7 FinalRow: 1 TestNode";
+
+}
+
+int main() {
+    constexpr Can::Model::Database database("TestNode", databaseText);
 
     volatile int32_t wheelSpeed;
     auto msg = database.buildMessage("Telemetry", &wheelSpeed);
 
-    //
-    // 1. Check whether the parsing algortihm finds the message in DBC.
-    //
-    assert(msg && "Message could be found in DBC.");
+    assert(msg);
+    assert(typeid(Can::Model::Message) == typeid(*msg));
+    assert(12 == msg->getIdentifier());
+    assert(4 == msg->getPayloadSize());
 
     //
-    // 2. Check whether the parsing algorithm does not include a cycle time.
+    // The combined sizes of multiple signal values must exactly match the DBC.
     //
-    assert(typeid(Can::Model::Message) == typeid(*msg) && "Single shot message was build.");
+    volatile uint16_t firstSignal = 1;
+    volatile uint16_t secondSignal = 2;
+
+    auto multipleSignals = database.buildMessage(
+        "MultipleSignals", 
+        &firstSignal, 
+        &secondSignal
+    );
+
+    assert(multipleSignals);
+    assert(42 == multipleSignals->getIdentifier());
+    assert(4 == multipleSignals->getPayloadSize());
 
     //
-    // 3. Check if the identifier can be read from DBC.
+    // Zero-byte and maximum classic-CAN payloads are both valid boundaries.
     //
-    assert(0x0c == msg->getIdentifier() && "Identifier gets parsed from DBC.");
+    auto emptyMessage = database.buildMessage("Empty");
+
+    assert(emptyMessage);
+    assert(0 == emptyMessage->getIdentifier());
+    assert(0 == emptyMessage->getPayloadSize());
+
+    volatile uint64_t maximumPayload = 0;
+    auto maximumMessage = database.buildMessage(
+        "MaximumIdentifier", &maximumPayload
+    );
+
+    assert(maximumMessage);
+    assert(65535 == maximumMessage->getIdentifier());
+    assert(8 == maximumMessage->getPayloadSize());
 
     //
-    // 4. Check if the payload size can be parsed from DBC.
-    //
-    assert(0x04 == msg->getPayloadSize() && "Payload size gets parsed from DBC.");
-
-    //
-    // 5. Check if an oversized signal results in an unpopulated variable.
+    // A single signal that is larger or smaller than the payload fails.
     //
     volatile uint64_t oversizedSignal;
     auto largeMsg = database.buildMessage("Telemetry", &oversizedSignal);
-    assert(!largeMsg && "Invalid signal size results in invalid message.");
+    assert(!largeMsg);
 
-    //
-    // 6. Check if an undersized signal results in an upopulated variable.
-    //
     volatile int16_t undersizedSignal;
     auto smallMsg = database.buildMessage("Telemetry", &undersizedSignal);
-    assert(!smallMsg && "Invalid signal size results in invalid message.");
+    assert(!smallMsg);
+
+    //
+    // The same exact-size rule applies to combinations in either direction.
+    //
+    auto tooFewSignals = database.buildMessage("MultipleSignals", &firstSignal);
+    assert(!tooFewSignals);
     
+    volatile uint32_t tooManySignals = 0;
+    auto tooMany = database.buildMessage(
+        "MultipleSignals", &firstSignal, &tooManySignals
+    );
+
+    assert(!tooMany);
+
     //
-    // 7. Check if an unknown signal results in an unpopulated variable.
+    // Lookup is exact and case-sensitive; unknown and null names are rejected.
     //
-    auto unknownMsg = database.buildMessage("Unknown", &wheelSpeed); 
-    assert(!unknownMsg && "Unknown signal results in invalid message.");
+    assert(!database.buildMessage("Unknown", &wheelSpeed));
+    assert(!database.buildMessage("TelemetryExtra", &wheelSpeed));
+    assert(!database.buildMessage("telemetry", &wheelSpeed));
+    assert(!database.buildMessage(nullptr, &wheelSpeed));
+
+    //
+    // Unsupported lengths and malformed/out-of-range header values are rejected.
+    //
+    assert(!database.buildMessage("IdentifierOverflow"));
+    assert(!database.buildMessage("PayloadOverflow"));
+    assert(!database.buildMessage("PayloadTooLarge"));
+    assert(!database.buildMessage("IdentifierParseOverflow"));
+    assert(!database.buildMessage("MissingPayload"));
+    assert(!database.buildMessage("IndentedHeader"));
+
+    //
+    // A final header without a newline is still scanned.
+    //
+    volatile uint8_t finalSignal = 0;
+    auto finalMessage = database.buildMessage("FinalRow", &finalSignal);
+
+    assert(finalMessage);
+    assert(7 == finalMessage->getIdentifier());
+    assert(1 == finalMessage->getPayloadSize());
+
+    //
+    // A null DBC pointer cannot produce a match.
+    //
+    constexpr Can::Model::Database nullDatabase("TestNode", nullptr);
+    assert(!nullDatabase.buildMessage("Telemetry", &wheelSpeed));
 
     return 0;
 }

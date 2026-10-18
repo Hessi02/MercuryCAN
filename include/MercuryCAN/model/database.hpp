@@ -198,6 +198,11 @@ private:
         if (!parseUnsigned(cursor, lineEnd, payloadSize))
             return std::nullopt;
 
+        if (identifier > std::numeric_limits<uint16_t>::max() ||
+            payloadSize > std::numeric_limits<uint8_t>::max()
+        )
+            return std::nullopt;
+
         return MessageDefinition{
             static_cast<uint16_t>(identifier),
             static_cast<uint8_t>(payloadSize)
