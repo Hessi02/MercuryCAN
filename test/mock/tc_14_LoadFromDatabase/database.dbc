@@ -1,0 +1,33 @@
+VERSION ""
+
+NS_ :
+
+
+BS_:
+
+BU_:
+
+
+BO_ 12 Telemetry: 4 TestNode
+
+BO_ 0 Empty: 0 TestNode
+
+BO_ 65535 MaximumIdentifier: 8 TestNode
+
+BO_ 42 MultipleSignals: 4 TestNode
+
+BO_ 65536 IdentifierOverflow: 0 TestNode
+
+BO_ 12 PayloadOverflow: 256 TestNode
+
+BO_ 12 PayloadTooLarge: 9 TestNode
+
+BO_ 4294967296 IdentifierParseOverflow: 0 TestNode
+
+BO_ 12 MissingPayload: TestNode
+
+BO_ 12: 0 TestNode
+
+ BO_ 15 IndentedHeader: 0 TestNode
+
+BO_ 7 FinalRow: 1 TestNode

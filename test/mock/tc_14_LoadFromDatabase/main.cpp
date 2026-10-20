@@ -18,29 +18,10 @@
 #include <type_traits>
 #include <typeinfo>
 
-namespace {
-
-constexpr char databaseText[] =
-    "VERSION \"\"\n"
-    "NS_ :\n"
-    "BS_:\n"
-    "BU_:\n"
-    "BO_ 12 Telemetry: 4 TestNode\n"
-    "BO_ 0 Empty: 0 TestNode\n"
-    "BO_ 65535 MaximumIdentifier: 8 TestNode\n"
-    "BO_ 42 MultipleSignals: 4 TestNode\n"
-    "BO_ 65536 IdentifierOverflow: 0 TestNode\n"
-    "BO_ 12 PayloadOverflow: 256 TestNode\n"
-    "BO_ 12 PayloadTooLarge: 9 TestNode\n"
-    "BO_ 4294967296 IdentifierParseOverflow: 0 TestNode\n"
-    "BO_ 12 MissingPayload: TestNode\n"
-    "BO_ 12: 0 TestNode\n"
-    " BO_ 15 IndentedHeader: 0 TestNode\n"
-    "BO_ 7 FinalRow: 1 TestNode";
-}
+extern const char databaseText[];
 
 int main() {
-    constexpr Can::Model::Database database(databaseText);
+    const Can::Model::Database database(databaseText);
     
     static_assert(std::is_same_v<
         decltype(database.buildMessage("Empty")),
