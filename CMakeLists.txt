@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 
 project(MercuryCAN)
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/res/cmake/embed_dbc.cmake")
+
 if(MOCK_SOURCES)
     find_package(Threads REQUIRED)
 

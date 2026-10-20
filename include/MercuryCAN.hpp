@@ -19,8 +19,9 @@
 #include <MercuryCAN/model/signal.hpp>
 #include <MercuryCAN/model/message.hpp>
 #include <MercuryCAN/model/cyclicMessage.hpp>
+#include <MercuryCAN/model/database.hpp>
 
-#include <MercuryCAN/driver/driver.hpp>
+#include <MercuryCAN/driver/driverInterface.hpp>
 
 #include <MercuryCAN/controller/transmitter.hpp>
 #include <MercuryCAN/controller/receiver.hpp>

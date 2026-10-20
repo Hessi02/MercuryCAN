@@ -5,7 +5,8 @@
  * Defines Can::Model::Database, a lightweight, non-owning view over
  * null-terminated DBC text. The class searches DBC \c BO_ message rows and
  * extracts the identifier and payload length needed to construct a
- * Can::Model::Message with caller-provided signal data pointers.
+ * Can::Model::Message or Can::Model::CyclicMessage with caller-provided
+ * signal data pointers.
  *
  * The parser currently supports exact message-name lookup and validates the
  * parsed identifier, declared payload length, and combined signal data size.
@@ -13,11 +14,10 @@
  * cycle times. Message creation returns a null pointer when no supported
  * matching definition is found or when the signal data does not fit.
  *
- * The DBC text and node name are not copied. The DBC text must remain valid
- * and null-terminated while the Database is used; signal data referenced by
- * a returned Message must likewise outlive that Message's use.
- * The caller owns each successfully returned Message pointer and must delete
- * it when it is no longer needed.
+ * The DBC text is not copied and must remain valid and null-terminated while
+ * the Database is used. Signal data referenced by a returned message must
+ * likewise outlive that message's use. The caller owns each successfully
+ * returned message pointer and must delete it when it is no longer needed.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -27,6 +27,7 @@
 #ifndef __MERCURYCAN_MODEL_DATABASE_HPP__
 #define __MERCURYCAN_MODEL_DATABASE_HPP__
 
+#include <MercuryCAN/model/cyclicMessage.hpp>
 #include <MercuryCAN/model/message.hpp>
 
 #include <cstddef>
@@ -50,9 +51,9 @@ namespace Can::Model {
  * classic-CAN maximum of eight bytes. The data type sizes are taken from C++
  * \c sizeof; they are not compared with individual DBC signal definitions.
  *
- * Both constructor arguments are non-owning pointers. The DBC text must
- * remain valid and null-terminated while the database is used. The node name
- * is retained but is not currently used to filter or validate message rows.
+ * The DBC text is a non-owning pointer and must remain valid and
+ * null-terminated while the database is used. Cycle times are supplied by the
+ * caller when creating cyclic messages; they are not read from DBC metadata.
  */
 class Database
 {
@@ -63,11 +64,9 @@ public:
      * Stores non-owning pointers; it does not copy either string or parse the
      * DBC during construction.
      *
-     * \param   node passes the associated node name.
      * \param   file passes the DBC content as a null-terminated string.
      */
-    constexpr Database(const char* node, const char* file) :
-        _node(node),
+    constexpr Database(const char* file) :
         _file(file)
     {}
 
@@ -89,7 +88,8 @@ public:
      * \param name passes the exact DBC message name to find.
      * \param signalPtrPack passes non-owning pointers to the signal data.
      * 
-     * \return A pointer to a heap-allocated message when the row is found. 
+     * \return A pointer to a heap-allocated message when the row and payload
+     *         size match, otherwise nullptr.
      */
     template<typename... SignalDataTypes>
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
@@ -98,20 +98,54 @@ public:
         const char* name, 
         SignalDataTypes*... signalPtrPack
     ) const {
-        const std::optional<MessageDefinition> definition = findMessage(name);
-        const std::size_t signalSize = (0 + ... + sizeof(SignalDataTypes));
+        const std::optional<MessageDefinition> definition =
+            findMessageWithPayloadSize(
+                name, (0 + ... + sizeof(SignalDataTypes))
+            );
 
         if (!definition)
             return nullptr;
 
-        const bool payloadFits = definition->payloadSize <= _maximumPayloadSize;
-        const bool signalDataFits = signalSize == definition->payloadSize;
+        return new Message(
+            definition->identifier,
+            signalPtrPack...
+        );
+    }
 
-        if (!payloadFits || !signalDataFits) 
+    /**
+     * \brief   Builds a cyclic message matching a DBC message definition.
+     *
+     * The exact, case-sensitive message name and combined signal data size
+     * must match a supported DBC message. The cycle time is supplied by the
+     * caller and is expressed in milliseconds.
+     *
+     * \tparam SignalDataTypes specifies the types of the signal data.
+     * \param name passes the exact DBC message name to find.
+     * \param cycleTime passes the cycle time in milliseconds.
+     * \param signalPtrPack passes non-owning pointers to the signal data.
+     *
+     * \return A pointer to a heap-allocated cyclic message when the row and
+     *         payload size match, otherwise nullptr.
+     */
+    template<typename... SignalDataTypes>
+        requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
+                    FitsIntoCanMessage<SignalDataTypes...>
+    CyclicMessage* buildCyclicMessage(
+        const char* name,
+        const uint16_t& cycleTime,
+        SignalDataTypes*... signalPtrPack
+    ) const {
+        const std::optional<MessageDefinition> definition =
+            findMessageWithPayloadSize(
+                name, (0 + ... + sizeof(SignalDataTypes))
+            );
+
+        if (!definition)
             return nullptr;
 
-        return new Message(
-            definition->identifier, 
+        return new CyclicMessage(
+            definition->identifier,
+            cycleTime,
             signalPtrPack...
         );
     }
@@ -161,6 +195,30 @@ private:
         }
 
         return std::nullopt;
+    }
+
+    /**
+     * \brief   Finds a message whose declared payload matches the signal data.
+     *
+     * \param name passes the exact DBC message name to find.
+     * \param signalSize passes the combined size of the signal data types.
+     *
+     * \return The parsed definition when its payload is supported and matches
+     *         signalSize, otherwise an empty optional.
+     */
+    std::optional<MessageDefinition> findMessageWithPayloadSize(
+        const char* name,
+        const std::size_t signalSize
+    ) const {
+        const std::optional<MessageDefinition> definition = findMessage(name);
+
+        if (!definition ||
+            definition->payloadSize > _maximumPayloadSize ||
+            signalSize != definition->payloadSize
+        )
+            return std::nullopt;
+
+        return definition;
     }
 
     /**
@@ -291,13 +349,6 @@ private:
      * \brief   Maximum payload size supported by the classic-CAN Message model.
      */
     static constexpr uint8_t _maximumPayloadSize = 8;
-
-    /**
-     * \brief   Non-owning pointer to the associated node name.
-     *
-     * Retained for future node-aware database parsing; currently unused.
-     */
-    const char* _node;
 
     /**
      * \brief   Non-owning pointer to the complete null-terminated DBC text.

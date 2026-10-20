@@ -40,11 +40,18 @@ constexpr char databaseText[] =
 }
 
 int main() {
-    constexpr Can::Model::Database database("TestNode", databaseText);
+    constexpr Can::Model::Database database(databaseText);
+    
     static_assert(std::is_same_v<
         decltype(database.buildMessage("Empty")),
         Can::Model::Message*
     >);
+
+    static_assert(std::is_same_v<
+        decltype(database.buildCyclicMessage("Empty", 1)),
+        Can::Model::CyclicMessage*
+    >);
+    
     static_assert(std::has_virtual_destructor_v<Can::Model::Message>);
 
     volatile int32_t wheelSpeed;
@@ -54,6 +61,23 @@ int main() {
     assert(typeid(Can::Model::Message) == typeid(*msg));
     assert(12 == msg->getIdentifier());
     assert(4 == msg->getPayloadSize());
+
+    auto cyclicMessage = database.buildCyclicMessage(
+        "Telemetry", 20, &wheelSpeed
+    );
+
+    assert(cyclicMessage);
+    assert(12 == cyclicMessage->getIdentifier());
+    assert(4 == cyclicMessage->getPayloadSize());
+    assert(20 == cyclicMessage->getCycleTime());
+    
+    volatile int16_t mismatchedSignal = 0;
+    
+    assert(!database.buildCyclicMessage(
+        "Telemetry", 20, &mismatchedSignal
+    ));
+    
+    assert(!database.buildCyclicMessage("Unknown", 20, &wheelSpeed));
 
     //
     // The combined sizes of multiple signal values must exactly match the DBC.
@@ -144,10 +168,11 @@ int main() {
     //
     // A null DBC pointer cannot produce a match.
     //
-    constexpr Can::Model::Database nullDatabase("TestNode", nullptr);
+    constexpr Can::Model::Database nullDatabase(nullptr);
     assert(!nullDatabase.buildMessage("Telemetry", &wheelSpeed));
 
     delete msg;
+    delete cyclicMessage;
     delete multipleSignals;
     delete emptyMessage;
     delete maximumMessage;
