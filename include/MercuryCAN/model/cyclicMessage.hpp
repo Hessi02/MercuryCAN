@@ -46,9 +46,9 @@ public:
      * \see     FitsIntoCanMessage
      */
     template<typename... SignalDataTypes>
-        requires(AllowedSignalDataType<SignalDataTypes>, ...) &&
+        requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
                     FitsIntoCanMessage<SignalDataTypes...>
-    CyclicMessage(
+    constexpr CyclicMessage(
         const uint16_t& identifier,
         const uint16_t& cycleTime,
         SignalDataTypes*... signalReferences
@@ -61,7 +61,7 @@ public:
      *
      * \return  Cycle time in milliseconds supplied to the constructor.
      */
-    uint16_t getCycleTime(void) const {
+    constexpr uint16_t getCycleTime(void) const {
         return _cycleTime;
     }
 

@@ -13,6 +13,7 @@
 
 #include <MercuryCAN/test/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
+#include <MercuryCAN/model/cyclicMessage.hpp>
 #include <MercuryCAN/model/message.hpp>
 
 #include <array>
@@ -28,6 +29,19 @@ static_assert([] {
 static_assert([] {
     Can::Model::Message message{0x124};
     return message.getIdentifier() == 0x124 &&
+           message.getPayloadSize() == 0;
+}());
+static_assert([] {
+    int signal = 0;
+    Can::Model::CyclicMessage message{0x125, 10, &signal};
+    return message.getIdentifier() == 0x125 &&
+           message.getCycleTime() == 10 &&
+           message.getPayloadSize() == sizeof(signal);
+}());
+static_assert([] {
+    Can::Model::CyclicMessage message{0x126, 20};
+    return message.getIdentifier() == 0x126 &&
+           message.getCycleTime() == 20 &&
            message.getPayloadSize() == 0;
 }());
 }
