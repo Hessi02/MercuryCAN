@@ -20,6 +20,41 @@
 
 extern const char databaseText[];
 
+namespace {
+constexpr char constexprDatabaseText[] =
+    "BO_ 12 Telemetry: 4 ECU\n"
+    "BO_ 0 Empty: 0 ECU";
+constexpr Can::Model::Database constexprDatabase{constexprDatabaseText};
+
+static_assert([] {
+    int signal = 0;
+    auto* message = constexprDatabase.buildMessage("Telemetry", &signal);
+    if (!message)
+        return false;
+
+    const bool matches =
+        message->getIdentifier() == 12 &&
+        message->getPayloadSize() == sizeof(signal);
+    delete message;
+    return matches;
+}());
+static_assert([] {
+    auto* message = constexprDatabase.buildCyclicMessage("Empty", 20);
+    if (!message)
+        return false;
+
+    const bool matches =
+        message->getIdentifier() == 0 &&
+        message->getPayloadSize() == 0 &&
+        message->getCycleTime() == 20;
+    delete message;
+    return matches;
+}());
+static_assert(
+    constexprDatabase.buildMessage("TelemetryExtra") == nullptr
+);
+}
+
 int main() {
     const Can::Model::Database database(databaseText);
     

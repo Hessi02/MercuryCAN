@@ -32,7 +32,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <cstring>
 #include <limits>
 #include <optional>
 
@@ -94,7 +93,7 @@ public:
     template<typename... SignalDataTypes>
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
                     FitsIntoCanMessage<SignalDataTypes...>
-    Message* buildMessage(
+    constexpr Message* buildMessage(
         const char* name, 
         SignalDataTypes*... signalPtrPack
     ) const {
@@ -130,7 +129,7 @@ public:
     template<typename... SignalDataTypes>
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
                     FitsIntoCanMessage<SignalDataTypes...>
-    CyclicMessage* buildCyclicMessage(
+    constexpr CyclicMessage* buildCyclicMessage(
         const char* name,
         const uint16_t& cycleTime,
         SignalDataTypes*... signalPtrPack
@@ -175,15 +174,16 @@ private:
      * 
      * \return The parsed identifier and payload length, or an empty optional.
      */
-    std::optional<MessageDefinition> findMessage(const char* name) const {
+    constexpr std::optional<MessageDefinition> findMessage(
+        const char* name
+    ) const {
         if (!name || !_file)
             return std::nullopt;
 
         for (const char* line = _file; *line; ) {
-            const char* lineEnd = std::strchr(line, '\n');
-
-            if (!lineEnd)
-                lineEnd = line + std::strlen(line);
+            const char* lineEnd = line;
+            while (*lineEnd && '\n' != *lineEnd)
+                ++lineEnd;
             
             const std::optional<MessageDefinition> definition = 
                 parseMessageDefinition(line, lineEnd, name);
@@ -206,7 +206,7 @@ private:
      * \return The parsed definition when its payload is supported and matches
      *         signalSize, otherwise an empty optional.
      */
-    std::optional<MessageDefinition> findMessageWithPayloadSize(
+    constexpr std::optional<MessageDefinition> findMessageWithPayloadSize(
         const char* name,
         const std::size_t signalSize
     ) const {
@@ -235,12 +235,17 @@ private:
      * 
      * \return Parsed fields for a valid matching row, otherwise empty.
      */
-    static std::optional<MessageDefinition> parseMessageDefinition(
+    static constexpr std::optional<MessageDefinition> parseMessageDefinition(
         const char* line, 
         const char* lineEnd, 
         const char* name
     ) {
-        if (lineEnd - line < 4 || 0 != std::strncmp(line, "BO_ ", 4))
+        if (lineEnd - line < 4 ||
+            'B' != line[0] ||
+            'O' != line[1] ||
+            '_' != line[2] ||
+            ' ' != line[3]
+        )
             return std::nullopt;
 
         const char* cursor = line + 4;
@@ -281,7 +286,7 @@ private:
      * 
      * \return True if the name matches and the colon is present.
      */
-    static bool parseMessageName(
+    static constexpr bool parseMessageName(
         const char*& cursor, 
         const char* end, 
         const char* name
@@ -294,11 +299,16 @@ private:
         while (i < end && ':' != *i && ' ' != *i && '\t' != *i)
             ++i;
 
-        const std::size_t length = static_cast<std::size_t>(i - cursor);
-        const bool isSameSize =  length == std::strlen(name);
-        const bool isMatch = 0 == std::strncmp(cursor, name, i - cursor);
+        std::size_t nameLength = 0;
+        while (name[nameLength])
+            ++nameLength;
 
-        if (i == end || ':' != *i || !isSameSize || !isMatch)
+        const std::size_t length = static_cast<std::size_t>(i - cursor);
+        bool isMatch = length == nameLength;
+        for (std::size_t index = 0; isMatch && index < length; ++index)
+            isMatch = cursor[index] == name[index];
+
+        if (i == end || ':' != *i || !isMatch)
             return false;
 
         cursor = i + 1;
@@ -320,7 +330,7 @@ private:
      * 
      * \return True if at least one digit was parsed without overflow.
      */
-    static bool parseUnsigned(
+    static constexpr bool parseUnsigned(
         const char*& cursor, 
         const char* end, 
         uint32_t& value
