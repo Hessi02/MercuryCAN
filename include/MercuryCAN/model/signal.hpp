@@ -172,8 +172,7 @@ public:
      * 
      * \param   signalPtr passes a pointer to the signal's data.
      */
-    Signal(SignalDataType* signalPtr) {
-        _data = signalPtr;
+    constexpr Signal(SignalDataType* signalPtr) : _data(signalPtr) {
     }
 
     /**
@@ -196,7 +195,7 @@ public:
      *
      * \return  Pointer to the associated signal data.
      */
-    SignalDataType* getDataPtr(void) const {
+    constexpr SignalDataType* getDataPtr(void) const {
         return _data;
     }
 

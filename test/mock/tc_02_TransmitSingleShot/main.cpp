@@ -16,8 +16,21 @@
 #include <MercuryCAN/controller/transmitter.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
 #include <MercuryCAN/model/cyclicMessage.hpp>
+#include <MercuryCAN/model/signal.hpp>
 
 #include <iostream>
+
+namespace {
+
+volatile uint16_t runtimeSignalData = 0;
+constexpr Can::Model::Signal<volatile uint16_t> signalConfiguration(
+    &runtimeSignalData
+);
+
+static_assert(signalConfiguration.getDataSize() == sizeof(uint16_t));
+static_assert(signalConfiguration.getDataPtr() == &runtimeSignalData);
+
+}
 
 int main(int argc, char** argv) {
     auto* driver = static_cast<Can::Driver::MockDriver*>(
