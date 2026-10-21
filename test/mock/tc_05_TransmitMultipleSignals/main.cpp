@@ -18,6 +18,20 @@
 #include <array>
 #include <iostream>
 
+namespace {
+static_assert([] {
+    int signal = 0;
+    Can::Model::Message message{0x123, &signal};
+    return message.getIdentifier() == 0x123 &&
+           message.getPayloadSize() == sizeof(signal);
+}());
+static_assert([] {
+    Can::Model::Message message{0x124};
+    return message.getIdentifier() == 0x124 &&
+           message.getPayloadSize() == 0;
+}());
+}
+
 int main(int argc, char** argv) {
     auto* driver = static_cast<Can::Driver::MockDriver*>(
         Can::Driver::DriverInterface::getInstance()

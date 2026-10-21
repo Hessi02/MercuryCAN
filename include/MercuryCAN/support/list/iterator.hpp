@@ -30,7 +30,8 @@ public:
      *
      * \param   element passes the element at which iteration starts.
      */
-    Iterator(Element<ContentType>* element) : _currentElement(element) {
+    constexpr Iterator(Element<ContentType>* element)
+        : _currentElement(element) {
     }
 
     /**
@@ -43,7 +44,7 @@ public:
      *
      * \return  True if this element differs from the element \p other.
      */
-    bool operator!=(const Iterator& other) const {
+    constexpr bool operator!=(const Iterator& other) const {
         return _currentElement != other._currentElement;
     }
 
@@ -52,7 +53,7 @@ public:
      *
      * \return  Copy of the current element's stored value.
      */
-    ContentType operator*(void) const {
+    constexpr ContentType operator*(void) const {
         return _currentElement->getContent();
     }
 
@@ -61,7 +62,7 @@ public:
      *
      * \return  Reference to this iterator after it has been advanced.
      */
-    const Iterator& operator++(void) {
+    constexpr const Iterator& operator++(void) {
         _currentElement = _currentElement->getNextElement();
         return *this;
     }

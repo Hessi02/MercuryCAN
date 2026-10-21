@@ -56,7 +56,7 @@ public:
     /**
      * \brief   Allows derived messages to be destroyed through a base pointer.
      */
-    virtual ~Message() = default;
+    constexpr virtual ~Message() = default;
 
     /**
      * \brief   Constructs a message from its identifier and signal references.
@@ -74,15 +74,15 @@ public:
     template<typename... SignalDataTypes>
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
                     FitsIntoCanMessage<SignalDataTypes...>
-    Message(const uint16_t identifier, SignalDataTypes*... signalPtrPack)
+    constexpr Message(const uint16_t identifier,
+                      SignalDataTypes*... signalPtrPack)
         : _payloadSize((0 + ... + sizeof(SignalDataTypes))),
-          _identifier(identifier) {
+          _identifier(identifier),
+          _signalCount(sizeof...(SignalDataTypes)) {
         (_signals.append(
              static_cast<AnySignal_t>(Signal<SignalDataTypes>(signalPtrPack))
          ),
          ...);
-
-        _signalCount = _signals.length();
     }
 
     /**
@@ -90,7 +90,7 @@ public:
      *
      * \return  CAN identifier supplied to the constructor.
      */
-    uint16_t getIdentifier(void) const {
+    constexpr uint16_t getIdentifier(void) const {
         return _identifier;
     }
 
@@ -99,7 +99,7 @@ public:
      *
      * \return  Payload size in bytes.
      */
-    std::size_t getPayloadSize(void) const {
+    constexpr std::size_t getPayloadSize(void) const {
         return _payloadSize;
     }
 
@@ -276,7 +276,7 @@ private:
     /**
      * \brief   Number of signal references stored in _signals.
      */
-    uint8_t _signalCount;
+    const uint8_t _signalCount;
 
     /**
      * \brief   Explicitly managed flag indicating a message update.

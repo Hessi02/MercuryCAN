@@ -30,7 +30,7 @@ public:
      * \param   nextElement passes the next element, or \c nullptr if there is
      *          no next element.
      */
-    Element(const ContentType& content, Element* nextElement)
+    constexpr Element(const ContentType& content, Element* nextElement)
         : _content(content), _nextElement(nextElement) {
     }
 
@@ -39,7 +39,7 @@ public:
      *
      * \return  Reference to the value held by this element.
      */
-    ContentType& getContent(void) {
+    constexpr ContentType& getContent(void) {
         return _content;
     }
 
@@ -48,7 +48,7 @@ public:
      *
      * \return  Pointer to the next element, or \c nullptr if there is none.
      */
-    Element* getNextElement(void) const {
+    constexpr Element* getNextElement(void) const {
         return _nextElement;
     }
 
@@ -57,7 +57,7 @@ public:
      *
      * \param   nextElement passes the next element, or \c nullptr to terminate.
      */
-    void setNextElement(Element* nextElement) {
+    constexpr void setNextElement(Element* nextElement) {
         _nextElement = nextElement;
     }
 
