@@ -18,14 +18,25 @@
 #include <type_traits>
 #include <typeinfo>
 
-extern const char databaseText[];
-
 namespace {
+constexpr Can::Model::Database embeddedDatabase{DATABASE_TEXT};
 constexpr char constexprDatabaseText[] =
     "BO_ 12 Telemetry: 4 ECU\n"
     "BO_ 0 Empty: 0 ECU";
 constexpr Can::Model::Database constexprDatabase{constexprDatabaseText};
 
+static_assert([] {
+    int signal = 0;
+    auto* message = embeddedDatabase.buildMessage("Telemetry", &signal);
+    if (!message)
+        return false;
+
+    const bool matches =
+        message->getIdentifier() == 12 &&
+        message->getPayloadSize() == sizeof(signal);
+    delete message;
+    return matches;
+}());
 static_assert([] {
     int signal = 0;
     auto* message = constexprDatabase.buildMessage("Telemetry", &signal);
@@ -56,7 +67,7 @@ static_assert(
 }
 
 int main() {
-    const Can::Model::Database database(databaseText);
+    const Can::Model::Database database(DATABASE_TEXT);
     
     static_assert(std::is_same_v<
         decltype(database.buildMessage("Empty")),

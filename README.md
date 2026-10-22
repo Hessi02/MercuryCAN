@@ -254,6 +254,23 @@ int main(void) {
 
 In general, MercuryCAN is intended to keep embedded CAN communication straightforward: define the message layout, bind the relevant signal variables, and then add the message to a transmitter or receiver depending on whether the device is sending or receiving data. This separation of frame definitions, signal access, and timing callbacks makes it easy to model periodic telemetry, event-driven updates, and reactive processing without mixing protocol details into the application logic.
 
+### Embedding a DBC file
+
+Use `embed_dbc` in CMake to add a preprocessor definition to the target. Its
+third argument is the macro name; use that name directly in the source as the
+DBC text string literal:
+
+```cmake
+embed_dbc(my_target ${CMAKE_CURRENT_SOURCE_DIR}/database.dbc DATABASE_TEXT)
+```
+
+```cpp
+constexpr Can::Model::Database database(DATABASE_TEXT);
+```
+
+The DBC text is available to constant expressions, so database lookups can be
+validated during compilation with `static_assert`.
+
 ## Development
 
 The further development of the library focuses on two main aspects:

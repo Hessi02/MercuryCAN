@@ -2,7 +2,6 @@
 
 #include <avr/io.h>
 
-extern const char dbc[];
 static volatile uint16_t voltage = 0;
 
 int main(void) {
