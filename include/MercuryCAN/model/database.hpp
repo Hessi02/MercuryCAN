@@ -11,13 +11,13 @@
  * The parser currently supports exact message-name lookup and validates the
  * parsed identifier, declared payload length, and combined signal data size.
  * It does not parse signal definitions, node assignments, DBC attributes, or
- * cycle times. Message creation returns a null pointer when no supported
+ * cycle times. Message creation returns an empty optional when no supported
  * matching definition is found or when the signal data does not fit.
  *
  * The DBC text is not copied and must remain valid and null-terminated while
  * the Database is used. Signal data referenced by a returned message must
- * likewise outlive that message's use. The caller owns each successfully
- * returned message pointer and must delete it when it is no longer needed.
+ * likewise outlive that message's use. Successfully built messages are
+ * returned by value and require no manual memory management.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -87,13 +87,13 @@ public:
      * \param name passes the exact DBC message name to find.
      * \param signalPtrPack passes non-owning pointers to the signal data.
      * 
-     * \return A pointer to a heap-allocated message when the row and payload
-     *         size match, otherwise nullptr.
+     * \return The message value when the row and payload size match,
+     *         otherwise an empty optional.
      */
     template<typename... SignalDataTypes>
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
                     FitsIntoCanMessage<SignalDataTypes...>
-    constexpr Message* buildMessage(
+    constexpr std::optional<Message> buildMessage(
         const char* name, 
         SignalDataTypes*... signalPtrPack
     ) const {
@@ -103,12 +103,13 @@ public:
             );
 
         if (!definition)
-            return nullptr;
+            return std::nullopt;
 
-        return new Message(
+        return std::optional<Message>{
+            std::in_place,
             definition->identifier,
             signalPtrPack...
-        );
+        };
     }
 
     /**
@@ -123,13 +124,13 @@ public:
      * \param cycleTime passes the cycle time in milliseconds.
      * \param signalPtrPack passes non-owning pointers to the signal data.
      *
-     * \return A pointer to a heap-allocated cyclic message when the row and
-     *         payload size match, otherwise nullptr.
+     * \return The cyclic message value when the row and payload size match,
+     *         otherwise an empty optional.
      */
     template<typename... SignalDataTypes>
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
                     FitsIntoCanMessage<SignalDataTypes...>
-    constexpr CyclicMessage* buildCyclicMessage(
+    constexpr std::optional<CyclicMessage> buildCyclicMessage(
         const char* name,
         const uint16_t& cycleTime,
         SignalDataTypes*... signalPtrPack
@@ -140,13 +141,14 @@ public:
             );
 
         if (!definition)
-            return nullptr;
+            return std::nullopt;
 
-        return new CyclicMessage(
+        return std::optional<CyclicMessage>{
+            std::in_place,
             definition->identifier,
             cycleTime,
             signalPtrPack...
-        );
+        };
     }
 
 private:

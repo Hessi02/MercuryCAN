@@ -15,6 +15,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <optional>
 #include <type_traits>
 #include <typeinfo>
 
@@ -27,30 +28,28 @@ constexpr Can::Model::Database constexprDatabase{constexprDatabaseText};
 
 static_assert([] {
     int signal = 0;
-    auto* message = embeddedDatabase.buildMessage("Telemetry", &signal);
+    auto message = embeddedDatabase.buildMessage("Telemetry", &signal);
     if (!message)
         return false;
 
     const bool matches =
         message->getIdentifier() == 12 &&
         message->getPayloadSize() == sizeof(signal);
-    delete message;
     return matches;
 }());
 static_assert([] {
     int signal = 0;
-    auto* message = constexprDatabase.buildMessage("Telemetry", &signal);
+    auto message = constexprDatabase.buildMessage("Telemetry", &signal);
     if (!message)
         return false;
 
     const bool matches =
         message->getIdentifier() == 12 &&
         message->getPayloadSize() == sizeof(signal);
-    delete message;
     return matches;
 }());
 static_assert([] {
-    auto* message = constexprDatabase.buildCyclicMessage("Empty", 20);
+    auto message = constexprDatabase.buildCyclicMessage("Empty", 20);
     if (!message)
         return false;
 
@@ -58,11 +57,10 @@ static_assert([] {
         message->getIdentifier() == 0 &&
         message->getPayloadSize() == 0 &&
         message->getCycleTime() == 20;
-    delete message;
     return matches;
 }());
 static_assert(
-    constexprDatabase.buildMessage("TelemetryExtra") == nullptr
+    !constexprDatabase.buildMessage("TelemetryExtra")
 );
 }
 
@@ -71,12 +69,12 @@ int main() {
     
     static_assert(std::is_same_v<
         decltype(database.buildMessage("Empty")),
-        Can::Model::Message*
+        std::optional<Can::Model::Message>
     >);
 
     static_assert(std::is_same_v<
         decltype(database.buildCyclicMessage("Empty", 1)),
-        Can::Model::CyclicMessage*
+        std::optional<Can::Model::CyclicMessage>
     >);
     
     static_assert(std::has_virtual_destructor_v<Can::Model::Message>);
@@ -197,13 +195,6 @@ int main() {
     //
     constexpr Can::Model::Database nullDatabase(nullptr);
     assert(!nullDatabase.buildMessage("Telemetry", &wheelSpeed));
-
-    delete msg;
-    delete cyclicMessage;
-    delete multipleSignals;
-    delete emptyMessage;
-    delete maximumMessage;
-    delete finalMessage;
 
     return 0;
 }

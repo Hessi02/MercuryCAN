@@ -6,13 +6,13 @@ static volatile uint16_t voltage = 0;
 
 int main(void) {
     Can::Model::Database db(dbc);  
-    Can::Model::CyclicMessage* msg = db.buildCyclicMessage("Measurement", 1, &voltage);
+    auto msg = db.buildCyclicMessage("Measurement", 1, &voltage);
 
     ADMUX = (1 << REFS0);
     ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 
     SignalSlot::MetaObject::connect(
-        msg,
+        &*msg,
         &Can::Model::Message::preSend,
         +[](uint32_t){
             ADCSRA |= (1 << ADSC);
