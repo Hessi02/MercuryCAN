@@ -112,7 +112,7 @@ public:
      *
      * \return  Pointer to the serialized payload buffer.
      */
-    unsigned char* getPayloadData(void) {
+    constexpr unsigned char* getPayloadData(void) {
         uint8_t retWriteIndex = 0;
 
         for (uint8_t index = 0; index < _signalCount; index++)
@@ -132,7 +132,8 @@ public:
      * \param   dataLength passes the number of available payload bytes.
      */
     void setPayloadData(
-        const uint8_t* data, const std::size_t& dataLength
+        const uint8_t* data, 
+        const std::size_t& dataLength
     ) {
         std::size_t readIndex = 0;
 
