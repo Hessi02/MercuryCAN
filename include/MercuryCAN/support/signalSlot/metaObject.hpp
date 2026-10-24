@@ -62,10 +62,11 @@ public:
              class... ParamPack>
     requires isDerived<SenderBase, Sender> &&
              isDerived<ReceiverBase, Receiver>
-    static void connect(Sender* sender,
-                        void(SenderBase::*signal)(ParamPack...),
-                        Receiver* receiver,
-                        void(ReceiverBase::*callback)(ParamPack...)
+    static void connect(
+        Sender* sender,
+        void(SenderBase::*signal)(ParamPack...),
+        Receiver* receiver,
+        void(ReceiverBase::*callback)(ParamPack...)
     ) {
         Connection<ParamPack...>* connection = 
             new Connection<ParamPack...> (
@@ -95,9 +96,10 @@ public:
              class SenderBase,
              class... ParamPack>
     requires isDerived<SenderBase, Sender>
-    static void connect(Sender* sender,
-                        void(SenderBase::*signal)(ParamPack...),
-                        void(*callback)(ParamPack...)
+    static void connect(
+        Sender* sender,
+        void(SenderBase::*signal)(ParamPack...),
+        void(*callback)(ParamPack...)
     ) {
         Connection<ParamPack...>* connection =
             new Connection<ParamPack...>(
@@ -133,10 +135,11 @@ public:
              class... ParamPack>
     requires isDerived<SenderBase, Sender> &&
              isDerived<ReceiverBase, Receiver>
-    static void disconnect(Sender* sender,
-                           void(SenderBase::*signal)(ParamPack...),
-                           Receiver* receiver,
-                           void(ReceiverBase::*callback)(ParamPack...)
+    static void disconnect(
+        Sender* sender,
+        void(SenderBase::*signal)(ParamPack...),
+        Receiver* receiver,
+        void(ReceiverBase::*callback)(ParamPack...)
     ) {
         Generic::Container<Connection<ParamPack...>*>& connections = _connections<ParamPack...>;
 
@@ -174,9 +177,10 @@ public:
              class SenderBase,
              class... ParamPack>
     requires isDerived<SenderBase, Sender>
-    static void disconnect(Sender* sender,
-                           void(SenderBase::*signal)(ParamPack...),
-                           void(*callback)(ParamPack...)
+    static void disconnect(
+        Sender* sender,
+        void(SenderBase::*signal)(ParamPack...),
+        void(*callback)(ParamPack...)
     ) {
         Generic::Container<Connection<ParamPack...>*>& connections = _connections<ParamPack...>;
 
@@ -213,9 +217,10 @@ public:
              class SenderBase,
              class... ParamPack>
     requires isDerived<SenderBase, Sender>
-    static void executeAllCallbacks(Sender* sender,
-                                    void(SenderBase::*signal)(ParamPack...),
-                                    ParamPack... args
+    static void executeAllCallbacks(
+        Sender* sender,
+        void(SenderBase::*signal)(ParamPack...),
+        ParamPack... args
     ) {
         for (Connection<ParamPack...>* connection : _connections<ParamPack...>) {
             if (sender && connection &&

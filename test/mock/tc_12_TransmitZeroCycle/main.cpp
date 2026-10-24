@@ -60,7 +60,7 @@ void processThreeCycles() {
 }
 
 int main(int argc, char** argv) {
-    auto* driver = static_cast<Can::Driver::MockDriver*>(
+    Can::Driver::MockDriver* driver = static_cast<Can::Driver::MockDriver*>(
         Can::Driver::DriverInterface::getInstance()
     );
 

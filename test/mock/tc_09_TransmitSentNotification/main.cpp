@@ -16,7 +16,6 @@
 
 #include <iostream>
 
-
 static Can::Driver::MockDriver* driver = nullptr;
 static unsigned int sentCount          = 0;
 static uint32_t sentTick               = 0;

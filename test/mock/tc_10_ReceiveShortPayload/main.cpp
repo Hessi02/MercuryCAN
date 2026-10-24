@@ -45,7 +45,7 @@ bool verifyRecordedPayload(const Can::Driver::MockDriver& driver) {
 }
 
 int main(int argc, char** argv) {
-    auto* driver = static_cast<Can::Driver::MockDriver*>(
+    Can::Driver::MockDriver* driver = static_cast<Can::Driver::MockDriver*>(
         Can::Driver::DriverInterface::getInstance()
     );
 

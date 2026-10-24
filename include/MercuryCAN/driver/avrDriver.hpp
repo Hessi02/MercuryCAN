@@ -162,7 +162,8 @@ private:
      * \param   payloadLength passes the number of payload bytes.
      */
     void transmitPayload(
-        const uint8_t* data, const std::size_t& payloadLength
+        const uint8_t* data, 
+        const std::size_t& payloadLength
     ) const;
 
     /**

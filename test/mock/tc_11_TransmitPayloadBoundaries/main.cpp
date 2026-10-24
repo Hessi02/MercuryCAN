@@ -67,7 +67,7 @@ bool verifyFrameCount(const Can::Driver::MockDriver& driver) {
 }
 
 int main() {
-    auto* driver = static_cast<Can::Driver::MockDriver*>(
+    Can::Driver::MockDriver* driver = static_cast<Can::Driver::MockDriver*>(
         Can::Driver::DriverInterface::getInstance()
     );
 

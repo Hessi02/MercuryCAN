@@ -205,7 +205,8 @@ private:
      * \param   writeIndex passes the payload write index and updates the next.
      */
     void appendSignalPayload(
-        const AnySignal_t& signal, uint8_t& writeIndex
+        const AnySignal_t& signal, 
+        uint8_t& writeIndex
     ) const {
         const std::size_t signalSize = std::visit(
             [](auto const& value) { return value.getDataSize(); }, signal

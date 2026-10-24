@@ -73,7 +73,8 @@ void Can::Controller::Transmitter::processMessage(
 }
 
 void Can::Controller::Transmitter::transmitMessage(
-    const uint8_t& index, const bool* dueMessages
+    const uint8_t& index, 
+    const bool* dueMessages
 ) {
     if (!dueMessages[index])
         return;

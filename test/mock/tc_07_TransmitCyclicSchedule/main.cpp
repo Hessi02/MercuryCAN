@@ -25,7 +25,7 @@ static std::size_t preSendCount = 0;
 static std::size_t sentCount = 0;
 
 int main(int argc, char** argv) {
-    auto* driver = static_cast<Can::Driver::MockDriver*>(
+    Can::Driver::MockDriver* driver = static_cast<Can::Driver::MockDriver*>(
         Can::Driver::DriverInterface::getInstance()
     );
 

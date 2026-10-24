@@ -20,10 +20,13 @@
 #include <typeinfo>
 
 namespace {
+
 constexpr Can::Model::Database embeddedDatabase{DATABASE_TEXT};
+
 constexpr char constexprDatabaseText[] =
     "BO_ 12 Telemetry: 4 ECU\n"
     "BO_ 0 Empty: 0 ECU";
+
 constexpr Can::Model::Database constexprDatabase{constexprDatabaseText};
 
 static_assert([] {
@@ -37,6 +40,7 @@ static_assert([] {
         message->getPayloadSize() == sizeof(signal);
     return matches;
 }());
+
 static_assert([] {
     int signal = 0;
     auto message = constexprDatabase.buildMessage("Telemetry", &signal);
@@ -48,6 +52,7 @@ static_assert([] {
         message->getPayloadSize() == sizeof(signal);
     return matches;
 }());
+
 static_assert([] {
     auto message = constexprDatabase.buildCyclicMessage("Empty", 20);
     if (!message)
@@ -59,9 +64,11 @@ static_assert([] {
         message->getCycleTime() == 20;
     return matches;
 }());
+
 static_assert(
     !constexprDatabase.buildMessage("TelemetryExtra")
 );
+
 }
 
 int main() {

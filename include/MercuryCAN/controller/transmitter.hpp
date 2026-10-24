@@ -112,9 +112,7 @@ private:
      * \param   index passes the index of the message to transmit.
      * \param   dueMessages passes the due-status array for this cycle.
      */
-    static void transmitMessage(
-        const uint8_t& index, const bool* dueMessages
-    );
+    static void transmitMessage(const uint8_t& index, const bool* dueMessages);
 
     /**
      * \brief   Emits the sent notification for a due message.

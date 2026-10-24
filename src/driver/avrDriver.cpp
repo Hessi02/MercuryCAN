@@ -34,7 +34,8 @@ void Can::Driver::AvrDriver::receive(
 }
 
 void Can::Driver::AvrDriver::addRxMessage(
-    const uint16_t& identifier, const uint8_t& length
+    const uint16_t& identifier, 
+    const uint8_t& length
 ) {
     const uint8_t messageObject = reserveMessageObject();
 
@@ -110,7 +111,8 @@ void Can::Driver::AvrDriver::configureTransmitMessage(
 }
 
 void Can::Driver::AvrDriver::transmitPayload(
-    const uint8_t* data, const std::size_t& payloadLength
+    const uint8_t* data, 
+    const std::size_t& payloadLength
 ) const {
     for (std::size_t index = 0; index < payloadLength; index++)
         CANMSG = data[index];

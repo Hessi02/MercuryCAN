@@ -23,6 +23,7 @@
 namespace {
 
 volatile uint16_t runtimeSignalData = 0;
+
 constexpr Can::Model::Signal<volatile uint16_t> signalConfiguration(
     &runtimeSignalData
 );
@@ -33,7 +34,7 @@ static_assert(signalConfiguration.getDataPtr() == &runtimeSignalData);
 }
 
 int main(int argc, char** argv) {
-    auto* driver = static_cast<Can::Driver::MockDriver*>(
+    Can::Driver::MockDriver* driver = static_cast<Can::Driver::MockDriver*>(
         Can::Driver::DriverInterface::getInstance()
     );
    

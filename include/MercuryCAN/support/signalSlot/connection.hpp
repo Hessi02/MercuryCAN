@@ -77,10 +77,11 @@ public:
              class ReceiverBase>
     requires isDerived<SenderBase, Sender> &&
              isDerived<ReceiverBase, Receiver>
-    constexpr Connection(Sender* sender,
-                         void(SenderBase::*signal)(ParamPack...),
-                         Receiver* receiver,
-                         void(ReceiverBase::*callback)(ParamPack...)
+    constexpr Connection(
+        Sender* sender,
+        void(SenderBase::*signal)(ParamPack...),
+        Receiver* receiver,
+        void(ReceiverBase::*callback)(ParamPack...)
     ) : _sender(sender),
         _receiver(receiver),
         _signal(static_cast<Signal_t>(signal)),
@@ -100,9 +101,10 @@ public:
     template<class Sender,
              class SenderBase>
     requires isDerived<SenderBase, Sender>
-    constexpr Connection(Sender* sender,
-                         void(SenderBase::*signal)(ParamPack...),
-                         StaticCallback_t callback
+    constexpr Connection(
+        Sender* sender,
+        void(SenderBase::*signal)(ParamPack...),
+        StaticCallback_t callback
     ) : _sender(sender),
         _receiver(nullptr),
         _signal(static_cast<Signal_t>(signal)),

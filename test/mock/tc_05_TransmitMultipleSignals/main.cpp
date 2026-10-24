@@ -20,6 +20,7 @@
 #include <iostream>
 
 namespace {
+
 static_assert([] {
     int signal = 0;
     Can::Model::Message message{0x123, &signal};
@@ -44,10 +45,11 @@ static_assert([] {
            message.getCycleTime() == 20 &&
            message.getPayloadSize() == 0;
 }());
+
 }
 
 int main(int argc, char** argv) {
-    auto* driver = static_cast<Can::Driver::MockDriver*>(
+    Can::Driver::MockDriver* driver = static_cast<Can::Driver::MockDriver*>(
         Can::Driver::DriverInterface::getInstance()
     );
 
