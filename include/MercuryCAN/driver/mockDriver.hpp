@@ -14,8 +14,8 @@
  * SPDX-License-Identifier: Apache-2.0 
  */
 
-#ifndef __TEST_MOCK_DRIVER_HPP__
-#define __TEST_MOCK_DRIVER_HPP__
+#ifndef __MERCURYCAN_DRIVER_MOCK_DRIVER_HPP__
+#define __MERCURYCAN_DRIVER_MOCK_DRIVER_HPP__
 
 #include <MercuryCAN/driver/driverInterface.hpp>
 
@@ -126,18 +126,15 @@ public:
     ) override final;
 
     /**
-     * \brief   Registers a CAN message for reception in the mock.
+     * \brief   No-op receive registration required by the driver interface.
      *
-     * This method allows tests to configure the mock driver to expect incoming
-     * frames with a specific CAN identifier and payload length. It simulates
-     * the behavior of a real driver by storing the registration information,
-     * allowing the mock to verify that received frames match the expected
-     * configuration. Tests can use this method to ensure that the driver is
-     * correctly configured to receive the desired messages, and that the
-     * library's reception logic behaves as expected when frames are received.
+     * The mock does not need receive registrations: injected frames are
+     * forwarded to the registered Receiver without checking the identifier
+     * or payload length against a configuration. This method exists only to
+     * satisfy the DriverInterface contract.
      * 
-     * \param   identifier  CAN identifier to register.
-     * \param   length      Expected payload length in bytes.
+     * \param   identifier  Unused CAN identifier.
+     * \param   length      Unused expected payload length in bytes.
      */
     virtual void addRxMessage(
         const uint16_t& identifier, 
@@ -157,17 +154,14 @@ public:
     virtual void enterIdleSleep(void) const override final;
 
     /**
-     * \brief   Removes a CAN identifier from the mock's receive configuration.
+     * \brief   No-op receive removal required by the driver interface.
      * 
-     * This method allows tests to simulate the removal of a CAN identifier from 
-     * the mock driver's receive configuration. It updates the internal state of 
-     * the mock driver to reflect that the specified identifier is no longer 
-     * being monitored for incoming frames. Tests can use this method to verify 
-     * that the driver correctly handles the removal of receive configurations 
-     * and that the library's reception logic behaves as expected when frames 
-     * for the removed identifier are received.
+     * The mock does not maintain receive registrations, so there is no
+     * configuration to remove. Injected frames continue to be forwarded
+     * independently of this method. It exists only to satisfy the
+     * DriverInterface contract.
      *
-     * \param   identifier CAN identifier to remove.
+     * \param   identifier Unused CAN identifier.
      */
     virtual void removeRxMessage(const uint16_t& identifier) override final;
     
@@ -282,4 +276,4 @@ private:
 
 }
 
-#endif //__TEST_MOCK_DRIVER_HPP__
+#endif  //__MERCURYCAN_DRIVER_MOCK_DRIVER_HPP__

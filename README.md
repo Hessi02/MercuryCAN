@@ -190,7 +190,7 @@ int main(void) {
 }
 ```
 
-A single-shot message is available to the user here as well. The respective method waits for the specified duration until a message update occurs. If a timeout of zero milliseconds is passed, the system waits without a timeout. It should be noted that this is a synchronous event. A potential asynchronous implementation is a subject for future development.
+A single-shot message is available to the user here as well. The respective method waits synchronously until a message update occurs or the specified timeout expires. A timeout of zero milliseconds returns immediately with `false`; it does not wait for a message. A potential asynchronous implementation is a subject for future development.
 
 The example below shows such an implementation:
 

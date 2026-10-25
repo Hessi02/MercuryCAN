@@ -1,7 +1,7 @@
 #include <MercuryCAN/driver/driverInterface.hpp>
 
 #ifdef __USE_MOCK_DRIVER
-    #include <MercuryCAN/test/mockDriver.hpp>
+    #include <MercuryCAN/driver/mockDriver.hpp>
 #else
     #include <MercuryCAN/driver/avrDriver.hpp>
 #endif
