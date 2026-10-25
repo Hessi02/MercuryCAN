@@ -8,9 +8,4 @@ add_executable(relays.elf ${CMAKE_CURRENT_SOURCE_DIR}/relays/main.cpp)
 target_link_libraries(relays.elf PRIVATE MercuryCAN)
 target_include_directories(relays.elf PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_executable(adc.elf ${CMAKE_CURRENT_SOURCE_DIR}/adc/main.cpp)
-target_link_libraries(adc.elf PRIVATE MercuryCAN)
-target_include_directories(adc.elf PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-embed_dbc(adc.elf ${CMAKE_CURRENT_SOURCE_DIR}/adc/database.dbc dbc)
-
 endif()
