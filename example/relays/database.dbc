@@ -46,15 +46,18 @@ BO_ 1 RelayControl: 1 Vector__XXX
 	SG_ PA6 : 6|1@1+ (1,0) [0|1] "" Vector__XXX
 	SG_ PA7 : 7|1@1+ (1,0) [0|1] "" Vector__XXX
 
-CM_ BO_ 1 "Control state of relays";
-CM_ SG_ 1 PA0_Control "PIN A0 control";
-CM_ SG_ 1 PA1_Control "PIN A1 control";
-CM_ SG_ 1 PA2_Control "PIN A2 control";
-CM_ SG_ 1 PA3_Control "PIN A3 control";
-CM_ SG_ 1 PA4_Control "PIN A4 control";
-CM_ SG_ 1 PA5_Control "PIN A5 control";
-CM_ SG_ 1 PA6_Control "PIN A6 control";
-CM_ SG_ 1 PA7_Control "PIN A7 control";
+BA_DEF_ BO_ "GenMsgSendType" ENUM "cyclic","triggered","cyclicIfActive","cyclicAndTriggered","cyclicIfActiveAndTriggered","none";
+BA_DEF_ BO_ "GenMsgCycleTime" INT 0 10000;
+BA_DEF_ BO_ "GenMsgStartDelayTime" INT 0 10000;
+BA_DEF_ BO_ "GenMsgILSupport" ENUM "No","Yes";
+
+BA_DEF_DEF_ "GenMsgSendType" "none";
+BA_DEF_DEF_ "GenMsgILSupport" "No";
+
+BA_ "GenMsgSendType" BO_ 1 "cyclic";
+BA_ "GenMsgCycleTime" BO_ 1 1;
+BA_ "GenMsgStartDelayTime" BO_ 1 1000;
+BA_ "GenMsgILSupport" BO_ 256 "Yes";
 
 BA_DEF_ BO_  "VFrameFormat" ENUM  "StandardCAN","ExtendedCAN","reserved","J1939PG";
 BA_DEF_DEF_  "VFrameFormat" "StandardCAN";
