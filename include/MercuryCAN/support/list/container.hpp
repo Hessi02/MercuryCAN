@@ -27,9 +27,6 @@ namespace Generic {
  * Container owns and deletes its list elements. Stored values are copied into
  * those elements; if a value is a pointer, the pointed-to object is not
  * managed by the container.
- * Its operations can be constant-evaluated when dynamically allocated
- * elements are destroyed before the evaluation ends.
- *
  * \tparam  ContentType passes the type of values stored in the container.
  */
 template<typename ContentType>
@@ -38,7 +35,7 @@ public:
     /**
      * \brief   Constructs an empty container.
      */
-    constexpr Container(void) : _headOfStack(nullptr) {
+    Container(void) : _headOfStack(nullptr) {
     }
 
     /**
@@ -47,7 +44,7 @@ public:
      * The destructor does not manage the lifetime of objects referenced by
      * pointer values stored in the elements.
      */
-    constexpr virtual ~Container(void) {
+    virtual ~Container(void) {
         Element<ContentType>* nextElement = _headOfStack;
 
         while (nextElement) {
@@ -62,7 +59,7 @@ public:
      *
      * \param   value passes the value to copy into a new element.
      */
-    constexpr void append(const ContentType& value) {
+    void append(const ContentType& value) {
         Element<ContentType>* newElement =
             new Element<ContentType>(value, _headOfStack);
 
@@ -79,7 +76,7 @@ public:
      *
      * \param   comparator passes the function that compares two values.
      */
-    constexpr void sort(
+    void sort(
         bool (*comparator)(const ContentType&, const ContentType&)
     ) {
         Element<ContentType>* sortedElements = nullptr;
@@ -102,7 +99,7 @@ public:
      *
      * \param   value passes the value to find and remove.
      */
-    constexpr void remove(const ContentType& value) {
+    void remove(const ContentType& value) {
         Element<ContentType>* previousElement = nullptr;
         Element<ContentType>* currentElement = _headOfStack;
 
@@ -130,7 +127,7 @@ public:
      *
      * \return  Result of sizeof(Container).
      */
-    constexpr std::size_t size(void) {
+    std::size_t size(void) {
         return sizeof(*this);
     }
 
@@ -139,7 +136,7 @@ public:
      *
      * \return  Number of stored elements, represented as an 8-bit value.
      */
-    constexpr uint8_t length(void) const {
+    uint8_t length(void) const {
         uint8_t loopIterations = 0;
         Element<ContentType>* nextElement = _headOfStack;
 
@@ -161,7 +158,7 @@ public:
      *
      * \return  Mutable reference to the value at \p index.
      */
-    constexpr ContentType& at(const uint8_t& index) const {
+    ContentType& at(const uint8_t& index) const {
         Element<ContentType>* targetElement = elementAt(index);
         return targetElement->getContent();
     }
@@ -172,7 +169,7 @@ public:
      * Stored pointer values are not deleted; only the list elements are
      * destroyed.
      */
-    constexpr void deleteAll(void) {
+    void deleteAll(void) {
         const uint8_t elementCount = length();
 
         for (uint8_t i = 0; i < elementCount; i++) {
@@ -189,7 +186,7 @@ public:
      * \param   content passes the value to copy into the new element.
      * \param   index passes the zero-based insertion index.
      */
-    constexpr void insert(const ContentType content, const uint8_t& index) {
+    void insert(const ContentType content, const uint8_t& index) {
         Element<ContentType>* newElement =
             new Element<ContentType>(content, _headOfStack);
 
@@ -211,7 +208,7 @@ public:
      *
      * \return  Iterator to the first element visited during traversal.
      */
-    constexpr Iterator<ContentType> begin(void) {
+    Iterator<ContentType> begin(void) {
         return Iterator(_headOfStack);
     }
 
@@ -220,7 +217,7 @@ public:
      *
      * \return  End iterator, represented by a null element pointer.
      */
-    constexpr Iterator<ContentType> end(void) {
+    Iterator<ContentType> end(void) {
         return Iterator<ContentType>(nullptr);
     }
 
@@ -233,7 +230,7 @@ private:
      *          possibly updated head.
      * \param   comparator passes the function that compares element values.
      */
-    constexpr void insertSorted(
+    void insertSorted(
         Element<ContentType>* element,
         Element<ContentType>*& sortedElements,
         bool (*comparator)(const ContentType&, const ContentType&)
@@ -261,7 +258,7 @@ private:
      *
      * \return  Pointer to the element at \p index.
      */
-    constexpr Element<ContentType>* elementAt(const uint8_t& index) const {
+    Element<ContentType>* elementAt(const uint8_t& index) const {
         const uint8_t itertaionsFromTop = length() - index - 1;
 
         Element<ContentType>* elementPointer = _headOfStack;

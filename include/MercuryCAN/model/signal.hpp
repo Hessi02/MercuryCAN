@@ -184,7 +184,7 @@ public:
      *
      * \return  Size of SignalDataType in bytes.
      */
-    constexpr std::size_t getDataSize(void) const {
+    std::size_t getDataSize(void) const {
         return sizeof(SignalDataType);
     }
 
@@ -195,7 +195,7 @@ public:
      *
      * \return  Pointer to the associated signal data.
      */
-    constexpr SignalDataType* getDataPtr(void) const {
+    SignalDataType* getDataPtr(void) const {
         return _data;
     }
 

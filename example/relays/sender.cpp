@@ -4,8 +4,9 @@
  *
  * Configures PORTA as an input and registers the DBC-defined RelayControl
  * message for cyclic transmission with a 1 ms cycle time. The message payload
- * is populated from PINA. The application then enters idle sleep while the
- * timer interrupt schedules transmissions.
+ * is populated from a RAM copy of PINA immediately before transmission. The
+ * application then enters idle sleep while the timer interrupt schedules
+ * transmissions.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -19,24 +20,37 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
-#include <cassert>
+
+namespace {
+
+volatile uint8_t relayControlValue = 0;
+
+void readRelayInputs(uint32_t) {
+    relayControlValue = PINA;
+}
+
+}
 
 int main(void) {
     DDRA = 0x00;
     
     constexpr Can::Model::Database dbc(DBC);
 
-    std::optional<Can::Model::CyclicMessage> relayControl = 
+    auto relayControl = 
         dbc.buildCyclicMessage(
-            "RelayControl",
-            1,
-            &PINA
+            "RelayControl", 
+            1, 
+            &relayControlValue
         );
 
-    assert(relayControl);
+    SignalSlot::MetaObject::connect(
+        &relayControl,
+        &Can::Model::Message::preSend,
+        &readRelayInputs
+    );
     
     Can::Controller::Transmitter tx;
-    tx.addCyclicMessage(*relayControl);
+    tx.addCyclicMessage(relayControl);
 
     auto* driver = Can::Driver::DriverInterface::getInstance();
     driver->enterIdleSleep();

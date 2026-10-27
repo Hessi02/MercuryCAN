@@ -28,12 +28,16 @@ constexpr Can::Model::Signal<volatile uint16_t> signalConfiguration(
     &runtimeSignalData
 );
 
-static_assert(signalConfiguration.getDataSize() == sizeof(uint16_t));
-static_assert(signalConfiguration.getDataPtr() == &runtimeSignalData);
-
 }
 
 int main(int argc, char** argv) {
+    if (signalConfiguration.getDataSize() != sizeof(uint16_t) ||
+        signalConfiguration.getDataPtr() != &runtimeSignalData
+    ) {
+        std::cerr << "Signal configuration returned incorrect data!" << std::endl;
+        return 8;
+    }
+
     Can::Driver::MockDriver* driver = static_cast<Can::Driver::MockDriver*>(
         Can::Driver::DriverInterface::getInstance()
     );

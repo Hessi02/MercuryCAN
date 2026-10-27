@@ -35,9 +35,6 @@ class MetaObject;
  *
  * A connection can target either a member callback on a receiver object or a
  * static callback function. Sender and receiver pointers are non-owning.
- * Its construction, comparisons, and callback execution can be constant-
- * evaluated when the referenced objects and callbacks support it.
- *
  * \tparam  ParamPack passes the signal and callback parameter types.
  */
 template<class... ParamPack>
@@ -77,7 +74,7 @@ public:
              class ReceiverBase>
     requires isDerived<SenderBase, Sender> &&
              isDerived<ReceiverBase, Receiver>
-    constexpr Connection(
+    Connection(
         Sender* sender,
         void(SenderBase::*signal)(ParamPack...),
         Receiver* receiver,
@@ -101,7 +98,7 @@ public:
     template<class Sender,
              class SenderBase>
     requires isDerived<SenderBase, Sender>
-    constexpr Connection(
+    Connection(
         Sender* sender,
         void(SenderBase::*signal)(ParamPack...),
         StaticCallback_t callback
@@ -120,7 +117,7 @@ public:
      *
      * \param   args passes the arguments forwarded to the callback.
      */
-    constexpr void executeCallback(ParamPack... args) {
+    void executeCallback(ParamPack... args) {
         if (_receiver && _callback)
             (*_receiver.*_callback)(args...);
         else if (_staticCallback)
@@ -134,7 +131,7 @@ public:
      *
      * \return  True if the pointer matches the stored sender.
      */
-    constexpr bool isSender(const MetaObject* sender) const {
+    bool isSender(const MetaObject* sender) const {
         return sender == _sender;
     }
 
@@ -145,7 +142,7 @@ public:
      *
      * \return  True if the pointer matches the stored receiver.
      */
-    constexpr bool isReceiver(const MetaObject* receiver) const {
+    bool isReceiver(const MetaObject* receiver) const {
         return receiver == _receiver;
     }
 
@@ -156,7 +153,7 @@ public:
      *
      * \return  True if the member function matches the stored signal.
      */
-    constexpr bool isSignal(const Signal_t& signal) const {
+    bool isSignal(const Signal_t& signal) const {
         return signal == _signal;
     }
 
@@ -167,7 +164,7 @@ public:
      *
      * \return  True if the member function matches the stored callback.
      */
-    constexpr bool isCallback(const Callback_t& callback) const {
+    bool isCallback(const Callback_t& callback) const {
         return callback == _callback;
     }
 
@@ -178,7 +175,7 @@ public:
      *
      * \return  True if the function matches the stored callback.
      */
-    constexpr bool isCallback(const StaticCallback_t& callback) const {
+    bool isCallback(const StaticCallback_t& callback) const {
         return callback == _staticCallback;
     }
 

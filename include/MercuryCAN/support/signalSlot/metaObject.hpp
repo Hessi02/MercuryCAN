@@ -31,8 +31,8 @@ namespace SignalSlot
  * Connections are stored in static containers grouped by their parameter
  * types. Signals are ordinary member functions; the \c signals and \c emit
  * macros provide syntax compatible with signal/slot-style call sites.
- * The shared, dynamically managed registry is runtime-only; standalone
- * connection records provide the constexpr-capable operations.
+ * The shared, dynamically managed registry and its connection records are
+ * used at runtime.
  */
 class MetaObject
 {

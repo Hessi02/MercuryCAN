@@ -16,13 +16,16 @@
 #ifndef __MERCURYCAN_MODEL_MESSAGE_HPP__
 #define __MERCURYCAN_MODEL_MESSAGE_HPP__
 
-#include <MercuryCAN/support/list/container.hpp>
 #include <MercuryCAN/support/signalSlot/metaObject.hpp>
 #include <MercuryCAN/model/signal.hpp>
 
+#include <array>
 #include <atomic>
+#include <utility>
+#include <variant>
 
-namespace Can::Model {
+namespace Can::Model 
+{
 
 /**
  * \brief   Checks whether the given signal data types fit into a CAN payload.
@@ -52,6 +55,22 @@ concept FitsIntoCanMessage = (0 + ... + sizeof(SignalDataTypes)) <= 8;
  */
 class Message : public SignalSlot::MetaObject
 {
+private:
+    /**
+     * \brief   Creates storage alternatives for the supplied signal counts.
+     */
+    template<std::size_t... SignalCounts>
+    static auto makeSignalStorageType(
+        std::index_sequence<SignalCounts...>
+    ) -> std::variant<std::array<AnySignal_t, SignalCounts>...>;
+
+    /**
+     * \brief   Storage alternatives for zero through eight signals.
+     */
+    using MakeSignalStorage_t = decltype(
+        makeSignalStorageType(std::make_index_sequence<9>{})
+    );
+
 public:
     /**
      * \brief   Allows derived messages to be destroyed through a base pointer.
@@ -78,11 +97,14 @@ public:
                       SignalDataTypes*... signalPtrPack)
         : _payloadSize((0 + ... + sizeof(SignalDataTypes))),
           _identifier(identifier),
-          _signalCount(sizeof...(SignalDataTypes)) {
-        (_signals.append(
-             static_cast<AnySignal_t>(Signal<SignalDataTypes>(signalPtrPack))
-         ),
-         ...);
+          _signals(
+              std::in_place_index<sizeof...(SignalDataTypes)>,
+              std::array<AnySignal_t, sizeof...(SignalDataTypes)>{
+                  static_cast<AnySignal_t>(
+                      Signal<SignalDataTypes>(signalPtrPack)
+                  )...
+              }
+          ) {
     }
 
     /**
@@ -112,11 +134,16 @@ public:
      *
      * \return  Pointer to the serialized payload buffer.
      */
-    constexpr unsigned char* getPayloadData(void) {
+    unsigned char* getPayloadData(void) {
         uint8_t retWriteIndex = 0;
 
-        for (uint8_t index = 0; index < _signalCount; index++)
-            appendSignalPayload(_signals.at(index), retWriteIndex);
+        std::visit(
+            [this, &retWriteIndex](auto& signalArray) {
+                for (AnySignal_t& signal : signalArray)
+                    appendSignalPayload(signal, retWriteIndex);
+            },
+            _signals
+        );
 
         return _payloadBuffer;
     }
@@ -137,12 +164,17 @@ public:
     ) {
         std::size_t readIndex = 0;
 
-        for (uint8_t index = 0; index < _signalCount; index++) {
-            if (!applySignalPayload(
-                    _signals.at(index), data, dataLength, readIndex
-                ))
-                return;
-        }
+        std::visit(
+            [this, data, &dataLength, &readIndex](auto& signalArray) {
+                for (AnySignal_t& signal : signalArray) {
+                    if (!applySignalPayload(
+                            signal, data, dataLength, readIndex
+                        ))
+                        return;
+                }
+            },
+            _signals
+        );
     }
 
     /**
@@ -276,11 +308,6 @@ private:
     const uint16_t _identifier;
 
     /**
-     * \brief   Number of signal references stored in _signals.
-     */
-    const uint8_t _signalCount;
-
-    /**
      * \brief   Explicitly managed flag indicating a message update.
      */
     std::atomic<bool> _updateFlag{false};
@@ -288,7 +315,7 @@ private:
     /**
      * \brief   Non-owning references to the signals contained in this message.
      */
-    Generic::Container<AnySignal_t> _signals;
+    MakeSignalStorage_t _signals;
 
     /**
      * \brief   Internal buffer used to serialize the message payload.

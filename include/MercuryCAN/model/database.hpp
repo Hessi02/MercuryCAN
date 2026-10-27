@@ -11,8 +11,8 @@
  * The parser currently supports exact message-name lookup and validates the
  * parsed identifier, declared payload length, and combined signal data size.
  * It does not parse signal definitions, node assignments, DBC attributes, or
- * cycle times. Message creation returns an empty optional when no supported
- * matching definition is found or when the signal data does not fit.
+ * cycle times. Messages can only be built through the consteval builders;
+ * missing definitions and mismatched payload sizes fail compilation.
  *
  * The DBC text is not copied and must remain valid and null-terminated while
  * the Database is used. Signal data referenced by a returned message must
@@ -87,14 +87,13 @@ public:
      * \param name passes the exact DBC message name to find.
      * \param signalPtrPack passes non-owning pointers to the signal data.
      * 
-     * \return The message value when the row and payload size match,
-     *         otherwise an empty optional.
+     * \return The matching Message.
      */
     template<typename... SignalDataTypes>
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
                     FitsIntoCanMessage<SignalDataTypes...>
-    constexpr std::optional<Message> buildMessage(
-        const char* name, 
+    consteval Message buildMessage(
+        const char* name,
         SignalDataTypes*... signalPtrPack
     ) const {
         const std::optional<MessageDefinition> definition =
@@ -103,13 +102,9 @@ public:
             );
 
         if (!definition)
-            return std::nullopt;
+            failConstantEvaluation();
 
-        return std::optional<Message>{
-            std::in_place,
-            definition->identifier,
-            signalPtrPack...
-        };
+        return Message{definition->identifier, signalPtrPack...};
     }
 
     /**
@@ -124,15 +119,14 @@ public:
      * \param cycleTime passes the cycle time in milliseconds.
      * \param signalPtrPack passes non-owning pointers to the signal data.
      *
-     * \return The cyclic message value when the row and payload size match,
-     *         otherwise an empty optional.
+     * \return The matching CyclicMessage.
      */
     template<typename... SignalDataTypes>
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
                     FitsIntoCanMessage<SignalDataTypes...>
-    constexpr std::optional<CyclicMessage> buildCyclicMessage(
+    consteval CyclicMessage buildCyclicMessage(
         const char* name,
-        const uint16_t& cycleTime,
+        const uint16_t cycleTime,
         SignalDataTypes*... signalPtrPack
     ) const {
         const std::optional<MessageDefinition> definition =
@@ -141,17 +135,19 @@ public:
             );
 
         if (!definition)
-            return std::nullopt;
+            failConstantEvaluation();
 
-        return std::optional<CyclicMessage>{
-            std::in_place,
-            definition->identifier,
-            cycleTime,
-            signalPtrPack...
+        return CyclicMessage{
+            definition->identifier, cycleTime, signalPtrPack...
         };
     }
 
 private:
+    /**
+     * \brief   Causes invalid consteval builds to fail during constant evaluation.
+     */
+    static void failConstantEvaluation() {}
+
     /**
      * \brief   Parsed fields needed to construct a Message.
      *
