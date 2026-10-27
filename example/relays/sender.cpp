@@ -39,7 +39,6 @@ int main(void) {
     auto relayControl = 
         dbc.buildCyclicMessage(
             "RelayControl", 
-            1, 
             &relayControlValue
         );
 

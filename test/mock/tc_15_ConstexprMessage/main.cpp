@@ -29,7 +29,13 @@ uint64_t eightByteSignal = 0;
 constexpr char databaseText[] =
     "BO_ 512 ByteMessage: 1 ECU\n"
     "BO_ 513 EmptyMessage: 0 ECU\n"
-    "BO_ 514 EightByteMessage: 8 ECU";
+    "BO_ 514 EightByteMessage: 8 ECU\n"
+    "BA_ \"GenMsgSendType\" BO_ 512 \"cyclicIfActive\";\n"
+    "BA_ \"GenMsgCycleTime\" BO_ 512 75;\n"
+    "BA_ \"GenMsgSendType\" BO_ 513 \"cyclicAndTriggered\";\n"
+    "BA_ \"GenMsgCycleTime\" BO_ 513 100;\n"
+    "BA_ \"GenMsgSendType\" BO_ 514 \"cyclicIfActiveAndTriggered\";\n"
+    "BA_ \"GenMsgCycleTime\" BO_ 514 250;";
 constexpr Can::Model::Database database(databaseText);
 
 constexpr Can::Model::Message emptyMessage(0x100);
@@ -57,9 +63,11 @@ constexpr Can::Model::Message databaseEmptyMessage =
 constexpr Can::Model::Message databaseMaximumPayloadMessage =
     database.buildMessage("EightByteMessage", &eightByteSignal);
 constexpr Can::Model::CyclicMessage databaseCyclicMessage =
-    database.buildCyclicMessage("ByteMessage", 75, &signal0);
+    database.buildCyclicMessage("ByteMessage", &signal0);
 constexpr Can::Model::CyclicMessage databaseEmptyCyclicMessage =
-    database.buildCyclicMessage("EmptyMessage", 100);
+    database.buildCyclicMessage("EmptyMessage");
+constexpr Can::Model::CyclicMessage databaseMaximumPayloadCyclicMessage =
+    database.buildCyclicMessage("EightByteMessage", &eightByteSignal);
 
 static_assert(
     emptyMessage.getIdentifier() == 0x100 &&
@@ -108,6 +116,11 @@ static_assert(
     databaseEmptyCyclicMessage.getIdentifier() == 513 &&
     databaseEmptyCyclicMessage.getPayloadSize() == 0 &&
     databaseEmptyCyclicMessage.getCycleTime() == 100
+);
+static_assert(
+    databaseMaximumPayloadCyclicMessage.getIdentifier() == 514 &&
+    databaseMaximumPayloadCyclicMessage.getPayloadSize() == 8 &&
+    databaseMaximumPayloadCyclicMessage.getCycleTime() == 250
 );
 
 }

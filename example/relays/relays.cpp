@@ -41,7 +41,6 @@ int main(void) {
     Can::Model::CyclicMessage relayControl = 
         dbc.buildCyclicMessage(
             "RelayControl", 
-            1, 
             &relayControlValue
         );
 

@@ -48,7 +48,6 @@ BO_ 1 RelayControl: 1 Vector__XXX
 
 BA_DEF_ BO_ "GenMsgSendType" ENUM "cyclic","triggered","cyclicIfActive","cyclicAndTriggered","cyclicIfActiveAndTriggered","none";
 BA_DEF_ BO_ "GenMsgCycleTime" INT 0 10000;
-BA_DEF_ BO_ "GenMsgStartDelayTime" INT 0 10000;
 BA_DEF_ BO_ "GenMsgILSupport" ENUM "No","Yes";
 
 BA_DEF_DEF_ "GenMsgSendType" "none";
@@ -56,7 +55,6 @@ BA_DEF_DEF_ "GenMsgILSupport" "No";
 
 BA_ "GenMsgSendType" BO_ 1 "cyclic";
 BA_ "GenMsgCycleTime" BO_ 1 1;
-BA_ "GenMsgStartDelayTime" BO_ 1 1000;
 BA_ "GenMsgILSupport" BO_ 256 "Yes";
 
 BA_DEF_ BO_  "VFrameFormat" ENUM  "StandardCAN","ExtendedCAN","reserved","J1939PG";

@@ -8,11 +8,11 @@
  * Can::Model::Message or Can::Model::CyclicMessage with caller-provided
  * signal data pointers.
  *
- * The parser currently supports exact message-name lookup and validates the
- * parsed identifier, declared payload length, and combined signal data size.
- * It does not parse signal definitions, node assignments, DBC attributes, or
- * cycle times. Messages can only be built through the consteval builders;
- * missing definitions and mismatched payload sizes fail compilation.
+ * The parser supports exact message-name lookup and validates the parsed
+ * identifier, declared payload length, and combined signal data size. Cyclic
+ * messages additionally require a cyclic \c GenMsgSendType and a defined
+ * \c GenMsgCycleTime. Messages can only be built through the consteval
+ * builders; missing definitions and mismatched payload sizes fail compilation.
  *
  * The DBC text is not copied and must remain valid and null-terminated while
  * the Database is used. Signal data referenced by a returned message must
@@ -42,17 +42,18 @@ namespace Can::Model {
  *
  * This class reads a null-terminated DBC string without taking ownership of
  * it. The current parser recognizes message header rows beginning with
- * \c BO_ and extracts only the decimal CAN identifier, exact message name,
- * and declared payload length. Signal definitions, node assignments,
- * attributes, and cycle times are not parsed.
+ * \c BO_ and extracts the decimal CAN identifier, exact message name, and
+ * declared payload length. For cyclic messages it also reads
+ * \c GenMsgSendType and \c GenMsgCycleTime attributes. Signal definitions
+ * and node assignments are not parsed.
  *
  * Message data is checked against the declared payload length and the
  * classic-CAN maximum of eight bytes. The data type sizes are taken from C++
  * \c sizeof; they are not compared with individual DBC signal definitions.
  *
  * The DBC text is a non-owning pointer and must remain valid and
- * null-terminated while the database is used. Cycle times are supplied by the
- * caller when creating cyclic messages; they are not read from DBC metadata.
+ * null-terminated while the database is used. Cyclic message timing and send
+ * type are read from DBC attributes.
  */
 class Database
 {
@@ -111,12 +112,13 @@ public:
      * \brief   Builds a cyclic message matching a DBC message definition.
      *
      * The exact, case-sensitive message name and combined signal data size
-     * must match a supported DBC message. The cycle time is supplied by the
-     * caller and is expressed in milliseconds.
+     * must match a supported DBC message. The message must have a cyclic
+     * \c GenMsgSendType (\c cyclic, \c cyclicIfActive, \c cyclicAndTriggered,
+     * or \c cyclicIfActiveAndTriggered) and a defined \c GenMsgCycleTime,
+     * expressed in milliseconds.
      *
      * \tparam SignalDataTypes specifies the types of the signal data.
      * \param name passes the exact DBC message name to find.
-     * \param cycleTime passes the cycle time in milliseconds.
      * \param signalPtrPack passes non-owning pointers to the signal data.
      *
      * \return The matching CyclicMessage.
@@ -126,11 +128,10 @@ public:
                     FitsIntoCanMessage<SignalDataTypes...>
     consteval CyclicMessage buildCyclicMessage(
         const char* name,
-        const uint16_t cycleTime,
         SignalDataTypes*... signalPtrPack
     ) const {
         const std::optional<MessageDefinition> definition =
-            findMessageWithPayloadSize(
+            findCyclicMessageWithPayloadSize(
                 name, (0 + ... + sizeof(SignalDataTypes))
             );
 
@@ -138,7 +139,7 @@ public:
             failConstantEvaluation();
 
         return CyclicMessage{
-            definition->identifier, cycleTime, signalPtrPack...
+            definition->identifier, definition->cycleTime, signalPtrPack...
         };
     }
 
@@ -151,13 +152,14 @@ private:
     /**
      * \brief   Parsed fields needed to construct a Message.
      *
-     * The identifier and payload length are read from a single DBC \c BO_
-     * header row. This does not represent or retain the row's signal
-     * definitions or other DBC metadata.
+     * The identifier and payload length are read from a DBC \c BO_ header
+     * row. Cyclic-message lookup additionally fills cycleTime from its DBC
+     * attributes.
      */
     struct MessageDefinition {
         uint16_t identifier;
         uint8_t payloadSize;
+        uint16_t cycleTime = 0;
     };
 
     /**
@@ -217,6 +219,168 @@ private:
             return std::nullopt;
 
         return definition;
+    }
+
+    /**
+     * \brief   Finds a cyclic message with matching signal data and attributes.
+     */
+    constexpr std::optional<MessageDefinition>
+    findCyclicMessageWithPayloadSize(
+        const char* name,
+        const std::size_t signalSize
+    ) const {
+        std::optional<MessageDefinition> definition =
+            findMessageWithPayloadSize(name, signalSize);
+
+        if (!definition)
+            return std::nullopt;
+
+        bool hasCyclicSendType = false;
+        std::optional<uint16_t> cycleTime;
+
+        for (const char* line = _file; *line; ) {
+            const char* lineEnd = line;
+            while (*lineEnd && '\n' != *lineEnd)
+                ++lineEnd;
+
+            uint32_t identifier = 0;
+            const char* value = nullptr;
+
+            if (parseAttributeHeader(
+                    line, lineEnd, "GenMsgSendType", identifier, value
+                ) && identifier == definition->identifier) {
+                hasCyclicSendType = parseCyclicSendType(value, lineEnd);
+            } else if (parseAttributeHeader(
+                           line, lineEnd, "GenMsgCycleTime",
+                           identifier, value
+                       ) && identifier == definition->identifier) {
+                uint32_t parsedCycleTime = 0;
+                if (parseUnsigned(value, lineEnd, parsedCycleTime) &&
+                    hasAttributeTerminator(value, lineEnd) &&
+                    parsedCycleTime <=
+                        std::numeric_limits<uint16_t>::max()) {
+                    cycleTime = static_cast<uint16_t>(parsedCycleTime);
+                } else {
+                    cycleTime.reset();
+                }
+            }
+
+            line = *lineEnd ? lineEnd + 1 : lineEnd;
+        }
+
+        if (!hasCyclicSendType || !cycleTime)
+            return std::nullopt;
+
+        definition->cycleTime = *cycleTime;
+        return definition;
+    }
+
+    /**
+     * \brief   Parses the header of a DBC message attribute assignment.
+     *
+     * On success, value points to the attribute value and identifier holds
+     * the BO_ identifier.
+     */
+    static constexpr bool parseAttributeHeader(
+        const char* line,
+        const char* lineEnd,
+        const char* attributeName,
+        uint32_t& identifier,
+        const char*& value
+    ) {
+        while (line < lineEnd && (' ' == *line || '\t' == *line))
+            ++line;
+
+        if (lineEnd - line < 3 ||
+            'B' != line[0] || 'A' != line[1] || '_' != line[2])
+            return false;
+
+        const char* cursor = line + 3;
+        while (cursor < lineEnd && (' ' == *cursor || '\t' == *cursor))
+            ++cursor;
+
+        if (!parseQuotedString(cursor, lineEnd, attributeName))
+            return false;
+
+        while (cursor < lineEnd && (' ' == *cursor || '\t' == *cursor))
+            ++cursor;
+
+        if (lineEnd - cursor < 3 ||
+            'B' != cursor[0] || 'O' != cursor[1] || '_' != cursor[2])
+            return false;
+
+        cursor += 3;
+        if (!parseUnsigned(cursor, lineEnd, identifier))
+            return false;
+
+        while (cursor < lineEnd && (' ' == *cursor || '\t' == *cursor))
+            ++cursor;
+
+        value = cursor;
+        return true;
+    }
+
+    /**
+     * \brief   Parses and compares a quoted DBC string value.
+     */
+    static constexpr bool parseQuotedString(
+        const char*& cursor,
+        const char* end,
+        const char* expected
+    ) {
+        if (cursor == end || '"' != *cursor++)
+            return false;
+
+        while (*expected) {
+            if (cursor == end || *cursor++ != *expected++)
+                return false;
+        }
+
+        if (cursor == end || '"' != *cursor)
+            return false;
+
+        ++cursor;
+        return true;
+    }
+
+    /**
+     * \brief   Checks whether a send type includes cyclic transmission.
+     */
+    static constexpr bool parseCyclicSendType(
+        const char* value,
+        const char* end
+    ) {
+        const auto matches = [value, end](const char* sendType) {
+            const char* cursor = value;
+            return parseQuotedString(cursor, end, sendType) &&
+                   hasAttributeTerminator(cursor, end);
+        };
+
+        return matches("cyclic") ||
+               matches("cyclicIfActive") ||
+               matches("cyclicAndTriggered") ||
+               matches("cyclicIfActiveAndTriggered");
+    }
+
+    /**
+     * \brief   Checks for the assignment terminator after an attribute value.
+     */
+    static constexpr bool hasAttributeTerminator(
+        const char* cursor,
+        const char* end
+    ) {
+        while (cursor < end &&
+               (' ' == *cursor || '\t' == *cursor || '\r' == *cursor))
+            ++cursor;
+
+        if (cursor == end || ';' != *cursor++)
+            return false;
+
+        while (cursor < end &&
+               (' ' == *cursor || '\t' == *cursor || '\r' == *cursor))
+            ++cursor;
+
+        return cursor == end;
     }
 
     /**

@@ -21,7 +21,11 @@ constexpr Can::Model::Database embeddedDatabase{DATABASE_TEXT};
 
 constexpr char constexprDatabaseText[] =
     "BO_ 12 Telemetry: 4 ECU\n"
-    "BO_ 0 Empty: 0 ECU";
+    "BO_ 0 Empty: 0 ECU\n"
+    "BA_ \"GenMsgSendType\" BO_ 12 \"cyclic\";\n"
+    "BA_ \"GenMsgCycleTime\" BO_ 12 20;\n"
+    "BA_ \"GenMsgSendType\" BO_ 0 \"cyclicAndTriggered\";\n"
+    "BA_ \"GenMsgCycleTime\" BO_ 0 30;";
 
 constexpr Can::Model::Database constexprDatabase{constexprDatabaseText};
 
@@ -35,9 +39,9 @@ constexpr Can::Model::Message telemetryMessage =
 constexpr Can::Model::Message emptyMessage =
     constexprDatabase.buildMessage("Empty");
 constexpr Can::Model::CyclicMessage cyclicMessage =
-    constexprDatabase.buildCyclicMessage("Telemetry", 20, &telemetrySignal);
+    constexprDatabase.buildCyclicMessage("Telemetry", &telemetrySignal);
 constexpr Can::Model::CyclicMessage emptyCyclicMessage =
-    constexprDatabase.buildCyclicMessage("Empty", 30);
+    constexprDatabase.buildCyclicMessage("Empty");
 
 static_assert(embeddedMessage.getIdentifier() == 12);
 static_assert(embeddedMessage.getPayloadSize() == sizeof(embeddedSignal));
