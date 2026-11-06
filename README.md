@@ -5,27 +5,6 @@ An easy-to-use C++23 CAN library optimized for the AT90CAN128 microcontroller.
     <img src="res/icons/logo.png" alt="MercuryCAN" width="180">
 </p>
 
-## Prerequisites
-
-Different tools are required for compiling and flashing. A different toolchain may also be used if desired; however, there is no guarantee that all components of the library will be fully functional in that case.
-
-### AVR-GCC
-`AVR-GCC` is a compiler used to write C and C++ programs for AVR microcontrollers. It compiles the source code into machine code that an AVR microcontroller can execute. Make sure, that your selected version supports C++23.
-
-[![GitHub](https://img.shields.io/github/v/release/ZakKemble/avr-gcc-build?logo=github)](https://github.com/ZakKemble/avr-gcc-build)
-
-### AVRDUDE
-`AVRDUDE` is a command-line tool used to program AVR microcontrollers. It can upload compiled firmware to the microcontroller and read or write its memory. AVRDUDE supports various programmers and interfaces.
-
-[![GitHub](https://img.shields.io/github/v/release/avrdudes/avrdude?logo=github)](https://github.com/avrdudes/avrdude)
-
-### avr-libstdcpp
-`avr-libstdcpp` is a C++ library that provides standard C++ functionality for AVR microcontrollers.
-It includes features such as classes, containers, and other parts of the C++ standard library.
-It is designed for resource-constrained embedded systems, where memory and processing power are limited.
-
-[![GitHub](https://img.shields.io/github/last-commit/modm-io/avr-libstdcpp?logo=github&label=commit)](https://github.com/modm-io/avr-libstdcpp)
-
 ## Usage
 
 This library offers classes for receiving and transmitting CAN frames. The following examples show the general use of these classes. Both classes can be used independently of one another. Nevertheless, only one instance of each respective class should exist.
