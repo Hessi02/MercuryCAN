@@ -240,11 +240,41 @@ third argument is the macro name; use that name directly in the source as the
 DBC text string literal:
 
 ```cmake
-embed_dbc(my_target ${CMAKE_CURRENT_SOURCE_DIR}/database.dbc DATABASE_TEXT)
+embed_dbc(my_target ${CMAKE_CURRENT_SOURCE_DIR}/database.dbc DBC)
 ```
 
 ```cpp
-constexpr Can::Model::Database database(DATABASE_TEXT);
+volatile uint8_t relayControlValue = 0;
+
+void updateRelayOutputs(uint32_t) {
+    PORTA = relayControlValue;
+}
+
+int main(void) {
+    constexpr Can::Model::Database dbc(DBC);
+
+    static volatile uint8_t relayControlValue;
+
+    //
+    // BO_ 54 RelayControl: 1 Vector__XXX
+    //
+    Can::Model::CyclicMessage measRxFrame(
+        Can::Model::CyclicMessage relayControl = 
+            dbc.buildCyclicMessage(
+                "RelayControl", 
+                &relayControlValue
+            )
+    );
+
+    SignalSlot::MetaObject::connect(
+        &relayControl,
+        &Can::Model::Message::received,
+        &updateRelayOutputs
+    );
+
+    Can::Controller::Receiver rx;
+    rx.addCyclicMessage(relayControl);
+}
 ```
 
 The DBC text is available to constant expressions, so database lookups can be
