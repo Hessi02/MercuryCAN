@@ -255,16 +255,21 @@ int main(void) {
 
     static volatile uint8_t relayControlValue;
 
-    //
     // BO_ 54 RelayControl: 1 Vector__XXX
-    //
-    Can::Model::CyclicMessage measRxFrame(
-        Can::Model::CyclicMessage relayControl = 
-            dbc.buildCyclicMessage(
-                "RelayControl", 
-                &relayControlValue
-            )
-    );
+    //   SG_ Relay_0 : 0|1@1- (1,0) [0|1] "" Vector__XXX
+    //   SG_ Relay_1 : 1|1@1- (1,0) [0|1] "" Vector__XXX
+    //   SG_ Relay_2 : 2|1@1- (1,0) [0|1] "" Vector__XXX
+    //   SG_ Relay_3 : 3|1@1- (1,0) [0|1] "" Vector__XXX
+    //   SG_ Relay_4 : 4|1@1- (1,0) [0|1] "" Vector__XXX
+    //   SG_ Relay_5 : 5|1@1- (1,0) [0|1] "" Vector__XXX
+    //   SG_ Relay_6 : 6|1@1- (1,0) [0|1] "" Vector__XXX
+    //   SG_ Relay_7 : 7|1@1- (1,0) [0|1] "" Vector__XXX
+
+    Can::Model::CyclicMessage relayControl = 
+        dbc.buildCyclicMessage(
+            "RelayControl", 
+            &relayControlValue
+        )
 
     SignalSlot::MetaObject::connect(
         &relayControl,
