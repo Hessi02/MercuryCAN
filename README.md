@@ -282,11 +282,3 @@ int main(void) {
 
 The DBC text is available to constant expressions, so database lookups can be
 validated during compilation with `static_assert`.
-
-## Development
-
-The further development of the library focuses on two main aspects:
-
-### Reduction of execution time
-
-The library serves as a communication tool rather than the primary task of an embedded system; therefore, sufficient computing capacity must remain available for other tasks. The focus of these optimizations is the transmission cycle sequence. Furthermore, the interaction with other CAN devices must be tested to optimally align the timing of the CAN frames with other devices on the bus.
