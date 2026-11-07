@@ -64,40 +64,18 @@ The following example shows a complete initialization for a temperature sensor:
 
 ```cpp
 int main(void) {
-    volatile unsigned char systemState    = 0;
-    volatile unsigned long systemTime     = 0;
-    volatile signed short  temperature    = 0;
-    volatile unsigned char rollingCounter = 0;
-
-    // BO_ 86 status: 5 Vector__XXX
-	//   SG_ systemState : 0|8@1+ (1,0) [0|10] "" Vector__XXX
-	//   SG_ systemTime : 8|32@1+ (0.001,0) [0|0] "s" Vector__XXX
-    
-    Can::Model::CyclicMessage status(
-        0x56,
-        100,
-        &systemState,
-        &systemTime
-    );
-    
-    SignalSlot::MetaObject::connect(
-        &status,
-        &Can::Model::CyclicMessage::Message::preSend,
-        +[](unsigned long) {
-            auto& driver = Can::Driver::DriverInterface::getInstance();
-            systemTime = driver.getTickCountMs();
-        }
-    );
+    volatile int16_t temperature = 0;
+    volatile uint8_t rollingCtr  = 0;
 
     // BO_ 256 measurement: 3 Vector__XXX
     //   SG_ temperature : 7|16@0- (0.01,0) [-20|80] "°C" Vector__XXX
-    //   SG_ rollingCounter : 16|8@1+ (1,0) [0|0] "" Vector__XXX
+    //   SG_ rollingCtr  : 16|8@1+ (1,0) [0|0] "" Vector__XXX
     
     Can::Model::CyclicMessage measurement(
         0x100,         
         100,          
         &temperature,
-        &rollingCounter
+        &rollingCtr
     );
 
     SignalSlot::MetaObject::connect(
@@ -113,14 +91,11 @@ int main(void) {
         &measurement,
         &Can::Model::CyclicMessage::Message::sent,
         +[](unsigned long) {
-            rollingCounter += 1;
+            rollingCtr += 1;
         }
     );
 
-    systemState = 1;
-
     Can::Controller::Transmitter tx; 
-    tx.addCyclicMessage(status);
     tx.addCyclicMessage(measurement);
         
     auto& driver = Can::Driver::DriverInterface::getInstance();
@@ -169,7 +144,7 @@ int main(void) {
 }
 ```
 
-A single-shot message is available to the user here as well. The respective method waits synchronously until a message update occurs or the specified timeout expires. A timeout of zero milliseconds returns immediately with `false`; it does not wait for a message. A potential asynchronous implementation is a subject for future development.
+A single-shot message is available to the user here as well. The respective method waits synchronously until a message update occurs or the specified timeout expires. A potential asynchronous implementation is a subject for future development.
 
 The example below shows such an implementation:
 
@@ -184,7 +159,7 @@ bool awaitTorqueMeasurement(volatile long& torque) {
     );
 
     static Receiver rx;
-    return rx.awaitMessage(trqMeas);
+    return rx.awaitMessage(trqMeas, 10);
 }
 ```
 
