@@ -197,7 +197,7 @@ public:
     double temperatureC;
     double temperatureF;
 
-    void onTemperatureReceived(unsigned long tickCountMs) {
+    void onTemperatureReceived(uint32_t) {
         temperatureF = temperatureC * 9 / 5 + 32;
     }
 };
@@ -231,7 +231,7 @@ int main(void) {
 }
 ```
 
-In general, MercuryCAN is intended to keep embedded CAN communication straightforward: define the message layout, bind the relevant signal variables, and then add the message to a transmitter or receiver depending on whether the device is sending or receiving data. This separation of frame definitions, signal access, and timing callbacks makes it easy to model periodic telemetry, event-driven updates, and reactive processing without mixing protocol details into the application logic.
+Defining messages directly in code keeps embedded CAN communication straightforward: describe the frame layout, bind the relevant signal variables, and add each message to a transmitter or receiver. When your network is already described in a DBC file, MercuryCAN can use that database to build messages while preserving the same transmitter and receiver workflow. The next section shows how to embed a DBC file and create messages from it.
 
 ### Embedding a DBC file
 
@@ -252,8 +252,6 @@ void updateRelayOutputs(uint32_t) {
 
 int main(void) {
     constexpr Can::Model::Database dbc(DBC);
-
-    static volatile uint8_t relayControlValue;
 
     // BO_ 54 RelayControl: 1 Vector__XXX
     //   SG_ Relay_0 : 0|1@1- (1,0) [0|1] "" Vector__XXX
@@ -292,7 +290,3 @@ The further development of the library focuses on two main aspects:
 ### Reduction of execution time
 
 The library serves as a communication tool rather than the primary task of an embedded system; therefore, sufficient computing capacity must remain available for other tasks. The focus of these optimizations is the transmission cycle sequence. Furthermore, the interaction with other CAN devices must be tested to optimally align the timing of the CAN frames with other devices on the bus.
-
-### Automatic generation from a database
-
-Automated definition of the relevant frames and signals should be enabled via DBC input. Wherever possible, no wizard or generator application should be required. The library should provide mechanisms to parse such a DBC file at compile time and convert it into the corresponding code.
