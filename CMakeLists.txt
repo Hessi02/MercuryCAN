@@ -11,20 +11,44 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/res/cmake/embed_dbc.cmake")
 if(MOCK_SOURCES)
     find_package(Threads REQUIRED)
 
-    add_library(MercuryCAN
-                src/driver/driver.cpp 
-                src/driver/mockDriver.cpp
-                src/controller/transmitter.cpp 
-                src/controller/receiver.cpp
+    add_library(
+        MercuryCAN
+        src/driver/driver.cpp 
+        src/driver/mockDriver.cpp
+        src/controller/transmitter.cpp 
+        src/controller/receiver.cpp
     )
+
     target_compile_definitions(MercuryCAN PRIVATE __USE_MOCK_DRIVER)
     target_link_libraries(MercuryCAN PRIVATE Threads::Threads)
 else()
-    add_library(MercuryCAN
-                src/driver/driver.cpp 
-                src/driver/avrDriver.cpp
-                src/controller/transmitter.cpp 
-                src/controller/receiver.cpp
+    add_library(
+        MercuryCAN
+        src/driver/driver.cpp 
+        src/driver/avrDriver.cpp
+        src/controller/receiver.cpp
+        src/controller/transmitter.cpp 
+    )
+
+    file(
+        GLOB AVR_LIBSTDCPP_SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/lib/avr-libstdcpp/src/*.cc"
+    )
+
+    file(
+        GLOB AVR_LIBSTDCPP_RUNTIME_SOURCES
+         "${CMAKE_CURRENT_SOURCE_DIR}/lib/avr-libstdcpp/runtime/*.cpp"
+    )
+
+    target_sources(
+        MercuryCAN PRIVATE
+        ${AVR_LIBSTDCPP_SOURCES}
+        ${AVR_LIBSTDCPP_RUNTIME_SOURCES}
+    )
+
+    target_include_directories(
+        MercuryCAN PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}/lib/avr-libstdcpp/include"
     )
 endif()
 
