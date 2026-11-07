@@ -269,7 +269,7 @@ int main(void) {
         dbc.buildCyclicMessage(
             "RelayControl", 
             &relayControlValue
-        )
+        );
 
     SignalSlot::MetaObject::connect(
         &relayControl,

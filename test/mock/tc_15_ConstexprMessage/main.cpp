@@ -13,6 +13,7 @@
 #include <MercuryCAN/model/database.hpp>
 
 #include <cstdint>
+#include <string_view>
 
 namespace {
 
@@ -36,7 +37,13 @@ constexpr char databaseText[] =
     "BA_ \"GenMsgCycleTime\" BO_ 513 100;\n"
     "BA_ \"GenMsgSendType\" BO_ 514 \"cyclicIfActiveAndTriggered\";\n"
     "BA_ \"GenMsgCycleTime\" BO_ 514 250;";
-constexpr Can::Model::Database database(databaseText);
+constexpr std::string_view databaseTextView{
+    databaseText, sizeof(databaseText) - 1
+};
+constexpr Can::Model::Database database(databaseTextView);
+constexpr std::string_view byteMessageName = "ByteMessage";
+constexpr std::string_view emptyMessageName = "EmptyMessage";
+constexpr std::string_view eightByteMessageName = "EightByteMessage";
 
 constexpr Can::Model::Message emptyMessage(0x100);
 constexpr Can::Model::Message singleSignalMessage(0x101, &signal0);
@@ -57,17 +64,17 @@ constexpr Can::Model::CyclicMessage emptyCyclicMessage(0x200, 25);
 constexpr Can::Model::CyclicMessage cyclicMessage(0x201, 50, &signal0);
 
 constexpr Can::Model::Message databaseMessage =
-    database.buildMessage("ByteMessage", &signal0);
+    database.buildMessage(byteMessageName, &signal0);
 constexpr Can::Model::Message databaseEmptyMessage =
-    database.buildMessage("EmptyMessage");
+    database.buildMessage(emptyMessageName);
 constexpr Can::Model::Message databaseMaximumPayloadMessage =
-    database.buildMessage("EightByteMessage", &eightByteSignal);
+    database.buildMessage(eightByteMessageName, &eightByteSignal);
 constexpr Can::Model::CyclicMessage databaseCyclicMessage =
-    database.buildCyclicMessage("ByteMessage", &signal0);
+    database.buildCyclicMessage(byteMessageName, &signal0);
 constexpr Can::Model::CyclicMessage databaseEmptyCyclicMessage =
-    database.buildCyclicMessage("EmptyMessage");
+    database.buildCyclicMessage(emptyMessageName);
 constexpr Can::Model::CyclicMessage databaseMaximumPayloadCyclicMessage =
-    database.buildCyclicMessage("EightByteMessage", &eightByteSignal);
+    database.buildCyclicMessage(eightByteMessageName, &eightByteSignal);
 
 static_assert(
     emptyMessage.getIdentifier() == 0x100 &&
