@@ -63,7 +63,7 @@ public:
      * each due transmission, and its sent notification is emitted after the
      * driver transmit call.
      * 
-     * \note    A 'preSent' signal is more timing-critical than a 'sent' signal.
+     * \note    The 'preSend' signal is more timing-critical than 'sent'.
      *
      * \param   message passes the cyclic message to register.
      */
@@ -72,9 +72,9 @@ public:
     /**
      * \brief   Returns the number of registered cyclic messages.
      *
-     * The maximum number of messages is limited by the amound of MOBs available 
-     * in the driver. Even though the transmitter does not check the maximum, 
-     * the driver will not accept more than its available MOBs.
+     * This reports the number of registered messages; the transmitter does not
+     * impose a maximum. A driver may be unable to transmit a frame when no
+     * message object is available.
      * 
      * \return  Number of messages in the transmitter's shared cyclic list.
      */

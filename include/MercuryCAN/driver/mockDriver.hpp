@@ -75,7 +75,7 @@ public:
     std::vector<FrameEvent> txTrace;
 
     /** 
-     * \brief   Captured frame events for calls to receive(), in call order. 
+     * \brief   Captured frame events for calls to forwardReceiveFrame().
      * 
      * The rxTrace vector stores a sequence of FrameEvent instances representing
      * the frames that have been received by the mock driver. Each event 
@@ -147,12 +147,9 @@ public:
     /** 
      * \brief   Implements the driver's idle-sleep operation for tests. 
      * 
-     * This method simulates the behavior of a real driver entering an idle 
-     * sleep mode. In the context of testing, it allows tests to verify that the 
-     * driver correctly transitions to a low-power state when requested. The 
-     * method does not perform any actual sleep operation, but it can be used to 
-     * assert that the library's logic for entering idle sleep behaves as 
-     * expected.
+     * The mock does not model idle sleep. This method blocks indefinitely, so
+     * tests should not call it unless they specifically test the sleep call
+     * without expecting it to return.
      */
     virtual void enterIdleSleep(void) const override final;
 
@@ -265,15 +262,6 @@ private:
      */
     std::thread _txTimerThread;
 
-    /**
-     * \brief   Number of message objects available in the AVR CAN controller.
-     */
-    static inline constexpr uint8_t _messageObjectCount = 15;
-
-    /**
-     * \brief   Bit mask tracking which CAN message objects are in use.
-     */
-    static inline uint16_t _usedMessageObjectMask = 0;
 };
 
 }

@@ -2,13 +2,12 @@
  * \file    avrDriver.hpp
  * \brief   Declares the AVR implementation of the CAN driver interface.
  *
- * AvrDriver provides CAN communication, receive-message configuration, idle 
+ * AvrDriver provides CAN communication, receive-message configuration, idle
  * sleep, and millisecond timer support using the AVR CAN controller hardware.
- * It implements the DriverInterface and is created by it. The instance is not
- * constructed directly by callers. Mind that any additional methods or members
- * require the user to do a typecast to the concrete driver type, which cannot 
- * be expected to be done by users. Keep it simple and only add private internal 
- * methods and members.
+ * It implements DriverInterface and is created by it, not directly by callers.
+ * Additional public members would require callers to cast to AvrDriver, which
+ * is not expected. Keep this class simple; add only private implementation
+ * details.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -54,8 +53,8 @@ public:
      *
      * Configures a message object with the supplied identifier, writes the
      * payload, waits for transmission completion, and then releases the
-     * message object. If data is null or no message object is available,
-     * the method returns without transmitting.
+     * message object. This method blocks until the frame is sent. If data is
+     * null or no message object is available, it returns without transmitting.
      *
      * \todo    Consider a non-blocking implementation that uses a queue.
      * 
@@ -92,8 +91,8 @@ public:
      *
      * The object is configured to match identifier and accept the specified
      * payload length. Its receive interrupt is enabled. If no message object
-     * is available, no receive configuration is added. An respective method to
-     * remove the receive configuration is also provided.
+     * is available, no receive configuration is added. A corresponding method
+     * to remove the receive configuration is also provided.
      *
      * \param   identifier passes the CAN identifier to accept.
      * \param   length passes the expected payload length in bytes.
@@ -120,7 +119,7 @@ public:
      *
      * Matching receive objects are freed and their receive interrupts disabled. 
      * The method ignores identifiers that are not configured for reception. Any
-     * message objects that are not used for reception or dont match the passed
+     * message objects that are not used for reception or don't match the passed
      * identifier are not affected. The method does not return any status to the
      * caller, as it is assumed that the caller does not need to know whether a
      * message object was actually released or not.
@@ -170,11 +169,10 @@ public:
      * \brief   Increments the driver's millisecond tick counter.
      * 
      * This operation is called by the transmitter's periodic cycle processing. 
-     * The tick count should therefore always mirror the hardware timer's value.
-     * It should be considered to not make this method public, but it's required 
-     * for the transmitter to be able to be called from an interrupt service 
-     * routine. Thus it is public, but it should not be called from any other 
-     * context - specifically never from application code!
+     * The tick count should therefore mirror the hardware timer's value.
+     * Ideally this method would not be public, but the Transmitter needs access
+     * to it when processing timer interrupts. Application code should not call
+     * it.
      */
     virtual void incrementTickCountMs(void) override final;
 
@@ -198,12 +196,13 @@ private:
     /**
      * \brief   Writes the payload and starts CAN transmission.
      *
-     * The payload gets written to the controller's message object registers. At 
-     * this point, the target message object must have been selected and 
-     * configured with the identifier. The payload length must notexceed the 
-     * maximum allowed by the CAN standard. The transmission is started by 
-     * setting the transmit request bit in the message object control register, 
-     * but the method does not wait for completion. 
+     * The payload is written to the controller's message object registers. At
+     * this point, the target message object must have been selected and
+     * configured with the identifier. The caller must ensure that the payload
+     * length does not exceed the maximum allowed by the CAN standard. The
+     * transmission is started by setting the transmit request bit in the
+     * message object control register, but this method does not wait for
+     * completion.
      * 
      * \param   data passes the payload bytes to write.
      * \param   payloadLength passes the number of payload bytes.

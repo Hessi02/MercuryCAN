@@ -171,14 +171,11 @@ public:
      * destroyed.
      */
     void deleteAll(void) {
-        const uint8_t elementCount = length();
-
-        for (uint8_t i = 0; i < elementCount; i++) {
-            Element<ContentType>* elementPointer = elementAt(i);
-            delete elementPointer;
+        while (_headOfStack) {
+            Element<ContentType>* currentElement = _headOfStack;
+            _headOfStack = _headOfStack->getNextElement();
+            delete currentElement;
         }
-
-        _headOfStack = nullptr;
     }
 
     /**

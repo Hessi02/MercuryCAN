@@ -187,10 +187,10 @@ public:
     /**
      * \brief   Sets the message update flag.
      *
-     * The flag is not modified automatically by setPayloadData. It is intended 
-     * to be set by a controller after a message has been sent or received, and 
-     * can be used to indicate that the message has been updated since the last
-     * transmission or reception.
+     * The flag is not modified automatically by setPayloadData or by message
+     * transmission. Controllers and callers set it explicitly; the Receiver
+     * sets it after processing a matching frame, and awaitMessage clears it
+     * before waiting for a frame.
      *
      * \param   flag passes the new flag value.
      */
@@ -201,9 +201,9 @@ public:
     /**
      * \brief   Returns the current message update flag.
      *
-     * Use the flag to determine whether the message has been updated since the 
-     * last transmission or reception. Mind that this method can be called from 
-     * multiple threads, so the flag may change between calls.
+     * The flag has no automatic change-tracking semantics; its meaning depends
+     * on how callers set and clear it. This method is thread-safe, but the
+     * value may change between calls.
      * 
      * \return  True if the flag is set; otherwise false.
      */
@@ -230,12 +230,11 @@ signals:
      * \brief   Notifies observers after a message has been sent.
      * 
      * The sent signal is emitted after the payload has been transmitted. It 
-     * can be used to trigger actions that depend on the message being sent, 
-     * such as preparation of the following message payload. The use of this 
-     * signal is less time-critical than preSend, so the connected callbacks can 
-     * be a little slower and blocking if necessary. The complete execution of
-     * the sent callbacks must never exceed 1 millisecond, as this would block 
-     * the CAN bus and cause message loss.
+     * can be used to trigger actions that depend on the message being sent,
+     * such as preparation of the following message payload. It is less
+     * time-critical than preSend, but callbacks still run during transmission
+     * cycle processing. Keep them short and non-blocking; their total execution
+     * time must not exceed 1 millisecond.
      *
      * \param   tickCountMs passes the elapsed tick count in milliseconds.
      */

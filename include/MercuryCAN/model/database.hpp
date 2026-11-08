@@ -10,8 +10,9 @@
  * The parser supports exact message-name lookup and validates the identifier, 
  * declared payload length, and combined signal data size. Cyclic messages 
  * additionally require a cyclic GenMsgSendType and a defined GenMsgCycleTime. 
- * Messages can only be built through the consteval builders; missing message 
- * definitions and mismatched payload sizes fail compilation.
+ * The database builders are consteval; missing definitions and mismatched
+ * payload sizes make those builder calls fail compilation. Message objects can
+ * also be constructed directly without a Database.
  *
  * The DBC text is not copied and must remain valid while the Database is
  * used. Signal data referenced by a returned message must likewise outlive
@@ -47,8 +48,8 @@ namespace Can::Model
  * cyclic messages it also reads GenMsgSendType and GenMsgCycleTime attributes. 
  * Signal definitions and node assignments are not parsed.
  *
- * Message data is checked against the declared payload length and the CAN CC 
- * maximum of eight bytes. The data type sizes are taken from C++ sizeof; they 
+ * Message data is checked against the declared payload length and classic CAN's 
+ * maximum payload of eight bytes. Data type sizes come from C++ sizeof; they 
  * are not compared with individual DBC signal definitions.
  *
  * The DBC text is a non-owning view and must remain valid while the database
@@ -76,7 +77,7 @@ public:
      * Searches for an exact, case-sensitive message name in a BO_ row. A 
      * successful lookup supplies the CAN identifier and establishes the maximum 
      * data size from the DBC payload length. The combined sizeof of the signal 
-     * data types must fit both that length and the eight-byte CAN CC limit. 
+     * data types must fit both that length and classic CAN's eight-byte limit.
      * Individual DBC signal names, bit offsets, and signal lengths are not 
      * checked.
      *
@@ -240,9 +241,9 @@ private:
      * payload length that is both supported and equal to the combined sizeof of
      * the signal data types. The DBC text is scanned one newline-delimited row
      * at a time and each potential BO_ row is parsed for the identifier, name,
-     * and payload length. The message must also have cyclic GenMsgSendType and
-     * a defined GenMsgCycleTime attribute.
-     
+     * and payload length. The message must also have a cyclic GenMsgSendType
+     * and a defined GenMsgCycleTime attribute.
+     *
      * \param   name passes the exact DBC message name to find.
      * \param   signalSize passes the combined size of the signal data types.
      *
@@ -355,9 +356,8 @@ private:
     /**
      * \brief   Parses and compares a quoted DBC string value.
      * 
-     * The string must be quoted and match the expected value exactly. Leading
-     * whitespace is ignored; trailing whitespace is not. On success, cursor 
-     * starts with the text after the closing quote.
+     * The cursor must start with a quoted string matching the expected value
+     * exactly. On success, it starts with the text after the closing quote.
      * 
      * \param   cursor passes the remaining row text; shortened on success.
      * \param   expected passes the exact string to match.
@@ -385,9 +385,9 @@ private:
     /**
      * \brief   Checks whether a send type includes cyclic transmission.
      * 
-     * The value must be a quoted string and match one of the four supported
-     * cyclic send types. Leading whitespace is ignored; trailing whitespace is
-     * not. On success, cursor starts with the text after the closing quote.
+     * The value must begin with a quoted string matching one of the four
+     * supported cyclic send types. Optional whitespace may appear between the
+     * closing quote and the semicolon, and after the semicolon.
      * 
      * \param   value passes the attribute value to check.
      * 
@@ -409,13 +409,13 @@ private:
     /**
      * \brief   Checks for the assignment terminator after an attribute value.
      *
-     * The value must be followed by a semicolon and then only whitespace or
-     * the end of the row. Leading whitespace is ignored; trailing whitespace is
-     * not. On success, cursor starts with the text after the semicolon. 
+     * Leading spaces, tabs, or carriage returns are skipped. The remaining
+     * text must start with a semicolon followed only by optional whitespace or
+     * the end of the row. The input is passed by value and is not modified.
      * 
      * \param   text passes the attribute value and remaining row text.
      * 
-     * \return  True if a attribute terminator is present. 
+     * \return  True if an attribute terminator is present.
      */
     static constexpr bool hasAttributeTerminator(std::string_view text) {
         skipAttributeWhitespace(text);
@@ -572,7 +572,7 @@ private:
     }
 
     /**
-     * \brief   Maximum payload size supported by the CAN CC message model.
+     * \brief   Maximum payload size supported by the classic CAN message model.
      */
     static constexpr uint8_t _maximumPayloadSize = 8;
 

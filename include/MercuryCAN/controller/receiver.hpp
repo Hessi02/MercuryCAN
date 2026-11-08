@@ -76,7 +76,7 @@ public:
     /**
      * \brief   Applies received payload data to matching registered messages.
      *
-     * For each registered cyclic message with an matching identifier, applies 
+     * For each registered cyclic message with a matching identifier, applies
      * the available payload bytes, sets its update flag, and emits its received 
      * notification with the driver's current millisecond tick count. Payload 
      * processing follows the behavior of Message::setPayloadData().

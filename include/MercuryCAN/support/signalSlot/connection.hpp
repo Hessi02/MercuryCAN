@@ -5,9 +5,8 @@
  * Connection stores the sender, signal, and either a receiver member callback
  * or a static callback, and provides operations to execute and inspect that
  * connection. It is used by MetaObject to implement signal-slot connections.
- * Eventhough the implementation is simplified for usage on embedded systems, 
- * the use should be considered carefully, as it requires dynamic memory and may 
- * not be suitable for all systems.
+ * Although the implementation is simplified for embedded systems, it should be
+ * used carefully: it requires dynamic memory and may not suit every system.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *

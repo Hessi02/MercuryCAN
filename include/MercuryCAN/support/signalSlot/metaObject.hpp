@@ -26,11 +26,10 @@ namespace SignalSlot
 {
 
 /**
- * \brief  Macro to highligh a emittation of a signal. 
+ * \brief  Macro to highlight the emission of a signal.
  * 
  * The emit macro is used to highlight a signal call in a class derived from 
- * MetaObject. It has no other purpose than to show the reader, that a signal 
- * is being fired.+  
+ * MetaObject. It only indicates to the reader that a signal is being emitted.
  */
 #define emit
 
@@ -38,8 +37,8 @@ namespace SignalSlot
  * \brief   Macro to highlight a signal declaration.
  * 
  * The signals macro is used to highlight a signal declaration in a class 
- * derived from MetaObject. It has no other purpose than to show the reader, 
- * that the following member functions are intended for the signal/slot concept. 
+ * derived from MetaObject. It only marks the following member functions as part
+ * of the signal/slot interface.
  */
 #define signals public
 

@@ -1,11 +1,10 @@
 /**
  * \file    signal.hpp
- * \brief   Contains an header-only implementation for a CAN Signal model class.
+ * \brief   Defines the header-only CAN signal model.
  * 
- * The file contains the 'Signal' class, which can hold various data types as an
- * underlaying data container. To this end, various static checks and also many 
- * abstractions are applied, ultimately making 'AnySignal_t' available as an 
- * abstract signal alongside the 'AllowedSignal' concept.
+ * The Signal class refers to data of a supported C++ type. AnySignal_t provides
+ * a variant of supported Signal specializations, while AllowedSignalDataType
+ * and AllowedSignal constrain data and signal types, respectively.
  * 
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  * 
@@ -23,18 +22,10 @@ namespace Can::Model {
 /**
  * \brief   Variant of all data types that can be stored inside a signal object.
  * 
- * In general a CAN bus signal can represent data types like boolean, (unsigned) 
- * integer, fixed-point number, floating-point number, enumeration, bit field,
- * string or even raw data.
- * 
- * For now only (unsigned) integers, fixed-point numbers, floating-point numbers 
- * and raw data are supported. The remaining types are supported only indirectly 
- * yet. Enums can be added by defining an underlaying type like unsigned char. 
- * Variables with a number of bits not divisible by 8 are also not yet directly 
- * supported. The  conversion of a bit array must therefore currently be handled 
- * by the user. Booleans may be expressed as integer values for now. There may 
- * be added an interface to even add custom structs. For now, this remains as 
- * part of the to-do list.
+ * Only the built-in integer and floating-point types listed below are
+ * supported. Booleans, enums, fixed-point values, bit fields, strings, and raw
+ * data are not supported as signal types; applications can convert them to and
+ * from supported types themselves.
  * 
  * \todo    Support defining the meaning of individual bits of a byte.
  * \todo    Support of self-defined structs without use of typecasts. 
@@ -126,8 +117,8 @@ public:
      *
      * The pointer is stored internally without taking ownership of the 
      * referenced object. Therefore the data can be present on stack, heap, or 
-     * even in .bss / .data sections. Is just has to be valid over the signal's
-     * lifetime. 
+     * even in .bss / .data sections. It just has to remain valid for the
+     * signal's lifetime.
      * 
      * \param   signalPtr passes a pointer to the signal's data.
      */

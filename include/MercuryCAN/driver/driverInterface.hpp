@@ -51,7 +51,7 @@ public:
      * returned pointer is non-owning; the driver instance must remain valid for 
      * as long as the controllers may use it.
      *
-     * \todo    Consider an more user-friendly mechanism to access the driver.
+     * \todo    Consider a more user-friendly mechanism to access the driver.
      * 
      * \return  Pointer to the driver instance.
      */
@@ -62,10 +62,10 @@ public:
      *
      * The implementation uses the supplied payload bytes for transmission. The 
      * caller retains ownership of data and must keep the buffer valid for the 
-     * duration of this call. It directly writes the defined message onto the
-     * CAN bus and returns immediately. The driver must not block or wait for 
-     * the transmission to complete. The driver is responsible for ensuring that
-     * the payload length does not exceed the maximum allowed by the standard.
+     * duration of this call. A driver may block until transmission completes; 
+     * the timing and blocking behavior are implementation-specific. The caller 
+     * must provide a valid payload length that does not exceed the maximum 
+     * supported by the CAN standard.
      *
      * \param   identifier passes the CAN identifier of the message.
      * \param   data passes the address of the payload buffer.
@@ -99,12 +99,11 @@ public:
     /**
      * \brief   Configures reception for a CAN message.
      *
-     * The driver configures its receive hardware to accept frames matching the 
-     * specified identifier and length. Received frames are forwarded through 
-     * receive() to the registered Receiver. The driver must ensure that no 
-     * unrelated frames are forwarded to the receiver. The driver may limit the 
-     * number of identifiers that can be registered, and it may ignore requests 
-     * to register identifiers that exceed its capacity. 
+     * The driver may configure its receive hardware to accept frames matching
+     * the specified identifier and length. Received frames are forwarded 
+     * through forwardReceiveFrame() to the registered Receiver, which processes
+     * only matching registered messages. Implementations may limit how many
+     * identifiers can be registered or ignore requests beyond their capacity.
      *
      * \param   identifier passes the CAN identifier to accept.
      * \param   length passes the expected payload length in bytes.
@@ -143,7 +142,8 @@ public:
      * The timer periodically drives the transmitter's cycle processing and
      * advances the millisecond tick count used by message scheduling and
      * notification callbacks. An additional call of this method while the timer 
-     * is already running should always result in a reconfiguration.
+     * is already running must not start duplicate timer processing. An
+     * implementation may reconfigure the active timer or leave it unchanged.
      * 
      * \todo    Consider a direct implementation here as AVR also supports STL.
      */
@@ -155,8 +155,7 @@ public:
      * The driver stores the supplied pointer and uses it to forward received
      * frames. The pointer is non-owning; the Receiver must remain valid for as
      * long as the driver may use it. Passing nullptr clears the registered
-     * receiver. This mechanism is the reason why only one should be used while
-     * normal system operation is expected.
+     * receiver. Only one Receiver should be registered during normal operation.
      *
      * \param   recv passes a pointer to the receiver instance.
      */
@@ -177,11 +176,10 @@ public:
      * \brief   Advances the driver's millisecond tick count by one.
      *
      * This operation is called by the transmitter's periodic cycle processing. 
-     * The tick count should therefore always mirror the hardware timer's value.
-     * It should be considered to not make this method public, but it's required 
-     * for the transmitter to be able to be called from an interrupt service 
-     * routine. Thus it is public, but it should not be called from any other 
-     * context - specifically never from application code!
+     * The tick count should therefore mirror the hardware timer's value. 
+     * Ideally this method would not be public, but the Transmitter needs access
+     * to it when processing timer interrupts. Application code should not call
+     * it.
      */
     virtual void incrementTickCountMs(void) = 0;
 };
