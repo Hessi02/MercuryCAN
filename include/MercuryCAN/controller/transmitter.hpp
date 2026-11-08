@@ -16,8 +16,9 @@
 #ifndef __MERCURYCAN_CONTROLLER_TRANSMITTER_HPP__
 #define __MERCURYCAN_CONTROLLER_TRANSMITTER_HPP__
 
-#include <MercuryCAN/support/list/container.hpp>
 #include <MercuryCAN/model/cyclicMessage.hpp>
+
+#include <vector>
 
 namespace Can::Controller 
 {
@@ -76,9 +77,9 @@ public:
      * impose a maximum. A driver may be unable to transmit a frame when no
      * message object is available.
      * 
-     * \return  Number of messages in the transmitter's shared cyclic list.
+     * \return  Number of messages in the transmitter's shared cyclic vector.
      */
-    uint8_t getMessageCount(void) const;
+    std::size_t getMessageCount(void) const;
 
     /**
      * \brief   Processes one periodic transmission cycle.
@@ -105,9 +106,9 @@ private:
      * \param   dueMessages passes the array in which the due status is stored.
      */
     static void processMessage(
-        const uint8_t& index,
+        const std::size_t& index,
         const uint32_t& tickCountMs,
-        bool* dueMessages
+        std::vector<bool>& dueMessages
     );
 
     /**
@@ -123,8 +124,8 @@ private:
      * \param   dueMessages passes the due-status array for this cycle.
      */
     static void transmitMessage(
-        const uint8_t& index, 
-        const bool* dueMessages
+        const std::size_t& index,
+        const std::vector<bool>& dueMessages
     );
 
     /**
@@ -141,20 +142,20 @@ private:
      * \param   dueMessages passes the due-status array for this cycle.
      */
     static void emitSentMessage(
-        const uint8_t& index,
+        const std::size_t& index,
         const uint32_t& tickCountMs,
-        const bool* dueMessages
+        const std::vector<bool>& dueMessages
     );
     
     /**
-     * \brief   Number of messages registered in the shared cyclic list.
-     */
-    static inline uint8_t _messageCount = 0;
-
-    /**
      * \brief   Shared non-owning pointers to registered cyclic messages.
      */
-    static inline Generic::Container<Model::CyclicMessage*> _cyclicMessages;
+    static inline std::vector<Model::CyclicMessage*> _cyclicMessages;
+
+    /**
+     * \brief   Per-cycle transmission flags, resized when messages are added.
+     */
+    static inline std::vector<bool> _dueMessages;
 };
 
 }

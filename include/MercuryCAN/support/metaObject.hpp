@@ -14,12 +14,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef __MERCURYCAN_SUPPORT_SIGNAL_SLOT_META_OBJECT_HPP__
-#define __MERCURYCAN_SUPPORT_SIGNAL_SLOT_META_OBJECT_HPP__
+#ifndef __MERCURYCAN_SUPPORT_META_OBJECT_HPP__
+#define __MERCURYCAN_SUPPORT_META_OBJECT_HPP__
 
-#include <MercuryCAN/support/list/container.hpp>
-#include <MercuryCAN/support/signalSlot/connection.hpp>
+#include <MercuryCAN/support/connection.hpp>
 
+#include <vector>
 #include <type_traits>
 
 namespace SignalSlot
@@ -92,7 +92,7 @@ public:
                 callback
             );
         
-        _connections<ParamPack...>.append(connection);
+        _connections<ParamPack...>.push_back(connection);
     }
 
     /**
@@ -126,7 +126,7 @@ public:
                 callback
             );
 
-        _connections<ParamPack...>.append(connection);
+        _connections<ParamPack...>.push_back(connection);
     }
 
     /**
@@ -163,9 +163,9 @@ public:
         Receiver* receiver,
         void(ReceiverBase::*callback)(ParamPack...)
     ) {
-        Generic::Container<Connection<ParamPack...>*>& connections = _connections<ParamPack...>;
+        std::vector<Connection<ParamPack...>*>& connections = _connections<ParamPack...>;
 
-        for (unsigned char i = 0; i < connections.length(); i++) {
+        for (std::size_t i = 0; i < connections.size(); i++) {
             Connection<ParamPack...>* connection = connections.at(i);
 
             if (connection &&
@@ -175,7 +175,7 @@ public:
                 connection->isCallback(static_cast<Connection<ParamPack...>::Callback_t>(callback))) 
             {
                 delete connection;
-                connections.remove(connection);
+                connections.erase(connections.begin() + i);
                 return;
             }
         }
@@ -207,9 +207,9 @@ public:
         void(SenderBase::*signal)(ParamPack...),
         void(*callback)(ParamPack...)
     ) {
-        Generic::Container<Connection<ParamPack...>*>& connections = _connections<ParamPack...>;
+        std::vector<Connection<ParamPack...>*>& connections = _connections<ParamPack...>;
 
-        for (unsigned char i = 0; i < connections.length(); i++) {
+        for (std::size_t i = 0; i < connections.size(); i++) {
             Connection<ParamPack...>* connection = connections.at(i);
 
             if (connection &&
@@ -218,7 +218,7 @@ public:
                 connection->isCallback(callback)) 
             {
                 delete connection;
-                connections.remove(connection);
+                connections.erase(connections.begin() + i);
                 return;
             }
         }
@@ -247,7 +247,10 @@ public:
         void(SenderBase::*signal)(ParamPack...),
         ParamPack... args
     ) {
-        for (Connection<ParamPack...>* connection : _connections<ParamPack...>) {
+        for (auto iterator = _connections<ParamPack...>.rbegin();
+             iterator != _connections<ParamPack...>.rend();
+             ++iterator) {
+            Connection<ParamPack...>* connection = *iterator;
             if (sender && connection &&
                 connection->isSender(static_cast<MetaObject*>(sender)) &&
                 connection->isSignal(static_cast<Connection<ParamPack...>::Signal_t>(signal))
@@ -262,7 +265,7 @@ private:
      * \brief   Connections grouped by their signal and callback types.
      */
     template<class... ParamPack>
-    inline static Generic::Container<Connection<ParamPack...>*> _connections;
+    inline static std::vector<Connection<ParamPack...>*> _connections;
 };
 
 }

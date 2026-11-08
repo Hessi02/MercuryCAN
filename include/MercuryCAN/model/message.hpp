@@ -16,7 +16,7 @@
 #ifndef __MERCURYCAN_MODEL_MESSAGE_HPP__
 #define __MERCURYCAN_MODEL_MESSAGE_HPP__
 
-#include <MercuryCAN/support/signalSlot/metaObject.hpp>
+#include <MercuryCAN/support/metaObject.hpp>
 #include <MercuryCAN/model/signal.hpp>
 
 #include <array>

@@ -19,6 +19,8 @@
 
 #include <MercuryCAN/model/cyclicMessage.hpp>
 
+#include <vector>
+
 namespace Can::Controller 
 {
 
@@ -103,14 +105,9 @@ private:
     volatile bool _awaitMessageReceived = false;
 
     /**
-     * \brief   Number of cyclic messages registered with this receiver.
-     */
-    uint8_t _messageCount = 0;
-
-    /**
      * \brief   Stored cyclic messages processed when matching frames arrive.
      */
-    Generic::Container<Model::CyclicMessage*> _cyclicMessages;
+    std::vector<Model::CyclicMessage*> _cyclicMessages;
 };
 
 }

@@ -49,8 +49,7 @@ bool Can::Controller::Receiver::awaitMessage(
 void Can::Controller::Receiver::addCyclicMessage(
     Model::CyclicMessage& message
 ) {
-    _cyclicMessages.append(&message);
-    _messageCount++;
+    _cyclicMessages.push_back(&message);
 
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
     driver->addRxMessage(message.getIdentifier(), message.getPayloadSize());
@@ -66,7 +65,7 @@ void Can::Controller::Receiver::processRxData(
     Model::Message* awaitedMessage = _awaitedMessage;
     bool awaitedMessageProcessed = false;
 
-    for (uint8_t i = 0; i < _messageCount; i++) {
+    for (std::size_t i = 0; i < _cyclicMessages.size(); i++) {
         Can::Model::CyclicMessage& message = *_cyclicMessages.at(i);
 
         if (identifier == message.getIdentifier()) {
