@@ -17,7 +17,7 @@ void Can::Driver::MockDriver::transmit(
     txTrace.push_back(event);
 }
 
-void Can::Driver::MockDriver::receive(
+void Can::Driver::MockDriver::forwardReceiveFrame(
     const uint16_t& identifier,
     const uint8_t* data,
     const std::size_t& payloadLength
@@ -113,5 +113,5 @@ void Can::Driver::MockDriver::injectRxFrame(
     const uint8_t* data,
     const std::size_t& payloadLength
 ) {
-    receive(identifier, data, payloadLength);
+    forwardReceiveFrame(identifier, data, payloadLength);
 }

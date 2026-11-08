@@ -4,7 +4,7 @@
  *
  * A CyclicMessage extends the Message model with a cycle time in milliseconds.
  * The cycle time can be used by a controller to determine when the message is
- * due for transmission.
+ * due for transmission.  
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -16,16 +16,15 @@
 
 #include <MercuryCAN/model/message.hpp>
 
-namespace Can::Model {
+namespace Can::Model 
+{
 
 /**
  * \brief   Represents a CAN message with an associated cycle time.
  *
  * A CyclicMessage extends Message with a cycle time in milliseconds. It
  * inherits the CAN identifier, signal references, payload handling, and
- * notification callbacks from Message.
- *
- * \see     Message
+ * notification callbacks from Message. 
  */
 class CyclicMessage : public Message 
 {
@@ -33,17 +32,14 @@ public:
     /**
      * \brief   Constructs object from identifier, cycle time and signals.
      *
-     * The identifier and signal references are passed to the Message
-     * constructor. The referenced signal data objects must remain valid for
-     * the lifetime of the CyclicMessage.
+     * The identifier and signal references are passed to the Message 
+     * constructor. The referenced signal data objects must remain valid for the 
+     * lifetime of the CyclicMessage.
      *
      * \tparam  SignalDataTypes passes the types of the signal data.
      * \param   identifier passes the CAN identifier for this message.
      * \param   cycleTime passes the message cycle time in milliseconds.
      * \param   signalReferences passes pointers to the signal data objects.
-     *
-     * \see     AllowedSignalDataType
-     * \see     FitsIntoCanMessage
      */
     template<typename... SignalDataTypes>
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
@@ -59,6 +55,10 @@ public:
     /**
      * \brief   Returns the cycle time of this message.
      *
+     * The cycle time is the interval in milliseconds at which the message is
+     * expected to be transmitted. It can be used by a controller to determine
+     * when the message is due for transmission. 
+     * 
      * \return  Cycle time in milliseconds supplied to the constructor.
      */
     constexpr uint16_t getCycleTime(void) const {

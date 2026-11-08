@@ -24,7 +24,7 @@ void Can::Driver::AvrDriver::transmit(
     completeTransmission(messageObject);
 }
 
-void Can::Driver::AvrDriver::receive(
+void Can::Driver::AvrDriver::forwardReceiveFrame(
     const uint16_t& identifier,
     const uint8_t* data,
     const std::size_t& payloadLength
@@ -228,7 +228,7 @@ ISR(CANIT_vect) {
 
         Can::Driver::DriverInterface* driver =
             Can::Driver::DriverInterface::getInstance();
-        driver->receive(identifier, data, length);
+        driver->forwardReceiveFrame(identifier, data, length);
     } else {
         CANSTMOB = 0x00;
         CANCDMOB = (1 << CONMOB1);

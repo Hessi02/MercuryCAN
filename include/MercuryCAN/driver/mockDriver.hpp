@@ -33,7 +33,10 @@ namespace Can::Driver
  *
  * Provides a controllable driver for tests without CAN hardware. Frame activity 
  * is exposed through txTrace and rxTrace. Cyclic transmissions are processed
- * by a background timer thread after activateTxTimer() is called.
+ * by a background timer thread after activateTxTimer() is called. Use this
+ * driver for mock testing of the MercuryCAN library, including transmission and 
+ * reception of CAN frames, as well as verifying the behavior of controllers and 
+ * other components that depend on the driver interface.
  */
 class MockDriver : public DriverInterface
 {
@@ -72,7 +75,7 @@ public:
     std::vector<FrameEvent> txTrace;
 
     /** 
-     * \brief   Captured frame events for calls to receive(), in call order. 
+     * \brief   Captured frame events for calls to forwardReceiveFrame().
      * 
      * The rxTrace vector stores a sequence of FrameEvent instances representing
      * the frames that have been received by the mock driver. Each event 
@@ -94,9 +97,9 @@ public:
      * correct frames are being transmitted by the driver, ensuring that the 
      * library's transmission logic behaves as expected.
      *
-     * \param   identifier    CAN identifier of the frame.
-     * \param   data          Payload bytes to transmit.
-     * \param   payloadLength Number of payload bytes.
+     * \param   identifier passes the CAN identifier of the frame.
+     * \param   data passes the payload bytes to transmit.
+     * \param   payloadLength passes the number of payload bytes.
      */
     virtual void transmit(
         const uint16_t& identifier,
@@ -115,11 +118,11 @@ public:
      * method also forwards the received frame to the registered Receiver
      * instance, if one is registered.
      *
-     * \param   identifier    CAN identifier of the frame.
-     * \param   data          Received payload bytes.
-     * \param   payloadLength Number of payload bytes.
+     * \param   identifier passes the CAN identifier of the frame.
+     * \param   data passes the received payload bytes.
+     * \param   payloadLength passes the number of payload bytes.
      */
-    virtual void receive(
+    virtual void forwardReceiveFrame(
         const uint16_t& identifier,
         const uint8_t* data,
         const std::size_t& payloadLength
@@ -133,8 +136,8 @@ public:
      * or payload length against a configuration. This method exists only to
      * satisfy the DriverInterface contract.
      * 
-     * \param   identifier  Unused CAN identifier.
-     * \param   length      Unused expected payload length in bytes.
+     * \param   identifier passes an unused CAN identifier.
+     * \param   length passes an unused expected payload length in bytes.
      */
     virtual void addRxMessage(
         const uint16_t& identifier, 
@@ -144,24 +147,20 @@ public:
     /** 
      * \brief   Implements the driver's idle-sleep operation for tests. 
      * 
-     * This method simulates the behavior of a real driver entering an idle 
-     * sleep mode. In the context of testing, it allows tests to verify that the 
-     * driver correctly transitions to a low-power state when requested. The 
-     * method does not perform any actual sleep operation, but it can be used to 
-     * assert that the library's logic for entering idle sleep behaves as 
-     * expected.
+     * The mock does not model idle sleep. This method blocks indefinitely, so
+     * tests should not call it unless they specifically test the sleep call
+     * without expecting it to return.
      */
     virtual void enterIdleSleep(void) const override final;
 
     /**
      * \brief   No-op receive removal required by the driver interface.
      * 
-     * The mock does not maintain receive registrations, so there is no
-     * configuration to remove. Injected frames continue to be forwarded
-     * independently of this method. It exists only to satisfy the
-     * DriverInterface contract.
+     * The mock does not maintain receive registrations, so there is no config 
+     * to remove. Injected frames continue to be forwarded independently of this 
+     * method. It exists only to satisfy the DriverInterface contract.
      *
-     * \param   identifier Unused CAN identifier.
+     * \param   identifier passes an unused CAN identifier.
      */
     virtual void removeRxMessage(const uint16_t& identifier) override final;
     
@@ -195,7 +194,7 @@ public:
      * driver correctly forwards received frames to the appropriate Receiver,
      * ensuring that the library's reception logic behaves as expected.
      *
-     * \param   recv Receiver instance; the pointer is not owned by the driver.
+     * \param   recv passes a receiver instance; the pointer is not owned.
      */
     virtual void setReceiverInstance(Controller::Receiver* recv) override final;
 
@@ -227,9 +226,9 @@ public:
      * and recorded in the driver's receive trace. The caller retains ownership
      * of the payload buffer and must keep it valid during the call.
      *
-     * \param   identifier CAN identifier of the received frame.
-     * \param   data pointer to the payload buffer.
-     * \param   payloadLength number of payload bytes in \p data.
+     * \param   identifier passes a CAN identifier of the received frame.
+     * \param   data passes a pointer to the payload buffer.
+     * \param   payloadLength passes the number of payload bytes in data.
      */
     void injectRxFrame(
         const uint16_t& identifier,
@@ -263,15 +262,6 @@ private:
      */
     std::thread _txTimerThread;
 
-    /**
-     * \brief   Number of message objects available in the AVR CAN controller.
-     */
-    static inline constexpr uint8_t _messageObjectCount = 15;
-
-    /**
-     * \brief   Bit mask tracking which CAN message objects are in use.
-     */
-    static inline uint16_t _usedMessageObjectMask = 0;
 };
 
 }

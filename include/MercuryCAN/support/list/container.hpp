@@ -27,6 +27,7 @@ namespace Generic {
  * Container owns and deletes its list elements. Stored values are copied into
  * those elements; if a value is a pointer, the pointed-to object is not
  * managed by the container.
+ * 
  * \tparam  ContentType passes the type of values stored in the container.
  */
 template<typename ContentType>
@@ -170,14 +171,11 @@ public:
      * destroyed.
      */
     void deleteAll(void) {
-        const uint8_t elementCount = length();
-
-        for (uint8_t i = 0; i < elementCount; i++) {
-            Element<ContentType>* elementPointer = elementAt(i);
-            delete elementPointer;
+        while (_headOfStack) {
+            Element<ContentType>* currentElement = _headOfStack;
+            _headOfStack = _headOfStack->getNextElement();
+            delete currentElement;
         }
-
-        _headOfStack = nullptr;
     }
 
     /**

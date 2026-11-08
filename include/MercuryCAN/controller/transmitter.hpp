@@ -19,7 +19,8 @@
 #include <MercuryCAN/support/list/container.hpp>
 #include <MercuryCAN/model/cyclicMessage.hpp>
 
-namespace Can::Controller {
+namespace Can::Controller 
+{
 
 /**
  * \brief   Sends CAN messages and schedules cyclic message transmissions.
@@ -29,18 +30,16 @@ namespace Can::Controller {
  * The registered cyclic messages are held in shared static storage, and the
  * transmitter's timer-driven cycle processing checks their cycle times.
  *
- * Registered message objects must remain valid while they are used by the
- * transmitter.
- *
- * \see     Model::Message
- * \see     Model::CyclicMessage
+ * \warning Registered message objects must remain valid while they are used!
  */
-class Transmitter {
+class Transmitter 
+{
 public:
     /**
      * \brief   Constructs a transmitter and activates the driver timer.
      *
-     * The timer drives periodic processing of registered cyclic messages.
+     * The timer drives periodic processing of registered cyclic messages. Its
+     * implementation is driver-specific and may be a hard- or software timer. 
      */
     Transmitter(void);
 
@@ -49,8 +48,7 @@ public:
      *
      * Serializes the message payload and passes its identifier and data to
      * the driver. After the transmit call returns, the message's sent
-     * notification is emitted with the driver's current millisecond tick
-     * count.
+     * notification is emitted with the driver's current tick count.
      *
      * \param   message passes the message to transmit.
      */
@@ -64,6 +62,8 @@ public:
      * is registered. Its preSend notification is emitted immediately before
      * each due transmission, and its sent notification is emitted after the
      * driver transmit call.
+     * 
+     * \note    The 'preSend' signal is more timing-critical than 'sent'.
      *
      * \param   message passes the cyclic message to register.
      */
@@ -72,6 +72,10 @@ public:
     /**
      * \brief   Returns the number of registered cyclic messages.
      *
+     * This reports the number of registered messages; the transmitter does not
+     * impose a maximum. A driver may be unable to transmit a frame when no
+     * message object is available.
+     * 
      * \return  Number of messages in the transmitter's shared cyclic list.
      */
     uint8_t getMessageCount(void) const;
@@ -79,12 +83,12 @@ public:
     /**
      * \brief   Processes one periodic transmission cycle.
      *
-     * Advances the driver's millisecond tick count, determines which
-     * registered messages are due based on their cycle times, emits their
-     * preSend notifications, transmits due messages, and then emits their
-     * sent notifications. A message with a cycle time of zero is never due.
+     * Advances the driver's millisecond tick count, determines which registered 
+     * messages are due based on their cycle times, emits their preSend signals,
+     * transmits due messages and then emits their sent notifications. A message 
+     * with a cycle time of zero is never due.
      *
-     * This method is called by the driver's timer interrupt.
+     * \note This method is called by the driver's timer interrupt.
      */
     static void processTransmitCycle(void);
 
@@ -109,14 +113,29 @@ private:
     /**
      * \brief   Transmits one message if it was marked as due.
      *
+     * The message's identifier and serialized payload are passed to the driver.
+     * It is assumed that the driver will not block and will return immediately. 
+     * Mind that the message at the given index may not be due for transmission 
+     * in this cycle. In that case, the driver is not called and the message is 
+     * skipped.
+     * 
      * \param   index passes the index of the message to transmit.
      * \param   dueMessages passes the due-status array for this cycle.
      */
-    static void transmitMessage(const uint8_t& index, const bool* dueMessages);
+    static void transmitMessage(
+        const uint8_t& index, 
+        const bool* dueMessages
+    );
 
     /**
      * \brief   Emits the sent notification for a due message.
      *
+     * The message's sent signal is emitted with the current tick count. It is
+     * assumed that the driver has already transmitted the message. The usage is
+     * preferred over the 'preSend' signal, which is more timing-critical and 
+     * may delay the messages transmission if the callback takes too long to 
+     * execute.
+     * 
      * \param   index passes the index of the message.
      * \param   tickCountMs passes the tick count associated with this cycle.
      * \param   dueMessages passes the due-status array for this cycle.
