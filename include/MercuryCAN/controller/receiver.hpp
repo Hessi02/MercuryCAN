@@ -4,10 +4,10 @@
  *
  * The Receiver configures the driver to accept registered message identifiers
  * and forwards incoming frames to the matching cyclic messages. It keeps
- * non-owning references, so registered messages must outlive the Receiver.
- * For each match, it applies the received payload to the message's signal
- * data, sets its update flag, and emits a received notification with the
- * current millisecond tick count.
+ * non-owning references, so registered messages must outlive the Receiver. For 
+ * each match, it applies the received payload to the message's signal data, 
+ * sets its update flag, and emits a received notification with the current 
+ * millisecond tick count.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -19,20 +19,19 @@
 
 #include <MercuryCAN/model/cyclicMessage.hpp>
 
-namespace Can::Controller {
+namespace Can::Controller 
+{
 
 /**
  * \brief   Configures CAN message reception and processes received data.
  *
  * The Receiver registers non-owning references to cyclic messages with the
- * driver and applies incoming payloads to registered messages whose
- * identifiers match. It also provides a synchronous operation for waiting
- * until a Message's update flag is set.
- *
- * \see     Model::Message
- * \see     Model::CyclicMessage
+ * driver and applies incoming payloads to registered messages whose identifiers 
+ * match. It also provides a synchronous operation for waiting until a Message's 
+ * update flag is set.
  */
-class Receiver {
+class Receiver 
+{
 public:
     /**
      * \brief   Waits synchronously for a message update.
@@ -58,8 +57,7 @@ public:
      * activated when the timeout is nonzero.
      *
      * \param   message passes the message whose update flag is awaited.
-     * \param   timeout passes the duration to wait for a message update in
-     *          milliseconds.
+     * \param   timeout passes the duration to wait for a message update in ms.
      */
     bool awaitMessage(Model::Message& message, const uint32_t& timeout);
 
@@ -78,11 +76,10 @@ public:
     /**
      * \brief   Applies received payload data to matching registered messages.
      *
-     * For each registered cyclic message with an identifier matching
-     * \p identifier, applies the available payload bytes, sets its update
-     * flag, and emits its received notification with the driver's current
-     * millisecond tick count. Payload processing follows the behavior of
-     * Message::setPayloadData().
+     * For each registered cyclic message with an matching identifier, applies 
+     * the available payload bytes, sets its update flag, and emits its received 
+     * notification with the driver's current millisecond tick count. Payload 
+     * processing follows the behavior of Message::setPayloadData().
      *
      * \param   identifier passes the CAN identifier of the received frame.
      * \param   data passes the received payload bytes.

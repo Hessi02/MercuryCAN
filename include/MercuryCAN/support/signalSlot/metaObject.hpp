@@ -4,7 +4,10 @@
  *
  * MetaObject allows objects to connect signals to member or static callbacks,
  * disconnect those connections, and execute callbacks associated with an
- * emitted signal.
+ * emitted signal. The intended usage is to derive a class from MetaObject and 
+ * use the signals and emit macros to declare and invoke signals. The connection 
+ * registry is shared by all MetaObject instances and is dynamically managed at 
+ * runtime.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -22,17 +25,31 @@
 namespace SignalSlot
 {
 
+/**
+ * \brief  Macro to highligh a emittation of a signal. 
+ * 
+ * The emit macro is used to highlight a signal call in a class derived from 
+ * MetaObject. It has no other purpose than to show the reader, that a signal 
+ * is being fired.+  
+ */
 #define emit
+
+/**
+ * \brief   Macro to highlight a signal declaration.
+ * 
+ * The signals macro is used to highlight a signal declaration in a class 
+ * derived from MetaObject. It has no other purpose than to show the reader, 
+ * that the following member functions are intended for the signal/slot concept. 
+ */
 #define signals public
 
 /**
  * \brief   Provides static signal-to-callback connection management.
  *
- * Connections are stored in static containers grouped by their parameter
- * types. Signals are ordinary member functions; the \c signals and \c emit
- * macros provide syntax compatible with signal/slot-style call sites.
- * The shared, dynamically managed registry and its connection records are
- * used at runtime.
+ * Connections are stored in static containers grouped by their parameter types. 
+ * Signals are ordinary member functions; the signals and emit macros provide 
+ * syntax compatible with signal/slot-style call sites. The shared, dynamically 
+ * managed registry and its connection records are used at runtime.
  */
 class MetaObject
 {
@@ -40,10 +57,10 @@ public:
     /**
      * \brief   Connects a sender signal to a receiver member callback.
      *
-     * Registers a connection that invokes \p callback on \p receiver whenever
-     * the specified \p signal is emitted by \p sender. Sender and receiver
-     * objects are not owned by the connection and must remain valid while the
-     * connection may be executed.
+     * Registers a connection that invokes callback on receiver whenever the 
+     * specified signal is emitted by sender. Sender and receiver objects aren't 
+     * owned by the connection and must remain valid while the connection may be 
+     * executed.
      *
      * \tparam  Sender passes the concrete sender type.
      * \tparam  SenderBase passes the base type declaring the signal.
@@ -82,9 +99,11 @@ public:
     /**
      * \brief   Connects a sender signal to a static callback function.
      *
-     * Registers a connection that invokes \p callback whenever the specified
-     * \p signal is emitted by \p sender.
-     *
+     * Registers a connection that invokes the specified callback function with 
+     * matching signature whenever the specified signal is emitted by the sender 
+     * and the sender and signal match. The connection does not own the sender 
+     * object.
+     *  
      * \tparam  Sender passes the concrete sender type.
      * \tparam  SenderBase passes the base type declaring the signal.
      * \tparam  ParamPack passes the signal and callback parameter types.
@@ -114,9 +133,13 @@ public:
     /**
      * \brief   Disconnects a receiver member callback from a sender signal.
      *
-     * Finds and removes the first connection matching all four supplied
-     * objects and member functions. If no matching connection exists, nothing
-     * is changed.
+     * Finds and removes the first connection matching all four supplied objects 
+     * and member functions. If no matching connection exists, no changes will 
+     * be applied. The comparison uses pointer identity; it does not compare the 
+     * state or type of the objects. This can be used to find connections 
+     * associated with a sender or receiver that is about to be deleted. The 
+     * connection does not own the sender or receiver objects and does not 
+     * manage their lifetime.
      *
      * \tparam  Sender passes the concrete sender type.
      * \tparam  SenderBase passes the base type declaring the signal.
@@ -163,8 +186,11 @@ public:
      * \brief   Disconnects a static callback from a sender signal.
      *
      * Finds and removes the first connection matching the supplied sender,
-     * signal, and callback. If no matching connection exists, nothing is
-     * changed.
+     * signal, and callback. If no matching connection exists, nothing is 
+     * changed. The comparison uses pointer identity; it does not compare the 
+     * state or type of the objects. This can be used to find connections 
+     * associated with a sender that is about to be deleted. The connection does 
+     * not own the sender object and does not manage its lifetime.
      *
      * \tparam  Sender passes the concrete sender type.
      * \tparam  SenderBase passes the base type declaring the signal.
@@ -234,10 +260,7 @@ public:
 
 private:
     /**
-     * \brief   Connections grouped by their signal and callback parameter types.
-     *
-     * The containers and their connection records are shared by all
-     * MetaObject instances.
+     * \brief   Connections grouped by their signal and callback types.
      */
     template<class... ParamPack>
     inline static Generic::Container<Connection<ParamPack...>*> _connections;

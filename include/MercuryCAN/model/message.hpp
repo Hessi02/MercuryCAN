@@ -49,15 +49,17 @@ concept FitsIntoCanMessage = (0 + ... + sizeof(SignalDataTypes)) <= 8;
  * written in reverse order. The total payload size cannot exceed eight bytes as
  * classic CAN is used for transmission. A message with no signals represents a
  * valid zero-byte payload.
- *
- * \see     FitsIntoCanMessage
- * \see     Signal
  */
 class Message : public SignalSlot::MetaObject
 {
 private:
     /**
      * \brief   Creates storage alternatives for the supplied signal counts.
+     * 
+     * The returned type is a std::variant of std::array<AnySignal_t, N> for 
+     * each N in SignalCounts. The arrays are used to store non-owning refs to 
+     * the signals contained in a Message. The variant is used to select the 
+     * correct array size at construction time, based on the number of signals.
      */
     template<std::size_t... SignalCounts>
     static auto makeSignalStorageType(
@@ -66,6 +68,11 @@ private:
 
     /**
      * \brief   Storage alternatives for zero through eight signals.
+     * 
+     * The type is a std::variant of std::array<AnySignal_t, N> for each N from
+     * zero to eight. The arrays are used to store non-owning refs to signals
+     * contained in a Message. The variant is used to select the correct array 
+     * size at construction time, based on the number of signals.
      */
     using MakeSignalStorage_t = decltype(
         makeSignalStorageType(std::make_index_sequence<9>{})
@@ -82,13 +89,13 @@ public:
      *
      * Each provided signal type must be allowed by AllowedSignalDataType, and 
      * the sum of their sizes must fit into the message's eight-byte payload.
+     * The signal references are stored internally without taking ownership of 
+     * the referenced objects. Therefore the data can be present on stack, heap, 
+     * or in static storage, but must remain valid for the Message's lifetime.
      *
      * \tparam  SignalDataTypes passes the types of the signal data.
      * \param   identifier passes the CAN identifier for this message.
      * \param   signalPtrPack passes pointers to the signal data objects.
-     *
-     * \see     AllowedSignalDataType
-     * \see     FitsIntoCanMessage
      */
     template<typename... SignalDataTypes>
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
@@ -180,7 +187,10 @@ public:
     /**
      * \brief   Sets the message update flag.
      *
-     * The flag is not modified automatically by setPayloadData.
+     * The flag is not modified automatically by setPayloadData. It is intended 
+     * to be set by a controller after a message has been sent or received, and 
+     * can be used to indicate that the message has been updated since the last
+     * transmission or reception.
      *
      * \param   flag passes the new flag value.
      */
@@ -191,6 +201,10 @@ public:
     /**
      * \brief   Returns the current message update flag.
      *
+     * Use the flag to determine whether the message has been updated since the 
+     * last transmission or reception. Mind that this method can be called from 
+     * multiple threads, so the flag may change between calls.
+     * 
      * \return  True if the flag is set; otherwise false.
      */
     bool getUpdateFlag(void) const {
@@ -201,6 +215,11 @@ signals:
     /**
      * \brief   Notifies observers immediately before a message is sent.
      *
+     * The preSend signal is emitted before the payload is transmitted. The use 
+     * of this signal is time-critical, so the connected callbacks should be 
+     * fast and non-blocking. If possible the 'sent' signal should be used 
+     * instead, which is emitted after the payload has been sent.
+     * 
      * \param   tickCountMs passes the elapsed tick count in milliseconds.
      */
     void preSend(uint32_t tickCountMs) {
@@ -209,6 +228,14 @@ signals:
 
     /**
      * \brief   Notifies observers after a message has been sent.
+     * 
+     * The sent signal is emitted after the payload has been transmitted. It 
+     * can be used to trigger actions that depend on the message being sent, 
+     * such as preparation of the following message payload. The use of this 
+     * signal is less time-critical than preSend, so the connected callbacks can 
+     * be a little slower and blocking if necessary. The complete execution of
+     * the sent callbacks must never exceed 1 millisecond, as this would block 
+     * the CAN bus and cause message loss.
      *
      * \param   tickCountMs passes the elapsed tick count in milliseconds.
      */
@@ -219,6 +246,12 @@ signals:
     /**
      * \brief   Notifies observers after received payload data is applied.
      *
+     * The received signal is emitted after the payload has been received and 
+     * applied. It can be used to trigger actions that depend on the message 
+     * being received, such as processing of the received data. The callbacks
+     * for this signal must be fast enough to finish before next received frame.
+     * Make it therefore non-blocking and avoid long loops or delays.
+     *      
      * \param   tickCountMs passes the elapsed tick count in milliseconds.
      */
     void received(uint32_t tickCountMs) {

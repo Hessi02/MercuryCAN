@@ -27,6 +27,7 @@ namespace Generic {
  * Container owns and deletes its list elements. Stored values are copied into
  * those elements; if a value is a pointer, the pointed-to object is not
  * managed by the container.
+ * 
  * \tparam  ContentType passes the type of values stored in the container.
  */
 template<typename ContentType>

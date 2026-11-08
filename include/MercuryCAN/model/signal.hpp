@@ -2,10 +2,10 @@
  * \file    signal.hpp
  * \brief   Contains an header-only implementation for a CAN Signal model class.
  * 
- * The file contains the 'Signal' class, which can hold various data types. 
- * To this end, various static checks and abstractions are applied, ultimately 
- * making 'AnySignal_t' available as an abstract signal alongside the 
- * 'AllowedSignal' concept.
+ * The file contains the 'Signal' class, which can hold various data types as an
+ * underlaying data container. To this end, various static checks and also many 
+ * abstractions are applied, ultimately making 'AnySignal_t' available as an 
+ * abstract signal alongside the 'AllowedSignal' concept.
  * 
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  * 
@@ -58,22 +58,12 @@ typedef std::variant<
 /**
  * \brief   Checks whether a type is contained in a std::variant.
  * 
- * Evaluates to 'true' if \p TypeToCheck matches at least one of the types
- * contained in \p VariantOfValids. Top-level 'const' and 'volatile' qualifiers
- * of \p TypeToCheck are ignored.
+ * Evaluates to true if TypeToCheck matches at least one of the types contained 
+ * in VariantOfValids. Top-level const and volatile qualifiers of TypeToCheck 
+ * are ignored.
  * 
  * \tparam  TypeToCheck passes a type to check against the types of the variant. 
  * \tparam  VariantOfValids passes a std::variant containing the allowed types.
- * 
- * \example
- * \code
- * using MyVariant = std::variant<int, double, std::string>
- * 
- * static_assert(InVariant<int, MyVariant>::value);
- * static_assert(InVariant<double, MyVariant>::value);
- * static_assert(InVariant<const int, MyVariant>::value);
- * static_assert(!InVariant<float, MyVariant>::value);
- * \endcode
  */
 template<typename TypeToCheck, typename VariantOfValids>
 struct InVariant {};
@@ -82,13 +72,13 @@ struct InVariant {};
 /**
  * \brief   Specialization for std::variant.
  * 
- * This specialization extracts all types contained in the given std::variant 
- * and checks whether \p TypeToCheck matches at least one of them. The types 
- * contained are captured by the parameter pack \p AllowedDataTypes.
+ * This specialization extracts all types contained in the given variant and 
+ * checks whether TypeToCheck matches at least one of them. The types contained 
+ * are captured by the parameter pack AllowedDataTypes.
  * 
- * Top-level const and volatile qualifiers are removed from @p TypeToCheck 
- * before performing the comparisons. Qualifiers of the types contained in the 
- * variant are not removed. 
+ * Top-level const and volatile qualifiers are removed from TypeToCheck before 
+ * performing the comparisons. Qualifiers of the types contained in the variant 
+ * are not removed. 
  * 
  * \tparam  TypeToCheck passes a type to check against the types of the variant. 
  * \tparam  VariantOfValids passes a std::variant containing the allowed types.
@@ -102,39 +92,13 @@ struct InVariant<TypeToCheck, std::variant<AllowedDataTypes...>>
 /**
  * \brief   Concept that constrains a type to the allowed signal data types.
  *
- * A type satisfies this concept if it is contained in the std::variant 
- * represented by \c AllowedSignalTypes_t.
+ * A type satisfies this concept if it is contained in the variant represented 
+ * by AllowedSignalTypes_t. The actual type check is performed by  InVariant. 
+ * Top-level const and volatile qualifiers of SignalDataType are ignored during 
+ * the check. This concept can be used to constrain functions, classes, or other 
+ * templates to signal data types supported by the system.
  *
- * The actual type check is performed by \c InVariant. Top-level const and 
- * volatile qualifiers of \p SignalDataType are ignored during the check.
- *
- * This concept can be used to constrain functions, classes, or other templates 
- * to signal data types supported by the system.
- *
- * For example, if \c AllowedSignalTypes_t is defined as:
- *
- * \code
- * using AllowedSignalTypes_t = std::variant<int, double, std::string>;
- * \endcode
- *
- * the following types satisfy the concept:
- *
- * \code
- * static_assert(AllowedSignalDataType<int>);
- * static_assert(AllowedSignalDataType<volatile double>);
- * static_assert(AllowedSignalDataType<const int>);
- * \endcode
- *
- * whereas a type not contained in the variant does not:
- *
- * \code
- * static_assert(!AllowedSignalDataType<bool>);
- * \endcode
- *
- * \tparam  SignalDataType passes a type to check against the allowed data types.
- *
- * \see     InVariant
- * \see     AllowedSignalTypes_t
+ * \tparam  SignalDataType passes a type to check against the allowed types.
  */
 template<typename SignalDataType>
 concept AllowedSignalDataType =
@@ -145,16 +109,11 @@ concept AllowedSignalDataType =
  * \brief   Represents a signal containing a pointer to signal data.
  *
  * A Signal is associated with a specific signal data type, which must be one of 
- * the types allowed by AllowedSignalDataType.
- *
- * The Signal class does not own the referenced data. The caller is responsible 
- * for ensuring that the pointed-to object remains valid for the lifetime of the 
- * Signal object.
+ * the types allowed by AllowedSignalDataType. The Signal class does not own the 
+ * referenced data. The caller is responsible for ensuring that the pointed-to 
+ * object remains valid for the lifetime of the signal object.
  *
  * \tparam  SignalDataType passes the type of the signal's data.
- *
- * \see     AllowedSignalDataType
- * \see     AllowedSignal
  */
 template<typename SignalDataType>
     requires AllowedSignalDataType<SignalDataType>
@@ -191,7 +150,10 @@ public:
     /**
      * \brief   Returns the pointer to the internal signal data.
      *
-     * The signal does not transfer ownership of the referenced object.
+     * The signal does not transfer ownership of the referenced object. That is, 
+     * the caller is responsible for ensuring that the pointed-to object remains 
+     * valid for the lifetime of the signal. If not, the runtime will most 
+     * likely crash when the pointer is dereferenced.
      *
      * \return  Pointer to the associated signal data.
      */
@@ -203,8 +165,6 @@ private:
 
     /**
      * \brief   Pointer to the associated signal data.
-     *
-     * The pointed-to object is not owned by the Signal.
      */
     SignalDataType* _data;
 };
@@ -218,9 +178,6 @@ private:
  * possible Signal types.
  *
  * \tparam  DataType passes a data type for which a Signal type is created.
- *
- * \see Signal
- * \see MakeSignalVariant
  */
 template<typename DataType>
 struct MakeSignalVariant {
@@ -239,26 +196,6 @@ struct MakeSignalVariant {
  * specialization creates a corresponding std::variant containing a Signal for 
  * each of those data types. In addition to the regular Signal<DataType> types, 
  * Signals using volatile-qualified data types are generated as well.
- *
- * For example:
- *
- * \code
- * using DataTypes = std::variant<int, double>;
- * \endcode
- *
- * results in:
- *
- * \code
- * using SignalTypes = std::variant<
- *     Signal<int>,
- *     Signal<double>,
- *     Signal<volatile int>,
- *     Signal<volatile double>
- * >;
- * \endcode
- *
- * The resulting variant can therefore represent a Signal for every
- * allowed data type, including its volatile-qualified counterpart.
  *
  * \tparam  DataType passes types contained in the input std::variant.
  *
@@ -284,31 +221,9 @@ struct MakeSignalVariant<std::variant<DataType...>>
 /**
  * \brief   Variant containing all supported signal types.
  *
- * The type is generated from AllowedSignalTypes_t by MakeSignalVariant.
- *
- * For every allowed signal data type, the variant contains a Signal for the 
- * regular type and a Signal for its volatile-qualified counterpart.
- *
- * For example, if AllowedSignalTypes_t is:
- *
- * \code
- * using AllowedSignalTypes_t = std::variant<int, double>;
- * \endcode
- *
- * AnySignal_t becomes equivalent to:
- *
- * \code
- * std::variant<
- *     Signal<int>,
- *     Signal<double>,
- *     Signal<volatile int>,
- *     Signal<volatile double>
- * >
- * \endcode
- *
- * \see     AllowedSignalTypes_t
- * \see     MakeSignalVariant
- * \see     Signal
+ * The type is generated from AllowedSignalTypes_t by MakeSignalVariant. For 
+ * every allowed signal data type, the variant contains a Signal for the regular 
+ * type and a Signal for its volatile-qualified counterpart.
  */
 using AnySignal_t = MakeSignalVariant<AllowedSignalTypes_t>::AnyType;
 
@@ -318,19 +233,15 @@ using AnySignal_t = MakeSignalVariant<AllowedSignalTypes_t>::AnyType;
  *
  * A type satisfies this concept if it is contained in AnySignal_t. In other 
  * words, the concept can be used to determine whether a type represents one of 
- * the Signal specializations supported by the system.
- *
- * This concept is based on InVariant and therefore evaluates to true if 
- * SignalDataType matches at least one of the types contained in AnySignal_t.
+ * the Signal specializations supported by the system. This concept is based on 
+ * InVariant and therefore evaluates to true if  SignalDataType matches at least 
+ * one of the types contained in AnySignal_t.
  *
  * \tparam  SignalDataType passes a type to check against the supported types.
- *
- * \see     AnySignal_t
- * \see     InVariant
- * \see     Signal
  */
 template<typename SignalDataType>
 concept AllowedSignal = InVariant<SignalDataType, AnySignal_t>::value;
+
 }
 
 #endif  //__MERCURYCAN_MODEL_SIGNAL_HPP__
