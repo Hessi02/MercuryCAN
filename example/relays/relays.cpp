@@ -21,14 +21,10 @@
 #include <util/delay.h>
 #include <cassert>
 
-namespace {
-
-volatile uint8_t relayControlValue = 0;
+static volatile uint8_t relayControlValue = 0;
 
 void updateRelayOutputs(uint32_t) {
     PORTA = relayControlValue;
-}
-
 }
 
 int main(void) {

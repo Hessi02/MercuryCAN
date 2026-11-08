@@ -21,14 +21,10 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-namespace {
-
-volatile uint8_t relayControlValue = 0;
+static volatile uint8_t relayControlValue = 0;
 
 void readRelayInputs(uint32_t) {
     relayControlValue = PINA;
-}
-
 }
 
 int main(void) {
