@@ -1,3 +1,19 @@
+/**
+ * \file    receiver.cpp
+ * \brief   Implements the CAN message receiver controller.
+ *
+ * The Receiver waits for individual messages, optionally with a timeout, and
+ * registers cyclic messages for ongoing reception. It configures the active
+ * driver for the requested identifiers and processes incoming frames by
+ * updating matching messages, setting their update flags, and emitting their
+ * received notifications. The receiver stores non-owning pointers to awaited
+ * and cyclic messages; those messages must remain valid while in use.
+ *
+ * \copyright Copyright (C) 2026 Luca Hesselbrock
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <MercuryCAN/controller/receiver.hpp>
 
 #include <MercuryCAN/driver/driverInterface.hpp>

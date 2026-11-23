@@ -1,3 +1,19 @@
+/**
+ * \file    mockDriver.cpp
+ * \brief   Implements the test double for the CAN driver interface.
+ *
+ * MockDriver records transmitted and received frames, forwards injected receive 
+ * frames to the registered Receiver, and provides a background millisecond 
+ * timer for cyclic transmission processing. It simulates driver behavior 
+ * without CAN hardware, allowing controller and message behavior to be 
+ * exercised in tests. The timer thread is stopped and joined when the driver is 
+ * destroyed.
+ *
+ * \copyright Copyright (C) 2026 Luca Hesselbrock
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>

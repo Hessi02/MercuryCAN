@@ -1,3 +1,19 @@
+/**
+ * \file    avrDriver.cpp
+ * \brief   Implements the CAN driver using AVR controller hardware.
+ *
+ * AvrDriver configures the AVR CAN controller, manages its message objects for 
+ * transmitting and receiving frames, and forwards received data to the 
+ * registered Receiver. It also configures Timer0 to drive cyclic transmission
+ * processing and the driver's millisecond tick count. The CAN and Timer0
+ * interrupt handlers handle incoming frames and invoke the transmitter's
+ * periodic processing, respectively.
+ *
+ * \copyright Copyright (C) 2026 Luca Hesselbrock
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <MercuryCAN/driver/avrDriver.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>

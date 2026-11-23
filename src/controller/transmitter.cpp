@@ -1,3 +1,19 @@
+/**
+ * \file    transmitter.cpp
+ * \brief   Implements immediate and cyclic CAN message transmission.
+ *
+ * The Transmitter sends individual messages through the active driver and emits 
+ * their sent notifications after transmission. It also registers non-owning 
+ * references to cyclic messages, orders them by CAN identifier, and processes 
+ * them during timer-driven cycles. Each cycle advances the driver's millisecond 
+ * tick count, emits pre-send notifications for due messages, transmits them, 
+ * and then emits their sent notifications.
+ *
+ * \copyright Copyright (C) 2026 Luca Hesselbrock
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <MercuryCAN/controller/transmitter.hpp>
 
 #include <MercuryCAN/driver/driverInterface.hpp>
