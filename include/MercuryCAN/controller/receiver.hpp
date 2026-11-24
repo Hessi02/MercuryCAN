@@ -17,7 +17,7 @@
 #ifndef __MERCURYCAN_CONTROLLER_RECEIVER_HPP__
 #define __MERCURYCAN_CONTROLLER_RECEIVER_HPP__
 
-#include <MercuryCAN/model/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
 
 #include <vector>
 
@@ -48,7 +48,7 @@ public:
      *
      * \param   message passes the message whose update flag is awaited.
      */
-    void awaitMessage(Model::Message& message);
+    void awaitMessage(Model::Runtime::Message& message);
 
     /**
      * \brief   Waits synchronously for a message update until timeout expired.
@@ -61,7 +61,7 @@ public:
      * \param   message passes the message whose update flag is awaited.
      * \param   timeout passes the duration to wait for a message update in ms.
      */
-    bool awaitMessage(Model::Message& message, const uint32_t& timeout);
+    bool awaitMessage(Model::Runtime::Message& message, const uint32_t& timeout);
 
     /**
      * \brief   Registers a cyclic message for reception.
@@ -73,7 +73,7 @@ public:
      *
      * \param   message passes the cyclic message to register.
      */
-    void addCyclicMessage(Model::CyclicMessage& message);
+    void addCyclicMessage(Model::Runtime::CyclicMessage& message);
 
     /**
      * \brief   Applies received payload data to matching registered messages.
@@ -97,7 +97,7 @@ private:
     /**
      * \brief   Message currently awaited by awaitMessage(), if any.
      */
-    Model::Message* volatile _awaitedMessage = nullptr;
+    Model::Runtime::Message* volatile _awaitedMessage = nullptr;
 
     /**
      * \brief   Signals that the awaited frame has been fully processed.
@@ -107,7 +107,7 @@ private:
     /**
      * \brief   Stored cyclic messages processed when matching frames arrive.
      */
-    std::vector<Model::CyclicMessage*> _cyclicMessages;
+    std::vector<Model::Runtime::CyclicMessage*> _cyclicMessages;
 };
 
 }

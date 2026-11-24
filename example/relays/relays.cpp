@@ -12,7 +12,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <MercuryCAN/model/database.hpp>
+#include <MercuryCAN/model/configuration/database.hpp>
 #include <MercuryCAN/driver/driverInterface.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
@@ -32,9 +32,9 @@ int main(void) {
    
     _delay_ms(100);
 
-    constexpr Can::Model::Database dbc(DBC);
+    constexpr Can::Model::Configuration::Database dbc(DBC);
 
-    Can::Model::CyclicMessage relayControl = 
+    Can::Model::Runtime::CyclicMessage relayControl = 
         dbc.buildCyclicMessage(
             "RelayControl", 
             &relayControlValue
@@ -42,7 +42,7 @@ int main(void) {
 
     SignalSlot::MetaObject::connect(
         &relayControl,
-        &Can::Model::Message::received,
+        &Can::Model::Runtime::Message::received,
         &updateRelayOutputs
     );
 

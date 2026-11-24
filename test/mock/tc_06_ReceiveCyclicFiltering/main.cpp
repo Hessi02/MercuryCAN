@@ -13,7 +13,7 @@
 
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
-#include <MercuryCAN/model/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
 
 #include <iostream>
 
@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
     constexpr uint16_t identifier = 0x123;
     volatile uint8_t value = 0;
     
-    Can::Model::CyclicMessage frame(
+    Can::Model::Runtime::CyclicMessage frame(
         identifier, 
         10, 
         &value
@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
         
     SignalSlot::MetaObject::connect(
         &frame,
-        &Can::Model::Message::received,
+        &Can::Model::Runtime::Message::received,
         +[](uint32_t tickCountMs) {
             receivedCount++;
             receivedTick = tickCountMs;

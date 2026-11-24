@@ -19,7 +19,7 @@ void sendXAxisData(volatile short xAcc, volatile short yAcc) {
 	//   SG_ xAcc :  0|16@1- (1,0) [0|32000] "mg" Vector__XXX
 	//   SG_ yAcc : 16|16@1- (1,0) [0|32000] "mg" Vector__XXX
 
-    Can::Model::Message accelerations(
+    Can::Model::Runtime::Message accelerations(
         0x10,
         &xAcc,
         &yAcc
@@ -41,7 +41,7 @@ int main(void) {
 	//   SG_ voltage :  0|32@1- (1,0) [0|80] "V" Vector__XXX
 	//   SG_ current : 32|32@1- (1,0) [0|10] "A" Vector__XXX
     
-    Can::Model::CyclicMessage powerMeasures{
+    Can::Model::Runtime::CyclicMessage powerMeasures{
         0x12,
         10,
         &voltage,
@@ -71,7 +71,7 @@ int main(void) {
     //   SG_ temperature : 7|16@0- (0.01,0) [-20|80] "°C" Vector__XXX
     //   SG_ rollingCtr  : 16|8@1+ (1,0) [0|0] "" Vector__XXX
     
-    Can::Model::CyclicMessage measurement(
+    Can::Model::Runtime::CyclicMessage measurement(
         0x100,         
         100,          
         &temperature,
@@ -80,7 +80,7 @@ int main(void) {
 
     SignalSlot::MetaObject::connect(
         &measurement,
-        &Can::Model::CyclicMessage::Message::preSend,
+        &Can::Model::Runtime::Message::preSend,
         +[](unsigned long) {
             static Sensor sensor;
             temperature = sensor.readTemperature();
@@ -89,7 +89,7 @@ int main(void) {
 
     SignalSlot::MetaObject::connect(
         &measurement,
-        &Can::Model::CyclicMessage::Message::sent,
+        &Can::Model::Runtime::Message::sent,
         +[](unsigned long) {
             rollingCtr += 1;
         }
@@ -118,7 +118,7 @@ int main(void) {
     // BO_ 1 peerFrame : 2 Vector__XXX
     //   SG_ peerValue : 16|0@1+ (1,0) [0|0] "" Vector__XXX
     
-    Can::Model::CyclicMessage peerFrame(
+    Can::Model::Runtime::CyclicMessage peerFrame(
         0x01,
         1,
         &value
@@ -127,7 +127,7 @@ int main(void) {
     // BO_ 2 repeatedFrame : 2 Vector__XXX
     //   SG_ repeatedValue : 16|0@1+ (1,0) [0|0] "" Vector__XXX
     
-    Can::Model::CyclicMessage repeatedFrame(
+    Can::Model::Runtime::CyclicMessage repeatedFrame(
         0x02,
         1,
         &value
@@ -153,7 +153,7 @@ bool awaitTorqueMeasurement(volatile long& torque) {
     // BO_ 9 trqMeas : 4 Vector__XXX
 	//   SG_ torque : 0|32@1- (0.001,0) [0|75] "Nm" Vector__XXX
     
-    Can::Model::Message trqMeas(
+    Can::Model::Runtime::Message trqMeas(
         0x09,
         &torque
     );
@@ -183,7 +183,7 @@ int main(void) {
     // BO_ 10 measurement : 4 Vector__XXX
     //   SG_ temperature : 0|32@1- (1,0) [-10|50] "°C" Vector__XXX
     
-    Can::Model::CyclicMessage measRxFrame(
+    Can::Model::Runtime::CyclicMessage measRxFrame(
         0x0a,
         100,
         &conv.temperatureC
@@ -191,7 +191,7 @@ int main(void) {
  
     SignalSlot::MetaObject::connect(
         &measRxFrame,
-        &Can::Model::CyclicMessage::Message::received,
+        &Can::Model::Runtime::Message::received,
         &conv,
         &TemperatureConverter::onTemperatureReceived
     );
@@ -226,7 +226,7 @@ void updateRelayOutputs(uint32_t) {
 }
 
 int main(void) {
-    constexpr Can::Model::Database dbc(DBC);
+    constexpr Can::Model::Configuration::Database dbc(DBC);
 
     // BO_ 54 RelayControl: 1 Vector__XXX
     //   SG_ Relay_0 : 0|1@1- (1,0) [0|1] "" Vector__XXX
@@ -238,7 +238,7 @@ int main(void) {
     //   SG_ Relay_6 : 6|1@1- (1,0) [0|1] "" Vector__XXX
     //   SG_ Relay_7 : 7|1@1- (1,0) [0|1] "" Vector__XXX
 
-    Can::Model::CyclicMessage relayControl = 
+    Can::Model::Runtime::CyclicMessage relayControl = 
         dbc.buildCyclicMessage(
             "RelayControl", 
             &relayControlValue
@@ -246,7 +246,7 @@ int main(void) {
 
     SignalSlot::MetaObject::connect(
         &relayControl,
-        &Can::Model::Message::received,
+        &Can::Model::Runtime::Message::received,
         &updateRelayOutputs
     );
 

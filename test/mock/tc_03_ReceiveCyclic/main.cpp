@@ -15,7 +15,7 @@
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
-#include <MercuryCAN/model/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
 
 #include <iostream>
 
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     constexpr uint16_t identifier = 0x123;
     volatile uint8_t byteToRecv = 0;
 
-    Can::Model::CyclicMessage rxFrame(
+    Can::Model::Runtime::CyclicMessage rxFrame(
         identifier,
         10,
         &byteToRecv

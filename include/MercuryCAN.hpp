@@ -16,10 +16,10 @@
 #ifndef __MERCURY_CAN_HPP__
 #define __MERCURY_CAN_HPP__
 
-#include <MercuryCAN/model/signal.hpp>
-#include <MercuryCAN/model/message.hpp>
-#include <MercuryCAN/model/cyclicMessage.hpp>
-#include <MercuryCAN/model/database.hpp>
+#include <MercuryCAN/model/runtime/signal.hpp>
+#include <MercuryCAN/model/runtime/message.hpp>
+#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
+#include <MercuryCAN/model/configuration/database.hpp>
 
 #include <MercuryCAN/driver/driverInterface.hpp>
 

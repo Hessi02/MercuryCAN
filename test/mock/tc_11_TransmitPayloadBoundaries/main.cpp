@@ -12,7 +12,7 @@
 
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
-#include <MercuryCAN/model/message.hpp>
+#include <MercuryCAN/model/runtime/message.hpp>
 
 #include <iostream>
 
@@ -80,8 +80,8 @@ int main() {
 
     volatile uint64_t payload = maximumPayload;
 
-    Can::Model::Message emptyFrame(emptyIdentifier);
-    Can::Model::Message maximumFrame(maximumIdentifier, &payload);
+    Can::Model::Runtime::Message emptyFrame(emptyIdentifier);
+    Can::Model::Runtime::Message maximumFrame(maximumIdentifier, &payload);
     
     tx.sendMessage(emptyFrame);
     tx.sendMessage(maximumFrame);

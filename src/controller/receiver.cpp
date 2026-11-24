@@ -18,7 +18,7 @@
 
 #include <MercuryCAN/driver/driverInterface.hpp>
 
-void Can::Controller::Receiver::awaitMessage(Model::Message& message) {
+void Can::Controller::Receiver::awaitMessage(Model::Runtime::Message& message) {
     message.setUpdateFlag(false);
 
     _awaitMessageReceived = false;
@@ -35,7 +35,7 @@ void Can::Controller::Receiver::awaitMessage(Model::Message& message) {
 }
 
 bool Can::Controller::Receiver::awaitMessage(
-    Model::Message& message,
+    Model::Runtime::Message& message,
     const uint32_t& timeoutMs
 ) {
     message.setUpdateFlag(false);
@@ -63,7 +63,7 @@ bool Can::Controller::Receiver::awaitMessage(
 }
 
 void Can::Controller::Receiver::addCyclicMessage(
-    Model::CyclicMessage& message
+    Model::Runtime::CyclicMessage& message
 ) {
     _cyclicMessages.push_back(&message);
 
@@ -78,11 +78,11 @@ void Can::Controller::Receiver::processRxData(
     const std::size_t& dataLength
 ) {
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
-    Model::Message* awaitedMessage = _awaitedMessage;
+    Model::Runtime::Message* awaitedMessage = _awaitedMessage;
     bool awaitedMessageProcessed = false;
 
     for (std::size_t i = 0; i < _cyclicMessages.size(); i++) {
-        Can::Model::CyclicMessage& message = *_cyclicMessages.at(i);
+        Can::Model::Runtime::CyclicMessage& message = *_cyclicMessages.at(i);
 
         if (identifier == message.getIdentifier()) {
             message.setPayloadData(data, dataLength);

@@ -13,8 +13,8 @@
 
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
-#include <MercuryCAN/model/cyclicMessage.hpp>
-#include <MercuryCAN/model/message.hpp>
+#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/message.hpp>
 
 #include <array>
 #include <iostream>
@@ -23,24 +23,24 @@ namespace {
 
 static_assert([] {
     int signal = 0;
-    Can::Model::Message message{0x123, &signal};
+    Can::Model::Runtime::Message message{0x123, &signal};
     return message.getIdentifier() == 0x123 &&
            message.getPayloadSize() == sizeof(signal);
 }());
 static_assert([] {
-    Can::Model::Message message{0x124};
+    Can::Model::Runtime::Message message{0x124};
     return message.getIdentifier() == 0x124 &&
            message.getPayloadSize() == 0;
 }());
 static_assert([] {
     int signal = 0;
-    Can::Model::CyclicMessage message{0x125, 10, &signal};
+    Can::Model::Runtime::CyclicMessage message{0x125, 10, &signal};
     return message.getIdentifier() == 0x125 &&
            message.getCycleTime() == 10 &&
            message.getPayloadSize() == sizeof(signal);
 }());
 static_assert([] {
-    Can::Model::CyclicMessage message{0x126, 20};
+    Can::Model::Runtime::CyclicMessage message{0x126, 20};
     return message.getIdentifier() == 0x126 &&
            message.getCycleTime() == 20 &&
            message.getPayloadSize() == 0;
@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
     volatile uint16_t firstSignal  = 0x1234;
     volatile uint32_t secondSignal = 0x89abcdef;
 
-    Can::Model::Message frame(
+    Can::Model::Runtime::Message frame(
         identifier, 
         &firstSignal, 
         &secondSignal

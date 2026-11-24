@@ -15,8 +15,8 @@
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
-#include <MercuryCAN/model/cyclicMessage.hpp>
-#include <MercuryCAN/model/signal.hpp>
+#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/signal.hpp>
 
 #include <iostream>
 
@@ -24,7 +24,7 @@ namespace {
 
 volatile uint16_t runtimeSignalData = 0;
 
-constexpr Can::Model::Signal<volatile uint16_t> signalConfiguration(
+constexpr Can::Model::Runtime::Signal<volatile uint16_t> signalConfiguration(
     &runtimeSignalData
 );
 
@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
         }
     }
     
-    Can::Model::Message txFrame(
+    Can::Model::Runtime::Message txFrame(
         identifier,
         &testData
     );

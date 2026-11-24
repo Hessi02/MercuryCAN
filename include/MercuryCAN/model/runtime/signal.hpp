@@ -11,13 +11,14 @@
  * SPDX-License-Identifier: Apache-2.0 
  */
 
-#ifndef __MERCURYCAN_MODEL_SIGNAL_HPP__
-#define __MERCURYCAN_MODEL_SIGNAL_HPP__
+#ifndef __MERCURYCAN_MODEL_RUNTIME_SIGNAL_HPP__
+#define __MERCURYCAN_MODEL_RUNTIME_SIGNAL_HPP__
 
 #include <type_traits>
 #include <variant>
 
-namespace Can::Model {
+namespace Can::Model::Runtime
+{
 
 /**
  * \brief   Variant of all data types that can be stored inside a signal object.
@@ -235,4 +236,4 @@ concept AllowedSignal = InVariant<SignalDataType, AnySignal_t>::value;
 
 }
 
-#endif  //__MERCURYCAN_MODEL_SIGNAL_HPP__
+#endif  //__MERCURYCAN_MODEL_RUNTIME_SIGNAL_HPP__

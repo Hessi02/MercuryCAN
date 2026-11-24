@@ -24,11 +24,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef __MERCURYCAN_MODEL_DATABASE_HPP__
-#define __MERCURYCAN_MODEL_DATABASE_HPP__
+#ifndef __MERCURYCAN_MODEL_CONFIGURATION_DATABASE_HPP__
+#define __MERCURYCAN_MODEL_CONFIGURATION_DATABASE_HPP__
 
-#include <MercuryCAN/model/cyclicMessage.hpp>
-#include <MercuryCAN/model/message.hpp>
+#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/message.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -36,7 +36,7 @@
 #include <optional>
 #include <string_view>
 
-namespace Can::Model 
+namespace Can::Model::Configuration 
 {
 
 /**
@@ -92,9 +92,9 @@ public:
      * \return  The matching Message.
      */
     template<typename... SignalDataTypes>
-        requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
-                    FitsIntoCanMessage<SignalDataTypes...>
-    consteval Message buildMessage(
+        requires(Runtime::AllowedSignalDataType<SignalDataTypes> && ...) &&
+                    Runtime::FitsIntoCanMessage<SignalDataTypes...>
+    consteval Runtime::Message buildMessage(
         std::string_view name,
         SignalDataTypes*... signalPtrPack
     ) const {
@@ -106,7 +106,7 @@ public:
         if (!definition)
             failConstantEvaluation();
 
-        return Message{definition->identifier, signalPtrPack...};
+        return Runtime::Message{definition->identifier, signalPtrPack...};
     }
 
     /**
@@ -124,9 +124,9 @@ public:
      * \return  The matching CyclicMessage.
      */
     template<typename... SignalDataTypes>
-        requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
-                    FitsIntoCanMessage<SignalDataTypes...>
-    consteval CyclicMessage buildCyclicMessage(
+        requires(Runtime::AllowedSignalDataType<SignalDataTypes> && ...) &&
+                    Runtime::FitsIntoCanMessage<SignalDataTypes...>
+    consteval Runtime::CyclicMessage buildCyclicMessage(
         std::string_view name,
         SignalDataTypes*... signalPtrPack
     ) const {
@@ -138,7 +138,7 @@ public:
         if (!definition)
             failConstantEvaluation();
 
-        return CyclicMessage{
+        return Runtime::CyclicMessage{
             definition->identifier, definition->cycleTime, signalPtrPack...
         };
     }
@@ -584,4 +584,4 @@ private:
 
 }
 
-#endif //__MERCURYCAN_MODEL_DATABASE_HPP__
+#endif  //__MERCURYCAN_MODEL_CONFIGURATION_DATABASE_HPP__

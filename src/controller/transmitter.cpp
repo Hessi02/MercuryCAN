@@ -25,7 +25,7 @@ Can::Controller::Transmitter::Transmitter(void) {
     driver->activateTxTimer();
 }
 
-void Can::Controller::Transmitter::sendMessage(Model::Message& message) const {
+void Can::Controller::Transmitter::sendMessage(Model::Runtime::Message& message) const {
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
 
     driver->transmit(
@@ -38,15 +38,15 @@ void Can::Controller::Transmitter::sendMessage(Model::Message& message) const {
 }
 
 void Can::Controller::Transmitter::addCyclicMessage(
-    Model::CyclicMessage& message
+    Model::Runtime::CyclicMessage& message
 ) {
     _cyclicMessages.push_back(&message);
 
     std::stable_sort(
         _cyclicMessages.begin(),
         _cyclicMessages.end(),
-        [](Model::CyclicMessage* const& left,
-           Model::CyclicMessage* const& right) {
+        [](Model::Runtime::CyclicMessage* const& left,
+           Model::Runtime::CyclicMessage* const& right) {
             return left->getIdentifier() < right->getIdentifier();
         }
     );
@@ -80,7 +80,7 @@ void Can::Controller::Transmitter::processMessage(
     const uint32_t& tickCountMs,
     std::vector<bool>& dueMessages
 ) {
-    Model::CyclicMessage& message = *_cyclicMessages.at(index);
+    Model::Runtime::CyclicMessage& message = *_cyclicMessages.at(index);
     const uint16_t cycleTime = message.getCycleTime();
     
     if (0 == cycleTime || 0 != tickCountMs % cycleTime) {
@@ -100,7 +100,7 @@ void Can::Controller::Transmitter::transmitMessage(
         return;
 
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
-    Model::CyclicMessage& message = *_cyclicMessages.at(index);
+    Model::Runtime::CyclicMessage& message = *_cyclicMessages.at(index);
     driver->transmit(
         message.getIdentifier(),
         message.getPayloadData(),

@@ -10,14 +10,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <MercuryCAN/model/database.hpp>
+#include <MercuryCAN/model/configuration/database.hpp>
 
 #include <cstdint>
 #include <type_traits>
 
 namespace {
 
-constexpr Can::Model::Database embeddedDatabase{DATABASE_TEXT};
+constexpr Can::Model::Configuration::Database embeddedDatabase{DATABASE_TEXT};
 
 constexpr char constexprDatabaseText[] =
     "BO_ 12 Telemetry: 4 ECU\n"
@@ -27,20 +27,20 @@ constexpr char constexprDatabaseText[] =
     "BA_ \"GenMsgSendType\" BO_ 0 \"cyclicAndTriggered\";\n"
     "BA_ \"GenMsgCycleTime\" BO_ 0 30;";
 
-constexpr Can::Model::Database constexprDatabase{constexprDatabaseText};
+constexpr Can::Model::Configuration::Database constexprDatabase{constexprDatabaseText};
 
 uint32_t embeddedSignal = 0;
 uint32_t telemetrySignal = 0;
 
-constexpr Can::Model::Message embeddedMessage =
+constexpr Can::Model::Runtime::Message embeddedMessage =
     embeddedDatabase.buildMessage("Telemetry", &embeddedSignal);
-constexpr Can::Model::Message telemetryMessage =
+constexpr Can::Model::Runtime::Message telemetryMessage =
     constexprDatabase.buildMessage("Telemetry", &telemetrySignal);
-constexpr Can::Model::Message emptyMessage =
+constexpr Can::Model::Runtime::Message emptyMessage =
     constexprDatabase.buildMessage("Empty");
-constexpr Can::Model::CyclicMessage cyclicMessage =
+constexpr Can::Model::Runtime::CyclicMessage cyclicMessage =
     constexprDatabase.buildCyclicMessage("Telemetry", &telemetrySignal);
-constexpr Can::Model::CyclicMessage emptyCyclicMessage =
+constexpr Can::Model::Runtime::CyclicMessage emptyCyclicMessage =
     constexprDatabase.buildCyclicMessage("Empty");
 
 static_assert(embeddedMessage.getIdentifier() == 12);
@@ -55,7 +55,7 @@ static_assert(cyclicMessage.getCycleTime() == 20);
 static_assert(emptyCyclicMessage.getIdentifier() == 0);
 static_assert(emptyCyclicMessage.getPayloadSize() == 0);
 static_assert(emptyCyclicMessage.getCycleTime() == 30);
-static_assert(std::has_virtual_destructor_v<Can::Model::Message>);
+static_assert(std::has_virtual_destructor_v<Can::Model::Runtime::Message>);
 
 }
 

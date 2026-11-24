@@ -11,12 +11,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef __MERCURYCAN_MODEL_CYCLIC_MESSAGE_HPP__
-#define __MERCURYCAN_MODEL_CYCLIC_MESSAGE_HPP__
+#ifndef __MERCURYCAN_MODEL_RUNTIME_CYCLIC_MESSAGE_HPP__
+#define __MERCURYCAN_MODEL_RUNTIME_CYCLIC_MESSAGE_HPP__
 
-#include <MercuryCAN/model/message.hpp>
+#include <MercuryCAN/model/runtime/message.hpp>
 
-namespace Can::Model 
+namespace Can::Model::Runtime 
 {
 
 /**
@@ -74,4 +74,4 @@ private:
 
 }
 
-#endif  //__MERCURYCAN_MODEL_CYCLIC_MESSAGE_HPP__
+#endif  //__MERCURYCAN_MODEL_RUNTIME_CYCLIC_MESSAGE_HPP__

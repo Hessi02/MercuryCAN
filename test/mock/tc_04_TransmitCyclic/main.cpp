@@ -16,7 +16,7 @@
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
-#include <MercuryCAN/model/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
     constexpr uint16_t identifier = 0x123;
     uint8_t byteToTransmit = 0;
 
-    Can::Model::CyclicMessage txFrame(
+    Can::Model::Runtime::CyclicMessage txFrame(
         identifier,
         cycleTimeMs,
         &byteToTransmit

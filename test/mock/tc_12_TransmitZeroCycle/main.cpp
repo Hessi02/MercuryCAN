@@ -12,17 +12,17 @@
 
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
-#include <MercuryCAN/model/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
 
 #include <iostream>
 
 static unsigned int preSendCount = 0;
 static unsigned int sentCount = 0;
 
-void connectNotifications(Can::Model::CyclicMessage& frame) {
+void connectNotifications(Can::Model::Runtime::CyclicMessage& frame) {
     SignalSlot::MetaObject::connect(
         &frame,
-        &Can::Model::Message::preSend,
+        &Can::Model::Runtime::Message::preSend,
         +[](uint32_t) {
             preSendCount++;
         }
@@ -30,7 +30,7 @@ void connectNotifications(Can::Model::CyclicMessage& frame) {
 
     SignalSlot::MetaObject::connect(
         &frame,
-        &Can::Model::Message::sent,
+        &Can::Model::Runtime::Message::sent,
         +[](uint32_t) {
             sentCount++;
         }
@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
     constexpr uint16_t identifier = 0x402;
     volatile uint8_t byteToTransmit = 0x5a;
 
-    Can::Model::CyclicMessage frame(
+    Can::Model::Runtime::CyclicMessage frame(
         identifier, 
         0, 
         &byteToTransmit

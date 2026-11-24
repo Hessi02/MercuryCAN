@@ -16,7 +16,7 @@
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
-#include <MercuryCAN/model/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
     constexpr uint8_t testData = 0xaa;
     volatile uint8_t byteToRecv = 0;
 
-    Can::Model::Message rxFrame(
+    Can::Model::Runtime::Message rxFrame(
         identifier,
         &byteToRecv
     );

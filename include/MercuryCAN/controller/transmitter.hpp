@@ -16,7 +16,7 @@
 #ifndef __MERCURYCAN_CONTROLLER_TRANSMITTER_HPP__
 #define __MERCURYCAN_CONTROLLER_TRANSMITTER_HPP__
 
-#include <MercuryCAN/model/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
 
 #include <vector>
 
@@ -53,7 +53,7 @@ public:
      *
      * \param   message passes the message to transmit.
      */
-    void sendMessage(Model::Message& message) const;
+    void sendMessage(Model::Runtime::Message& message) const;
 
     /**
      * \brief   Registers a message for cycle-based transmission.
@@ -68,7 +68,7 @@ public:
      *
      * \param   message passes the cyclic message to register.
      */
-    void addCyclicMessage(Model::CyclicMessage& message);
+    void addCyclicMessage(Model::Runtime::CyclicMessage& message);
 
     /**
      * \brief   Returns the number of registered cyclic messages.
@@ -150,7 +150,7 @@ private:
     /**
      * \brief   Shared non-owning pointers to registered cyclic messages.
      */
-    static inline std::vector<Model::CyclicMessage*> _cyclicMessages;
+    static inline std::vector<Model::Runtime::CyclicMessage*> _cyclicMessages;
 
     /**
      * \brief   Per-cycle transmission flags, resized when messages are added.

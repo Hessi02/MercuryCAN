@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <MercuryCAN/model/database.hpp>
+#include <MercuryCAN/model/configuration/database.hpp>
 
 #include <cstdint>
 #include <string_view>
@@ -40,14 +40,14 @@ constexpr char databaseText[] =
 constexpr std::string_view databaseTextView{
     databaseText, sizeof(databaseText) - 1
 };
-constexpr Can::Model::Database database(databaseTextView);
+constexpr Can::Model::Configuration::Database database(databaseTextView);
 constexpr std::string_view byteMessageName = "ByteMessage";
 constexpr std::string_view emptyMessageName = "EmptyMessage";
 constexpr std::string_view eightByteMessageName = "EightByteMessage";
 
-constexpr Can::Model::Message emptyMessage(0x100);
-constexpr Can::Model::Message singleSignalMessage(0x101, &signal0);
-constexpr Can::Model::Message maximumSignalCountMessage(
+constexpr Can::Model::Runtime::Message emptyMessage(0x100);
+constexpr Can::Model::Runtime::Message singleSignalMessage(0x101, &signal0);
+constexpr Can::Model::Runtime::Message maximumSignalCountMessage(
     0x102,
     &signal0,
     &signal1,
@@ -58,22 +58,22 @@ constexpr Can::Model::Message maximumSignalCountMessage(
     &signal6,
     &signal7
 );
-constexpr Can::Model::Message maximumPayloadMessage(0x103, &eightByteSignal);
+constexpr Can::Model::Runtime::Message maximumPayloadMessage(0x103, &eightByteSignal);
 
-constexpr Can::Model::CyclicMessage emptyCyclicMessage(0x200, 25);
-constexpr Can::Model::CyclicMessage cyclicMessage(0x201, 50, &signal0);
+constexpr Can::Model::Runtime::CyclicMessage emptyCyclicMessage(0x200, 25);
+constexpr Can::Model::Runtime::CyclicMessage cyclicMessage(0x201, 50, &signal0);
 
-constexpr Can::Model::Message databaseMessage =
+constexpr Can::Model::Runtime::Message databaseMessage =
     database.buildMessage(byteMessageName, &signal0);
-constexpr Can::Model::Message databaseEmptyMessage =
+constexpr Can::Model::Runtime::Message databaseEmptyMessage =
     database.buildMessage(emptyMessageName);
-constexpr Can::Model::Message databaseMaximumPayloadMessage =
+constexpr Can::Model::Runtime::Message databaseMaximumPayloadMessage =
     database.buildMessage(eightByteMessageName, &eightByteSignal);
-constexpr Can::Model::CyclicMessage databaseCyclicMessage =
+constexpr Can::Model::Runtime::CyclicMessage databaseCyclicMessage =
     database.buildCyclicMessage(byteMessageName, &signal0);
-constexpr Can::Model::CyclicMessage databaseEmptyCyclicMessage =
+constexpr Can::Model::Runtime::CyclicMessage databaseEmptyCyclicMessage =
     database.buildCyclicMessage(emptyMessageName);
-constexpr Can::Model::CyclicMessage databaseMaximumPayloadCyclicMessage =
+constexpr Can::Model::Runtime::CyclicMessage databaseMaximumPayloadCyclicMessage =
     database.buildCyclicMessage(eightByteMessageName, &eightByteSignal);
 
 static_assert(
