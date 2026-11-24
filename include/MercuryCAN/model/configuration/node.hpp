@@ -1,0 +1,12 @@
+#ifndef __MERCURYCAN_MODEL_CONFIGURATION_NODE_HPP__
+#define __MERCURYCAN_MODEL_CONFIGURATION_NODE_HPP__
+
+namespace Can::Model::Configuration
+{
+
+class Node
+{};
+
+}
+
+#endif //__MERCURYCAN_MODEL_CONFIGURATION_NODE_HPP__
