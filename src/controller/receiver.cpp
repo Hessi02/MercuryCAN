@@ -1,13 +1,13 @@
 /**
  * \file    receiver.cpp
- * \brief   Implements the CAN message receiver controller.
+ * \brief   Implements the CAN frame receiver controller.
  *
- * The Receiver waits for individual messages, optionally with a timeout, and
- * registers cyclic messages for ongoing reception. It configures the active
+ * The Receiver waits for individual frames, optionally with a timeout, and
+ * registers cyclic frames for ongoing reception. It configures the active
  * driver for the requested identifiers and processes incoming frames by
- * updating matching messages, setting their update flags, and emitting their
+ * updating matching frames, setting their update flags, and emitting their
  * received notifications. The receiver stores non-owning pointers to awaited
- * and cyclic messages; those messages must remain valid while in use.
+ * and cyclic frames; those frames must remain valid while in use.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -18,34 +18,34 @@
 
 #include <MercuryCAN/driver/driverInterface.hpp>
 
-void Can::Controller::Receiver::awaitMessage(Model::Runtime::Message& message) {
-    message.setUpdateFlag(false);
+void Can::Controller::Receiver::awaitMessage(Model::Runtime::Frame& frame) {
+    frame.setUpdateFlag(false);
 
     _awaitMessageReceived = false;
-    _awaitedMessage = &message;
+    _awaitedMessage = &frame;
     
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
     driver->setReceiverInstance(this);
-    driver->addRxMessage(message.getIdentifier(), message.getPayloadSize());
+    driver->addRxMessage(frame.getIdentifier(), frame.getPayloadSize());
 
     while (!_awaitMessageReceived);
 
     _awaitedMessage = nullptr;
-    driver->removeRxMessage(message.getIdentifier());
+    driver->removeRxMessage(frame.getIdentifier());
 }
 
 bool Can::Controller::Receiver::awaitMessage(
-    Model::Runtime::Message& message,
+    Model::Runtime::Frame& frame,
     const uint32_t& timeoutMs
 ) {
-    message.setUpdateFlag(false);
+    frame.setUpdateFlag(false);
 
     _awaitMessageReceived = false;
-    _awaitedMessage = &message;
+    _awaitedMessage = &frame;
 
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
     driver->setReceiverInstance(this);
-    driver->addRxMessage(message.getIdentifier(), message.getPayloadSize());
+    driver->addRxMessage(frame.getIdentifier(), frame.getPayloadSize());
 
     if (timeoutMs > 0)
         driver->activateTxTimer();
@@ -57,18 +57,18 @@ bool Can::Controller::Receiver::awaitMessage(
 
     const bool received = _awaitMessageReceived;
     _awaitedMessage = nullptr;
-    driver->removeRxMessage(message.getIdentifier());
+    driver->removeRxMessage(frame.getIdentifier());
 
     return received;
 }
 
 void Can::Controller::Receiver::addCyclicMessage(
-    Model::Runtime::CyclicMessage& message
+    Model::Runtime::CyclicFrame& frame
 ) {
-    _cyclicMessages.push_back(&message);
+    _cyclicMessages.push_back(&frame);
 
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
-    driver->addRxMessage(message.getIdentifier(), message.getPayloadSize());
+    driver->addRxMessage(frame.getIdentifier(), frame.getPayloadSize());
     driver->setReceiverInstance(this);
 }
 
@@ -78,29 +78,29 @@ void Can::Controller::Receiver::processRxData(
     const std::size_t& dataLength
 ) {
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
-    Model::Runtime::Message* awaitedMessage = _awaitedMessage;
-    bool awaitedMessageProcessed = false;
+    Model::Runtime::Frame* awaitedFrame = _awaitedMessage;
+    bool awaitedFrameProcessed = false;
 
     for (std::size_t i = 0; i < _cyclicMessages.size(); i++) {
-        Can::Model::Runtime::CyclicMessage& message = *_cyclicMessages.at(i);
+        Can::Model::Runtime::CyclicFrame& frame = *_cyclicMessages.at(i);
 
-        if (identifier == message.getIdentifier()) {
-            message.setPayloadData(data, dataLength);
-            message.setUpdateFlag(true);
+        if (identifier == frame.getIdentifier()) {
+            frame.setPayloadData(data, dataLength);
+            frame.setUpdateFlag(true);
             
-            emit message.received(driver->getTickCountMs());
+            emit frame.received(driver->getTickCountMs());
 
-            if (&message == awaitedMessage)
-                awaitedMessageProcessed = true;
+            if (&frame == awaitedFrame)
+                awaitedFrameProcessed = true;
         }
     }
 
-    if (awaitedMessage && identifier == awaitedMessage->getIdentifier()) {
-        if (!awaitedMessageProcessed) {
-            awaitedMessage->setPayloadData(data, dataLength);
-            awaitedMessage->setUpdateFlag(true);
+    if (awaitedFrame && identifier == awaitedFrame->getIdentifier()) {
+        if (!awaitedFrameProcessed) {
+            awaitedFrame->setPayloadData(data, dataLength);
+            awaitedFrame->setUpdateFlag(true);
 
-            emit awaitedMessage->received(driver->getTickCountMs());
+            emit awaitedFrame->received(driver->getTickCountMs());
         }
 
         _awaitMessageReceived = true;

@@ -52,9 +52,9 @@ public:
      * \brief   Transmits a CAN frame using an available message object.
      *
      * Configures a message object with the supplied identifier, writes the
-     * payload, waits for transmission completion, and then releases the
-     * message object. This method blocks until the frame is sent. If data is
-     * null or no message object is available, it returns without transmitting.
+     * payload, waits for transmission completion, and then releases the message 
+     * object. This method blocks until the frame is sent. If data is null or no 
+     * message object is available, it returns without transmitting.
      *
      * \todo    Consider a non-blocking implementation that uses a queue.
      * 
@@ -90,9 +90,9 @@ public:
      * \brief   Configures an available message object to receive a CAN frame.
      *
      * The object is configured to match identifier and accept the specified
-     * payload length. Its receive interrupt is enabled. If no message object
-     * is available, no receive configuration is added. A corresponding method
-     * to remove the receive configuration is also provided.
+     * payload length. Its receive interrupt is enabled. If no message object is 
+     * available, no receive configuration is added. A corresponding method to 
+     * remove the receive configuration is also provided.
      *
      * \param   identifier passes the CAN identifier to accept.
      * \param   length passes the expected payload length in bytes.
@@ -142,8 +142,8 @@ public:
     /**
      * \brief   Sets the receiver used to process incoming CAN frames.
      *
-     * The receiver pointer is non-owning. The receiver must remain valid for
-     * as long as this driver may forward frames to it. Only one receiver can be 
+     * The receiver pointer is non-owning. The receiver must remain valid for as 
+     * long as this driver may forward frames to it. Only one receiver can be 
      * registered at a time. Passing a null pointer clears the receiver, and any 
      * received frames are ignored. The user should always only use one receiver 
      * instance, as the driver does not support multiple receivers.
@@ -157,7 +157,7 @@ public:
     /**
      * \brief   Returns the driver's current millisecond tick count.
      *
-     * The count is used as an elapsed-time reference for cyclic message
+     * The count is used as an elapsed-time reference for cyclic message 
      * scheduling and callbacks. Its initial value and wraparound behavior are
      * determined by the concrete driver implementation. 
      *
@@ -268,8 +268,8 @@ private:
      * status registers, and resets their identifier and mask registers. The
      * message objects are not reserved or released; the caller must ensure that
      * no message object is in use when this method is called. The method does
-     * not disable interrupts or change the CAN controller's operating mode.
-     * It is intended to be called during initialization, when the controller is
+     * not disable interrupts or change the CAN controller's operating mode. It 
+     * is intended to be called during initialization, when the controller is
      * reset and no message objects are in use.
      */
     void resetMessageObjects(void) const;

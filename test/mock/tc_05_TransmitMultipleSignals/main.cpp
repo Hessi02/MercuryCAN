@@ -3,7 +3,7 @@
  * \brief   Tests serialization and transmission of multiple message signals.
  *
  * This testcase checks whether multiple signals in a frame are transmitted 
- * correctly. The test checks for the correct identifier and payload. If an
+ * correctly. The test checks for the correct identifier and payload. If an 
  * error occurrs, the information is printed to stderr.
  * 
  * \copyright Copyright (C) 2026 Luca Hesselbrock
@@ -13,8 +13,8 @@
 
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
-#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
-#include <MercuryCAN/model/runtime/message.hpp>
+#include <MercuryCAN/model/runtime/cyclicFrame.hpp>
+#include <MercuryCAN/model/runtime/frame.hpp>
 
 #include <array>
 #include <iostream>
@@ -23,27 +23,27 @@ namespace {
 
 static_assert([] {
     int signal = 0;
-    Can::Model::Runtime::Message message{0x123, &signal};
-    return message.getIdentifier() == 0x123 &&
-           message.getPayloadSize() == sizeof(signal);
+    Can::Model::Runtime::Frame frame{0x123, &signal};
+    return frame.getIdentifier() == 0x123 &&
+           frame.getPayloadSize() == sizeof(signal);
 }());
 static_assert([] {
-    Can::Model::Runtime::Message message{0x124};
-    return message.getIdentifier() == 0x124 &&
-           message.getPayloadSize() == 0;
+    Can::Model::Runtime::Frame frame{0x124};
+    return frame.getIdentifier() == 0x124 &&
+           frame.getPayloadSize() == 0;
 }());
 static_assert([] {
     int signal = 0;
-    Can::Model::Runtime::CyclicMessage message{0x125, 10, &signal};
-    return message.getIdentifier() == 0x125 &&
-           message.getCycleTime() == 10 &&
-           message.getPayloadSize() == sizeof(signal);
+    Can::Model::Runtime::CyclicFrame frame{0x125, 10, &signal};
+    return frame.getIdentifier() == 0x125 &&
+           frame.getCycleTime() == 10 &&
+           frame.getPayloadSize() == sizeof(signal);
 }());
 static_assert([] {
-    Can::Model::Runtime::CyclicMessage message{0x126, 20};
-    return message.getIdentifier() == 0x126 &&
-           message.getCycleTime() == 20 &&
-           message.getPayloadSize() == 0;
+    Can::Model::Runtime::CyclicFrame frame{0x126, 20};
+    return frame.getIdentifier() == 0x126 &&
+           frame.getCycleTime() == 20 &&
+           frame.getPayloadSize() == 0;
 }());
 
 }
@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
     volatile uint16_t firstSignal  = 0x1234;
     volatile uint32_t secondSignal = 0x89abcdef;
 
-    Can::Model::Runtime::Message frame(
+    Can::Model::Runtime::Frame frame(
         identifier, 
         &firstSignal, 
         &secondSignal

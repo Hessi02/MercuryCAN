@@ -11,7 +11,7 @@ This library offers classes for receiving and transmitting CAN frames. The follo
 
 ### Transmitting
 
-For transmission, variables are initialized on the stack or heap. Under no circumstances may this memory be deallocated during usage. By passing an identifier and one ore multiple signal data variables, a single-shot message can be constructed:
+For transmission, variables are initialized on the stack or heap. Under no circumstances may this memory be deallocated during usage. By passing an identifier and one ore multiple signal data variables, a single-shot frame can be constructed:
 
 ```cpp
 void sendXAxisData(volatile short xAcc, volatile short yAcc) {
@@ -19,7 +19,7 @@ void sendXAxisData(volatile short xAcc, volatile short yAcc) {
 	//   SG_ xAcc :  0|16@1- (1,0) [0|32000] "mg" Vector__XXX
 	//   SG_ yAcc : 16|16@1- (1,0) [0|32000] "mg" Vector__XXX
 
-    Can::Model::Runtime::Message accelerations(
+    Can::Model::Runtime::Frame accelerations(
         0x10,
         &xAcc,
         &yAcc
@@ -30,7 +30,7 @@ void sendXAxisData(volatile short xAcc, volatile short yAcc) {
 }
 ```
 
-In combination with an additional timing information, these arbitrary parameters of the constructor are assembled into a cyclic message. These messages can then be assigned to the transmitter. The following  example shows an 100 Hz message transmission:
+In combination with timing information, these constructor parameters form a cyclic frame. Cyclic frames can then be assigned to the transmitter. The following example shows a 100 Hz frame transmission:
 
 ```cpp
 int main(void) {
@@ -41,7 +41,7 @@ int main(void) {
 	//   SG_ voltage :  0|32@1- (1,0) [0|80] "V" Vector__XXX
 	//   SG_ current : 32|32@1- (1,0) [0|10] "A" Vector__XXX
     
-    Can::Model::Runtime::CyclicMessage powerMeasures{
+    Can::Model::Runtime::CyclicFrame powerMeasures{
         0x12,
         10,
         &voltage,
@@ -71,7 +71,7 @@ int main(void) {
     //   SG_ temperature : 7|16@0- (0.01,0) [-20|80] "°C" Vector__XXX
     //   SG_ rollingCtr  : 16|8@1+ (1,0) [0|0] "" Vector__XXX
     
-    Can::Model::Runtime::CyclicMessage measurement(
+    Can::Model::Runtime::CyclicFrame measurement(
         0x100,         
         100,          
         &temperature,
@@ -80,7 +80,7 @@ int main(void) {
 
     SignalSlot::MetaObject::connect(
         &measurement,
-        &Can::Model::Runtime::Message::preSend,
+        &Can::Model::Runtime::Frame::preSend,
         +[](unsigned long) {
             static Sensor sensor;
             temperature = sensor.readTemperature();
@@ -89,7 +89,7 @@ int main(void) {
 
     SignalSlot::MetaObject::connect(
         &measurement,
-        &Can::Model::Runtime::Message::sent,
+        &Can::Model::Runtime::Frame::sent,
         +[](unsigned long) {
             rollingCtr += 1;
         }
@@ -107,7 +107,7 @@ int main(void) {
 
 The receiving process initially proceeds analogously to the sending process. However, the timing information is derived from the CAN peer and is therefore superfluous as a parameter; consequently, it will likely be removed from the signature. Here, too, it is important that the passed memory region is not deallocated. 
 
-As with the transmitter, the cyclic message function is available. The transmitter and receiver can be conveniently used together and, for example, access shared memory areas.
+As with the transmitter, cyclic frames can also be received. The transmitter and receiver can be conveniently used together and, for example, access shared memory areas.
 
 A simple reception routine can be structured as follows:
 
@@ -118,7 +118,7 @@ int main(void) {
     // BO_ 1 peerFrame : 2 Vector__XXX
     //   SG_ peerValue : 16|0@1+ (1,0) [0|0] "" Vector__XXX
     
-    Can::Model::Runtime::CyclicMessage peerFrame(
+    Can::Model::Runtime::CyclicFrame peerFrame(
         0x01,
         1,
         &value
@@ -127,7 +127,7 @@ int main(void) {
     // BO_ 2 repeatedFrame : 2 Vector__XXX
     //   SG_ repeatedValue : 16|0@1+ (1,0) [0|0] "" Vector__XXX
     
-    Can::Model::Runtime::CyclicMessage repeatedFrame(
+    Can::Model::Runtime::CyclicFrame repeatedFrame(
         0x02,
         1,
         &value
@@ -144,7 +144,7 @@ int main(void) {
 }
 ```
 
-A single-shot message is available to the user here as well. The respective method waits synchronously until a message update occurs or the specified timeout expires. A potential asynchronous implementation is a subject for future development.
+A single-shot frame is available to the user here as well. The respective method waits synchronously until a frame update occurs or the specified timeout expires. A potential asynchronous implementation is a subject for future development.
 
 The example below shows such an implementation:
 
@@ -153,7 +153,7 @@ bool awaitTorqueMeasurement(volatile long& torque) {
     // BO_ 9 trqMeas : 4 Vector__XXX
 	//   SG_ torque : 0|32@1- (0.001,0) [0|75] "Nm" Vector__XXX
     
-    Can::Model::Runtime::Message trqMeas(
+    Can::Model::Runtime::Frame trqMeas(
         0x09,
         &torque
     );
@@ -183,7 +183,7 @@ int main(void) {
     // BO_ 10 measurement : 4 Vector__XXX
     //   SG_ temperature : 0|32@1- (1,0) [-10|50] "°C" Vector__XXX
     
-    Can::Model::Runtime::CyclicMessage measRxFrame(
+    Can::Model::Runtime::CyclicFrame measRxFrame(
         0x0a,
         100,
         &conv.temperatureC
@@ -191,7 +191,7 @@ int main(void) {
  
     SignalSlot::MetaObject::connect(
         &measRxFrame,
-        &Can::Model::Runtime::Message::received,
+        &Can::Model::Runtime::Frame::received,
         &conv,
         &TemperatureConverter::onTemperatureReceived
     );
@@ -206,7 +206,7 @@ int main(void) {
 }
 ```
 
-Defining messages directly in code keeps embedded CAN communication straightforward: describe the frame layout, bind the relevant signal variables, and add each message to a transmitter or receiver. When your network is already described in a DBC file, MercuryCAN can use that database to build messages while preserving the same transmitter and receiver workflow. The next section shows how to embed a DBC file and create messages from it.
+Defining frames directly in code keeps embedded CAN communication straightforward: describe the frame layout, bind the relevant signal variables, and add each frame to a transmitter or receiver. When your network is already described in a DBC file, MercuryCAN can use that database to build frames while preserving the same transmitter and receiver workflow. The next section shows how to embed a DBC file and create frames from it.
 
 ### Embedding a DBC file
 
@@ -238,7 +238,7 @@ int main(void) {
     //   SG_ Relay_6 : 6|1@1- (1,0) [0|1] "" Vector__XXX
     //   SG_ Relay_7 : 7|1@1- (1,0) [0|1] "" Vector__XXX
 
-    Can::Model::Runtime::CyclicMessage relayControl = 
+    Can::Model::Runtime::CyclicFrame relayControl =
         dbc.buildCyclicMessage(
             "RelayControl", 
             &relayControlValue
@@ -246,7 +246,7 @@ int main(void) {
 
     SignalSlot::MetaObject::connect(
         &relayControl,
-        &Can::Model::Runtime::Message::received,
+        &Can::Model::Runtime::Frame::received,
         &updateRelayOutputs
     );
 

@@ -2,10 +2,10 @@
  * \file    main.cpp (tc_03_ReceiveCyclic)
  * \brief   Tests the Receiver's cyclic receive mechanism using mock driver. 
  *
- * The test firstly initializes a typical CyclicMessage, a Receiver and get's 
- * the singleton MockDriver class. Then the injected RX message input is 
- * compared to the observed data output. If the message is received correctly, 
- * the test returns successful - output to stderr if not.
+ * The test firstly initializes a typical CyclicFrame, a Receiver and get's the 
+ * singleton MockDriver class. Then the injected RX message input is compared to 
+ * the observed data output. If the message is received correctly, the test 
+ * returns successful - output to stderr if not.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -15,7 +15,7 @@
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
-#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicFrame.hpp>
 
 #include <iostream>
 
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     constexpr uint16_t identifier = 0x123;
     volatile uint8_t byteToRecv = 0;
 
-    Can::Model::Runtime::CyclicMessage rxFrame(
+    Can::Model::Runtime::CyclicFrame rxFrame(
         identifier,
         10,
         &byteToRecv

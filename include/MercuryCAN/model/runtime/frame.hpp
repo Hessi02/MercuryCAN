@@ -1,10 +1,10 @@
 /**
- * \file    message.hpp
- * \brief   Defines the CAN message model and its payload handling.
+ * \file    frame.hpp
+ * \brief   Defines the CAN frame model and its payload handling.
  *
- * A Message associates a CAN identifier with non-owning pointers to signal
- * data. It serializes signal values in construction order, reversing the byte
- * order within each value, into a payload of at most eight bytes. Through its
+ * A Frame associates a CAN identifier with non-owning pointers to signal data. 
+ * It serializes signal values in construction order, reversing the byte order 
+ * within each value, into a payload of at most eight bytes. Through its
  * MetaObject base, it dispatches registered callbacks before sending, after
  * sending, and after received payload data has been applied. 
  * 
@@ -13,8 +13,8 @@
  * SPDX-License-Identifier: Apache-2.0 
  */
 
-#ifndef __MERCURYCAN_MODEL_RUNTIME_MESSAGE_HPP__
-#define __MERCURYCAN_MODEL_RUNTIME_MESSAGE_HPP__
+#ifndef __MERCURYCAN_MODEL_RUNTIME_FRAME_HPP__
+#define __MERCURYCAN_MODEL_RUNTIME_FRAME_HPP__
 
 #include <MercuryCAN/support/metaObject.hpp>
 #include <MercuryCAN/model/runtime/signal.hpp>
@@ -31,26 +31,26 @@ namespace Can::Model::Runtime
  * \brief   Checks whether the given signal data types fit into a CAN payload.
  *
  * The sum of the sizes of all types must not exceed the eight-byte payload
- * limit used by this message model. This is determined by the maximum data 
- * length of a classic CAN bus. Even though extensions such as CAN FD or CAN XL 
- * allow for more bytes, these methods are not available for the AVR.
+ * limit used by this frame model. This is determined by the maximum data length 
+ * of a classic CAN bus. Even though extensions such as CAN FD or CAN XL allow 
+ * for more bytes, these methods are not available for the AVR.
  *
  * \tparam  SignalDataTypes passes the signal data types to check.
  */
 template<typename... SignalDataTypes>
-concept FitsIntoCanMessage = (0 + ... + sizeof(SignalDataTypes)) <= 8;
+concept FitsIntoCanFrame = (0 + ... + sizeof(SignalDataTypes)) <= 8;
 
 /**
- * \brief   Represents a CAN message and the signals contained in its payload.
+ * \brief   Represents a CAN frame and the signals contained in its payload.
  *
- * A Message stores an identifier and non-owning references to its signal data.
- * The referenced objects must remain valid for the lifetime of the Message.
+ * A Frame stores an identifier and non-owning references to its signal data.
+ * The referenced objects must remain valid for the lifetime of the Frame.
  * Payload data is serialized one signal at a time, with each signal's bytes
  * written in reverse order. The total payload size cannot exceed eight bytes as
- * classic CAN is used for transmission. A message with no signals represents a
+ * classic CAN is used for transmission. A frame with no signals represents a
  * valid zero-byte payload.
  */
-class Message : public SignalSlot::MetaObject
+class Frame : public SignalSlot::MetaObject
 {
 private:
     /**
@@ -58,7 +58,7 @@ private:
      * 
      * The returned type is a std::variant of std::array<AnySignal_t, N> for 
      * each N in SignalCounts. The arrays are used to store non-owning refs to 
-     * the signals contained in a Message. The variant is used to select the 
+     * the signals contained in a Frame. The variant is used to select the 
      * correct array size at construction time, based on the number of signals.
      */
     template<std::size_t... SignalCounts>
@@ -71,7 +71,7 @@ private:
      * 
      * The type is a std::variant of std::array<AnySignal_t, N> for each N from
      * zero to eight. The arrays are used to store non-owning refs to signals
-     * contained in a Message. The variant is used to select the correct array 
+     * contained in a Frame. The variant is used to select the correct array 
      * size at construction time, based on the number of signals.
      */
     using MakeSignalStorage_t = decltype(
@@ -80,27 +80,27 @@ private:
 
 public:
     /**
-     * \brief   Allows derived messages to be destroyed through a base pointer.
+     * \brief   Allows derived frames to be destroyed through a base pointer.
      */
-    constexpr virtual ~Message() = default;
+    constexpr virtual ~Frame() = default;
 
     /**
-     * \brief   Constructs a message from its identifier and signal references.
+     * \brief   Constructs a frame from its identifier and signal references.
      *
      * Each provided signal type must be allowed by AllowedSignalDataType, and 
-     * the sum of their sizes must fit into the message's eight-byte payload.
-     * The signal references are stored internally without taking ownership of 
-     * the referenced objects. Therefore the data can be present on stack, heap, 
-     * or in static storage, but must remain valid for the Message's lifetime.
+     * the sum of their sizes must fit into the frame's eight-byte payload. The 
+     * signal references are stored internally without taking ownership of the 
+     * referenced objects. Therefore the data can be present on stack, heap, or 
+     * in static storage, but must remain valid for the Frame's lifetime.
      *
      * \tparam  SignalDataTypes passes the types of the signal data.
-     * \param   identifier passes the CAN identifier for this message.
+     * \param   identifier passes the CAN identifier for this frame.
      * \param   signalPtrPack passes pointers to the signal data objects.
      */
     template<typename... SignalDataTypes>
         requires(AllowedSignalDataType<SignalDataTypes> && ...) &&
-                    FitsIntoCanMessage<SignalDataTypes...>
-    constexpr Message(const uint16_t identifier,
+                    FitsIntoCanFrame<SignalDataTypes...>
+    constexpr Frame(const uint16_t identifier,
                       SignalDataTypes*... signalPtrPack)
         : _payloadSize((0 + ... + sizeof(SignalDataTypes))),
           _identifier(identifier),
@@ -115,7 +115,7 @@ public:
     }
 
     /**
-     * \brief   Returns the CAN identifier of this message.
+     * \brief   Returns the CAN identifier of this frame.
      *
      * \return  CAN identifier supplied to the constructor.
      */
@@ -124,7 +124,7 @@ public:
     }
 
     /**
-     * \brief   Returns the combined size of the message's signal data.
+     * \brief   Returns the combined size of the frame's signal data.
      *
      * \return  Payload size in bytes.
      */
@@ -136,8 +136,8 @@ public:
      * \brief   Serializes the current signal data into the internal payload.
      *
      * Each signal's bytes are appended in reverse order. The returned pointer
-     * refers to storage owned by this Message and is overwritten by the next
-     * call to this method.
+     * refers to storage owned by this Frame and is overwritten by the next call 
+     * to this method.
      *
      * \return  Pointer to the serialized payload buffer.
      */
@@ -156,7 +156,7 @@ public:
     }
 
     /**
-     * \brief   Applies payload bytes to the message's signal data.
+     * \brief   Applies payload bytes to the frame's signal data.
      *
      * Bytes are consumed in signal order, and each signal's bytes are read in
      * reverse order. If the input is too short for a signal, processing stops;
@@ -185,10 +185,10 @@ public:
     }
 
     /**
-     * \brief   Sets the message update flag.
+     * \brief   Sets the frame update flag.
      *
-     * The flag is not modified automatically by setPayloadData or by message
-     * transmission. Controllers and callers set it explicitly; the Receiver
+     * The flag is not modified automatically by setPayloadData or by frame
+     * transmission. Controllers and callers set it explicitly; the Receiver 
      * sets it after processing a matching frame, and awaitMessage clears it
      * before waiting for a frame.
      *
@@ -199,7 +199,7 @@ public:
     }
 
     /**
-     * \brief   Returns the current message update flag.
+     * \brief   Returns the current frame update flag.
      *
      * The flag has no automatic change-tracking semantics; its meaning depends
      * on how callers set and clear it. This method is thread-safe, but the
@@ -213,7 +213,7 @@ public:
 
 signals:
     /**
-     * \brief   Notifies observers immediately before a message is sent.
+     * \brief   Notifies observers immediately before a frame is sent.
      *
      * The preSend signal is emitted before the payload is transmitted. The use 
      * of this signal is time-critical, so the connected callbacks should be 
@@ -223,38 +223,38 @@ signals:
      * \param   tickCountMs passes the elapsed tick count in milliseconds.
      */
     void preSend(uint32_t tickCountMs) {
-        executeAllCallbacks(this, &Message::preSend, tickCountMs);
+        executeAllCallbacks(this, &Frame::preSend, tickCountMs);
     }    
 
     /**
-     * \brief   Notifies observers after a message has been sent.
+     * \brief   Notifies observers after a frame has been sent.
      * 
-     * The sent signal is emitted after the payload has been transmitted. It 
-     * can be used to trigger actions that depend on the message being sent,
-     * such as preparation of the following message payload. It is less
-     * time-critical than preSend, but callbacks still run during transmission
-     * cycle processing. Keep them short and non-blocking; their total execution
-     * time must not exceed 1 millisecond.
+     * The sent signal is emitted after the payload has been transmitted. It can 
+     * be used to trigger actions that depend on the frame being sent, such as 
+     * preparation of the following frame payload. It is less time-critical than 
+     * preSend, but callbacks still run during transmission cycle processing. 
+     * Keep them short and non-blocking; their total execution time must not 
+     * exceed 1 millisecond.
      *
      * \param   tickCountMs passes the elapsed tick count in milliseconds.
      */
     void sent(uint32_t tickCountMs) {
-        executeAllCallbacks(this, &Message::sent, tickCountMs);
+        executeAllCallbacks(this, &Frame::sent, tickCountMs);
     }
 
     /**
      * \brief   Notifies observers after received payload data is applied.
      *
      * The received signal is emitted after the payload has been received and 
-     * applied. It can be used to trigger actions that depend on the message 
-     * being received, such as processing of the received data. The callbacks
-     * for this signal must be fast enough to finish before next received frame.
-     * Make it therefore non-blocking and avoid long loops or delays.
+     * applied. It can be used to trigger actions that depend on the frame being 
+     * received, such as processing of the received data. The callbacks for this 
+     * signal must be fast enough to finish before next received frame. Make it 
+     * therefore non-blocking and avoid long loops or delays.
      *      
      * \param   tickCountMs passes the elapsed tick count in milliseconds.
      */
     void received(uint32_t tickCountMs) {
-        executeAllCallbacks(this, &Message::received, tickCountMs);
+        executeAllCallbacks(this, &Frame::received, tickCountMs);
     }
 
 private:
@@ -292,8 +292,8 @@ private:
      * \brief   Applies bytes from the input payload to one signal.
      *
      * If the remaining input is shorter than the signal data, no bytes are
-     * applied to this signal and false is returned. Otherwise bytes are read
-     * in reverse order and readIndex is advanced.
+     * applied to this signal and false is returned. Otherwise bytes are read in 
+     * reverse order and readIndex is advanced.
      *
      * \param   signal passes the signal whose data is updated.
      * \param   data passes the input payload bytes.
@@ -330,27 +330,27 @@ private:
     }
 
     /**
-     * \brief   Total size of the message's signal data in bytes.
+     * \brief   Total size of the frame's signal data in bytes.
      */
     const uint8_t _payloadSize;
 
     /**
-     * \brief   CAN identifier associated with this message.
+     * \brief   CAN identifier associated with this frame.
      */
     const uint16_t _identifier;
 
     /**
-     * \brief   Explicitly managed flag indicating a message update.
+     * \brief   Explicitly managed flag indicating a frame update.
      */
     std::atomic<bool> _updateFlag{false};
 
     /**
-     * \brief   Non-owning references to the signals contained in this message.
+     * \brief   Non-owning references to the signals contained in this frame.
      */
     MakeSignalStorage_t _signals;
 
     /**
-     * \brief   Internal buffer used to serialize the message payload.
+     * \brief   Internal buffer used to serialize the frame payload.
      *
      * The buffer has the maximum supported CAN payload capacity of eight bytes.
      */
@@ -359,4 +359,4 @@ private:
 
 }
 
-#endif  //__MERCURYCAN_MODEL_RUNTIME_MESSAGE_HPP__
+#endif  //__MERCURYCAN_MODEL_RUNTIME_FRAME_HPP__

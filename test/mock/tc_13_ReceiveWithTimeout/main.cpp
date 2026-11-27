@@ -15,7 +15,7 @@
 
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
-#include <MercuryCAN/model/runtime/message.hpp>
+#include <MercuryCAN/model/runtime/frame.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
     constexpr uint8_t receivedByte = 0x5a;
     volatile uint8_t byteToRecv    = 0;
 
-    Can::Model::Runtime::Message rxFrame(
+    Can::Model::Runtime::Frame rxFrame(
         identifier, 
         &byteToRecv
     );
@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 
     if (!rx.awaitMessage(rxFrame, 25)) {
         injector.join();
-        std::cerr << "Message was not received before timeout!" << std::endl;
+        std::cerr << "Frame was not received before timeout!" << std::endl;
         return 1;
     }
 

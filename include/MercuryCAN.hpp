@@ -17,8 +17,8 @@
 #define __MERCURY_CAN_HPP__
 
 #include <MercuryCAN/model/runtime/signal.hpp>
-#include <MercuryCAN/model/runtime/message.hpp>
-#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/frame.hpp>
+#include <MercuryCAN/model/runtime/cyclicFrame.hpp>
 #include <MercuryCAN/model/configuration/database.hpp>
 
 #include <MercuryCAN/driver/driverInterface.hpp>

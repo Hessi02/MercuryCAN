@@ -2,7 +2,7 @@
  * \file    main.cpp (tc_01_ReceiveSingleShot)
  * \brief   Tests the Receiver::awaitMessage() method using mock driver class. 
  *
- * The test firstly initializes a typical Message, a Receiver and get's the 
+ * The test firstly initializes a typical Frame, a Receiver and get's the
  * singleton MockDriver class. Then the awaitMessage() method is called. Another
  * thread is injected beforehand, where 100 ms after the await method call a RX 
  * message gets injected. If the message is received correctly, the test returns 
@@ -16,7 +16,7 @@
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
-#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicFrame.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
     constexpr uint8_t testData = 0xaa;
     volatile uint8_t byteToRecv = 0;
 
-    Can::Model::Runtime::Message rxFrame(
+    Can::Model::Runtime::Frame rxFrame(
         identifier,
         &byteToRecv
     );
@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
     }
 
     if (!rxFrame.getUpdateFlag()) {
-        std::cerr << "Message update flag was not set!" << std::endl;
+        std::cerr << "Frame update flag was not set!" << std::endl;
         return 2;
     }
 

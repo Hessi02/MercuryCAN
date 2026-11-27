@@ -23,7 +23,7 @@ namespace Can::Model::Runtime
 /**
  * \brief   Variant of all data types that can be stored inside a signal object.
  * 
- * Only the built-in integer and floating-point types listed below are
+ * Only the built-in integer and floating-point types listed below are 
  * supported. Booleans, enums, fixed-point values, bit fields, strings, and raw
  * data are not supported as signal types; applications can convert them to and
  * from supported types themselves.

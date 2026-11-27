@@ -12,7 +12,7 @@
 
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
-#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicFrame.hpp>
 
 #include <iostream>
 
@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
     volatile uint8_t firstSignal = 0;
     volatile uint16_t secondSignal = 0x1234;
 
-    Can::Model::Runtime::CyclicMessage rxFrame(
+    Can::Model::Runtime::CyclicFrame rxFrame(
         identifier, 
         10, 
         &firstSignal, 

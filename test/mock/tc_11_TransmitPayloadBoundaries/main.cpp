@@ -2,8 +2,8 @@
  * \file    main.cpp (tc_11_TransmitPayloadBoundaries)
  * \brief   Tests empty and maximum-size CAN payload transmission.
  *
- * The test sends a message with no signals and one with the maximum classic
- * CAN payload size, then checks the recorded frame sizes and payload bytes.
+ * The test sends a message with no signals and one with the maximum classic CAN 
+ * payload size, then checks the recorded frame sizes and payload bytes.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -12,7 +12,7 @@
 
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
-#include <MercuryCAN/model/runtime/message.hpp>
+#include <MercuryCAN/model/runtime/frame.hpp>
 
 #include <iostream>
 
@@ -80,8 +80,8 @@ int main() {
 
     volatile uint64_t payload = maximumPayload;
 
-    Can::Model::Runtime::Message emptyFrame(emptyIdentifier);
-    Can::Model::Runtime::Message maximumFrame(maximumIdentifier, &payload);
+    Can::Model::Runtime::Frame emptyFrame(emptyIdentifier);
+    Can::Model::Runtime::Frame maximumFrame(maximumIdentifier, &payload);
     
     tx.sendMessage(emptyFrame);
     tx.sendMessage(maximumFrame);

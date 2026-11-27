@@ -33,7 +33,7 @@ namespace Can::Driver
  *
  * Provides a controllable driver for tests without CAN hardware. Frame activity 
  * is exposed through txTrace and rxTrace. Cyclic transmissions are processed
- * by a background timer thread after activateTxTimer() is called. Use this
+ * by a background timer thread after activateTxTimer() is called. Use this 
  * driver for mock testing of the MercuryCAN library, including transmission and 
  * reception of CAN frames, as well as verifying the behavior of controllers and 
  * other components that depend on the driver interface.
@@ -132,8 +132,8 @@ public:
      * \brief   No-op receive registration required by the driver interface.
      *
      * The mock does not need receive registrations: injected frames are
-     * forwarded to the registered Receiver without checking the identifier
-     * or payload length against a configuration. This method exists only to
+     * forwarded to the registered Receiver without checking the identifier or 
+     * payload length against a configuration. This method exists only to
      * satisfy the DriverInterface contract.
      * 
      * \param   identifier passes an unused CAN identifier.

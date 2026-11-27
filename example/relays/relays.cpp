@@ -34,7 +34,7 @@ int main(void) {
 
     constexpr Can::Model::Configuration::Database dbc(DBC);
 
-    Can::Model::Runtime::CyclicMessage relayControl = 
+    Can::Model::Runtime::CyclicFrame relayControl =
         dbc.buildCyclicMessage(
             "RelayControl", 
             &relayControlValue
@@ -42,7 +42,7 @@ int main(void) {
 
     SignalSlot::MetaObject::connect(
         &relayControl,
-        &Can::Model::Runtime::Message::received,
+        &Can::Model::Runtime::Frame::received,
         &updateRelayOutputs
     );
 

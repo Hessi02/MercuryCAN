@@ -40,7 +40,7 @@ int main(void) {
 
     SignalSlot::MetaObject::connect(
         &relayControl,
-        &Can::Model::Runtime::Message::preSend,
+        &Can::Model::Runtime::Frame::preSend,
         &readRelayInputs
     );
     

@@ -4,19 +4,19 @@
  *
  * Defines 'Database', a lightweight, non-owning view over DBC text. The class 
  * searches BO_ message rows and extracts the identifier and payload length 
- * needed to construct a Message or CyclicMessage with caller-provided signal 
+ * needed to construct a Frame or CyclicFrame with caller-provided signal
  * data pointers.
  *
  * The parser supports exact message-name lookup and validates the identifier, 
  * declared payload length, and combined signal data size. Cyclic messages 
  * additionally require a cyclic GenMsgSendType and a defined GenMsgCycleTime. 
  * The database builders are consteval; missing definitions and mismatched
- * payload sizes make those builder calls fail compilation. Message objects can
+ * payload sizes make those builder calls fail compilation. Frame objects can
  * also be constructed directly without a Database.
  *
  * The DBC text is not copied and must remain valid while the Database is
- * used. Signal data referenced by a returned message must likewise outlive
- * that message's use. Successfully built messages are returned by value and
+ * used. Signal data referenced by a returned frame must likewise outlive
+ * that frame's use. Successfully built frames are returned by value and
  * require no manual memory management.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
@@ -27,8 +27,8 @@
 #ifndef __MERCURYCAN_MODEL_CONFIGURATION_DATABASE_HPP__
 #define __MERCURYCAN_MODEL_CONFIGURATION_DATABASE_HPP__
 
-#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
-#include <MercuryCAN/model/runtime/message.hpp>
+#include <MercuryCAN/model/runtime/cyclicFrame.hpp>
+#include <MercuryCAN/model/runtime/frame.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -40,7 +40,7 @@ namespace Can::Model::Configuration
 {
 
 /**
- * \brief   Builds CAN messages from DBC message definitions.
+ * \brief   Builds CAN frames from DBC message definitions.
  *
  * This class reads DBC text through a non-owning string view. The current
  * parser recognizes message header rows beginning with BO_ and extracts the 
@@ -48,7 +48,7 @@ namespace Can::Model::Configuration
  * cyclic messages it also reads GenMsgSendType and GenMsgCycleTime attributes. 
  * Signal definitions and node assignments are not parsed.
  *
- * Message data is checked against the declared payload length and classic CAN's 
+ * Frame data is checked against the declared payload length and classic CAN's
  * maximum payload of eight bytes. Data type sizes come from C++ sizeof; they 
  * are not compared with individual DBC signal definitions.
  *
@@ -72,7 +72,7 @@ public:
     {}
 
     /**
-     * \brief   Builds a message matching a DBC message definition.
+     * \brief   Builds a frame matching a DBC message definition.
      *
      * Searches for an exact, case-sensitive message name in a BO_ row. A 
      * successful lookup supplies the CAN identifier and establishes the maximum 
@@ -82,19 +82,19 @@ public:
      * checked.
      *
      * Each signal pointer must be non-null and point to data that remains
-     * alive for at least as long as the returned Message is used. Pointers
-     * are passed through to Message and are not owned or copied.
+     * alive for at least as long as the returned Frame is used. Pointers
+     * are passed through to Frame and are not owned or copied.
      *
      * \tparam  SignalDataTypes specifies types of the signal data.
      * \param   name passes the exact DBC message name to find.
      * \param   signalPtrPack passes non-owning pointers to the signal data.
      * 
-     * \return  The matching Message.
+     * \return  The matching Frame.
      */
     template<typename... SignalDataTypes>
         requires(Runtime::AllowedSignalDataType<SignalDataTypes> && ...) &&
-                    Runtime::FitsIntoCanMessage<SignalDataTypes...>
-    consteval Runtime::Message buildMessage(
+                    Runtime::FitsIntoCanFrame<SignalDataTypes...>
+    consteval Runtime::Frame buildMessage(
         std::string_view name,
         SignalDataTypes*... signalPtrPack
     ) const {
@@ -106,11 +106,11 @@ public:
         if (!definition)
             failConstantEvaluation();
 
-        return Runtime::Message{definition->identifier, signalPtrPack...};
+        return Runtime::Frame{definition->identifier, signalPtrPack...};
     }
 
     /**
-     * \brief   Builds a cyclic message matching a DBC message definition.
+     * \brief   Builds a cyclic frame matching a DBC message definition.
      *
      * The exact case-sensitive message name and combined signal data size must 
      * match a supported DBC message. The message must match a GenMsgSendType of
@@ -121,12 +121,12 @@ public:
      * \param   name passes the exact DBC message name to find.
      * \param   signalPtrPack passes non-owning pointers to the signal data.
      *
-     * \return  The matching CyclicMessage.
+     * \return  The matching CyclicFrame.
      */
     template<typename... SignalDataTypes>
         requires(Runtime::AllowedSignalDataType<SignalDataTypes> && ...) &&
-                    Runtime::FitsIntoCanMessage<SignalDataTypes...>
-    consteval Runtime::CyclicMessage buildCyclicMessage(
+                    Runtime::FitsIntoCanFrame<SignalDataTypes...>
+    consteval Runtime::CyclicFrame buildCyclicMessage(
         std::string_view name,
         SignalDataTypes*... signalPtrPack
     ) const {
@@ -138,7 +138,7 @@ public:
         if (!definition)
             failConstantEvaluation();
 
-        return Runtime::CyclicMessage{
+        return Runtime::CyclicFrame{
             definition->identifier, definition->cycleTime, signalPtrPack...
         };
     }
@@ -154,7 +154,7 @@ private:
     static void failConstantEvaluation() {}
 
     /**
-     * \brief   Parsed fields needed to construct a Message.
+     * \brief   Parsed fields needed to construct a Frame.
      *
      * The identifier and payload length are read from a DBC BO_ header row. 
      * Cyclic-message lookup additionally fills cycleTime from its corresponding

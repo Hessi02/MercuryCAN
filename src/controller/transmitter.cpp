@@ -1,12 +1,12 @@
 /**
  * \file    transmitter.cpp
- * \brief   Implements immediate and cyclic CAN message transmission.
+ * \brief   Implements immediate and cyclic CAN frame transmission.
  *
- * The Transmitter sends individual messages through the active driver and emits 
- * their sent notifications after transmission. It also registers non-owning 
- * references to cyclic messages, orders them by CAN identifier, and processes 
- * them during timer-driven cycles. Each cycle advances the driver's millisecond 
- * tick count, emits pre-send notifications for due messages, transmits them, 
+ * The Transmitter sends individual frames through the active driver and emits
+ * their sent notifications after transmission. It also registers non-owning
+ * references to cyclic frames, orders them by CAN identifier, and processes
+ * them during timer-driven cycles. Each cycle advances the driver's millisecond
+ * tick count, emits pre-send notifications for due frames, transmits them,
  * and then emits their sent notifications.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
@@ -25,28 +25,28 @@ Can::Controller::Transmitter::Transmitter(void) {
     driver->activateTxTimer();
 }
 
-void Can::Controller::Transmitter::sendMessage(Model::Runtime::Message& message) const {
+void Can::Controller::Transmitter::sendMessage(Model::Runtime::Frame& frame) const {
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
 
     driver->transmit(
-        message.getIdentifier(),
-        message.getPayloadData(),
-        message.getPayloadSize()
+        frame.getIdentifier(),
+        frame.getPayloadData(),
+        frame.getPayloadSize()
     );
 
-    emit message.sent(driver->getTickCountMs());
+    emit frame.sent(driver->getTickCountMs());
 }
 
 void Can::Controller::Transmitter::addCyclicMessage(
-    Model::Runtime::CyclicMessage& message
+    Model::Runtime::CyclicFrame& frame
 ) {
-    _cyclicMessages.push_back(&message);
+    _cyclicMessages.push_back(&frame);
 
     std::stable_sort(
         _cyclicMessages.begin(),
         _cyclicMessages.end(),
-        [](Model::Runtime::CyclicMessage* const& left,
-           Model::Runtime::CyclicMessage* const& right) {
+        [](Model::Runtime::CyclicFrame* const& left,
+           Model::Runtime::CyclicFrame* const& right) {
             return left->getIdentifier() < right->getIdentifier();
         }
     );
@@ -80,8 +80,8 @@ void Can::Controller::Transmitter::processMessage(
     const uint32_t& tickCountMs,
     std::vector<bool>& dueMessages
 ) {
-    Model::Runtime::CyclicMessage& message = *_cyclicMessages.at(index);
-    const uint16_t cycleTime = message.getCycleTime();
+    Model::Runtime::CyclicFrame& frame = *_cyclicMessages.at(index);
+    const uint16_t cycleTime = frame.getCycleTime();
     
     if (0 == cycleTime || 0 != tickCountMs % cycleTime) {
         dueMessages[index] = false;
@@ -89,7 +89,7 @@ void Can::Controller::Transmitter::processMessage(
     }
 
     dueMessages[index] = true;
-    emit message.preSend(tickCountMs);
+    emit frame.preSend(tickCountMs);
 }
 
 void Can::Controller::Transmitter::transmitMessage(
@@ -100,11 +100,11 @@ void Can::Controller::Transmitter::transmitMessage(
         return;
 
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
-    Model::Runtime::CyclicMessage& message = *_cyclicMessages.at(index);
+    Model::Runtime::CyclicFrame& frame = *_cyclicMessages.at(index);
     driver->transmit(
-        message.getIdentifier(),
-        message.getPayloadData(),
-        message.getPayloadSize()
+        frame.getIdentifier(),
+        frame.getPayloadData(),
+        frame.getPayloadSize()
     );
 }
 

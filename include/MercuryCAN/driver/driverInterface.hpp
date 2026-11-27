@@ -35,9 +35,9 @@ namespace Can::Driver
  * \brief   Defines the interface between the CAN controllers and the driver.
  *
  * DriverInterface provides the hardware-facing operations required by the
- * transmitter and receiver controllers. Implementations provide the actual
- * CAN communication, timer, and power-management behavior. The interface does
- * not take ownership of payload buffers or the Receiver instance passed to it.
+ * transmitter and receiver controllers. Implementations provide the actual CAN 
+ * communication, timer, and power-management behavior. The interface does not 
+ * take ownership of payload buffers or the Receiver instance passed to it.
  */
 class DriverInterface 
 {
@@ -116,8 +116,8 @@ public:
     /**
      * \brief   Places the system in the driver's idle sleep mode.
      *
-     * The concrete driver determines the sleep behavior and the events that
-     * can wake the system. Because the sleep states are hardware-specific, the 
+     * The concrete driver determines the sleep behavior and the events that can 
+     * wake the system. Because the sleep states are hardware-specific, the 
      * driver implementation must ensure that the system can be woken up by the 
      * CAN controller or other relevant events. No other expectations can be
      * made about the system's state at this point.
@@ -164,7 +164,7 @@ public:
     /**
      * \brief   Returns the driver's current millisecond tick count.
      *
-     * The count is used as an elapsed-time reference for cyclic message
+     * The count is used as an elapsed-time reference for cyclic message 
      * scheduling and callbacks. Its initial value and wraparound behavior are
      * determined by the concrete driver implementation. 
      *

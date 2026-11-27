@@ -12,7 +12,7 @@
 
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
-#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicFrame.hpp>
 
 #include <iostream>
 
@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     volatile uint16_t firstSignal = 0;
     volatile uint32_t secondSignal = 0;
 
-    Can::Model::Runtime::CyclicMessage rxFrame(
+    Can::Model::Runtime::CyclicFrame rxFrame(
         identifier,
         10,
         &firstSignal,
@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
     }
 
     if (sizeof(payload) != rxFrame.getPayloadSize()) {
-        std::cerr << "Message reported an incorrect payload size!" << std::endl;
+        std::cerr << "Frame reported an incorrect payload size!" << std::endl;
         return 2;
     }
 

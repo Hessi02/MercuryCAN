@@ -13,7 +13,7 @@
 
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
-#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicFrame.hpp>
 
 #include <array>
 #include <iostream>
@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
     constexpr uint16_t cycleTimeMs = 2;
     volatile uint8_t byteToTransmit = 0x7b;
 
-    Can::Model::Runtime::CyclicMessage txFrame(
+    Can::Model::Runtime::CyclicFrame txFrame(
         identifier, 
         cycleTimeMs, 
         &byteToTransmit
@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
 
     SignalSlot::MetaObject::connect(
         &txFrame,
-        &Can::Model::Runtime::Message::preSend,
+        &Can::Model::Runtime::Frame::preSend,
         +[](uint32_t tickCountMs) {
             if (preSendCount < preSendTicks.size())
                 preSendTicks[preSendCount] = tickCountMs;
@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
 
     SignalSlot::MetaObject::connect(
         &txFrame,
-        &Can::Model::Runtime::Message::sent,
+        &Can::Model::Runtime::Frame::sent,
         +[](uint32_t tickCountMs) {
             if (sentCount < sentTicks.size())
                 sentTicks[sentCount] = tickCountMs;

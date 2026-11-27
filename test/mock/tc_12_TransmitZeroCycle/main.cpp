@@ -2,8 +2,8 @@
  * \file    main.cpp (tc_12_TransmitZeroCycle)
  * \brief   Tests that a cyclic message with a zero interval is not sent.
  *
- * The transmitter is advanced through several cycles and must neither send
- * the message nor emit its pre-send or sent notifications.
+ * The transmitter is advanced through several cycles and must neither send the 
+ * message nor emit its pre-send or sent notifications.
  *
  * \copyright Copyright (C) 2026 Luca Hesselbrock
  *
@@ -12,17 +12,17 @@
 
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
-#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicFrame.hpp>
 
 #include <iostream>
 
 static unsigned int preSendCount = 0;
 static unsigned int sentCount = 0;
 
-void connectNotifications(Can::Model::Runtime::CyclicMessage& frame) {
+void connectNotifications(Can::Model::Runtime::CyclicFrame& frame) {
     SignalSlot::MetaObject::connect(
         &frame,
-        &Can::Model::Runtime::Message::preSend,
+        &Can::Model::Runtime::Frame::preSend,
         +[](uint32_t) {
             preSendCount++;
         }
@@ -30,7 +30,7 @@ void connectNotifications(Can::Model::Runtime::CyclicMessage& frame) {
 
     SignalSlot::MetaObject::connect(
         &frame,
-        &Can::Model::Runtime::Message::sent,
+        &Can::Model::Runtime::Frame::sent,
         +[](uint32_t) {
             sentCount++;
         }
@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
     constexpr uint16_t identifier = 0x402;
     volatile uint8_t byteToTransmit = 0x5a;
 
-    Can::Model::Runtime::CyclicMessage frame(
+    Can::Model::Runtime::CyclicFrame frame(
         identifier, 
         0, 
         &byteToTransmit

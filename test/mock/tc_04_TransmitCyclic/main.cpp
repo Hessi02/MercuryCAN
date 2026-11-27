@@ -2,7 +2,7 @@
  * \file    main.cpp (tc_04_TransmitCyclic)
  * \brief   Tests the Transmitter's cyclic transmit mechanism using mock driver. 
  *
- * The test firstly initializes a typical CyclicMessage, a Transmitter and get's 
+ * The test firstly initializes a typical CyclicFrame, a Transmitter and get's
  * the singleton MockDriver class. Then a message is incremented and transmitted
  * with an cycle time of 1 ms. If the values are identified correctly in the TX
  * trace of the mock driver instance, the test shall be evaluated as passed. If
@@ -16,7 +16,7 @@
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
-#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicFrame.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
     constexpr uint16_t identifier = 0x123;
     uint8_t byteToTransmit = 0;
 
-    Can::Model::Runtime::CyclicMessage txFrame(
+    Can::Model::Runtime::CyclicFrame txFrame(
         identifier,
         cycleTimeMs,
         &byteToTransmit

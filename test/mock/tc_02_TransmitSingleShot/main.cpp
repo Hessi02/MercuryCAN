@@ -2,7 +2,7 @@
  * \file    main.cpp (tc_02_TransmitSingleShot)
  * \brief   Tests the Transmitter::sendMessage() method using mock driver class. 
  *
- * The test firstly initializes a typical Message, a Transmittr and get's the 
+ * The test firstly initializes a typical Frame, a Transmitter and get's the
  * singleton MockDriver class. Then the sendMessage() method is called. 
  * Afterwards the identifier and payload are checked. If the message is sent 
  * correctly, the test returns successful - output to stderr if not.
@@ -15,7 +15,7 @@
 #include <MercuryCAN/driver/mockDriver.hpp>
 #include <MercuryCAN/controller/transmitter.hpp>
 #include <MercuryCAN/controller/receiver.hpp>
-#include <MercuryCAN/model/runtime/cyclicMessage.hpp>
+#include <MercuryCAN/model/runtime/cyclicFrame.hpp>
 #include <MercuryCAN/model/runtime/signal.hpp>
 
 #include <iostream>
@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
         }
     }
     
-    Can::Model::Runtime::Message txFrame(
+    Can::Model::Runtime::Frame txFrame(
         identifier,
         &testData
     );
