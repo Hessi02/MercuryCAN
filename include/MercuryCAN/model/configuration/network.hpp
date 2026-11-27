@@ -1,0 +1,12 @@
+#ifndef __MERCURYCAN_MODEL_CONFIGURATION_NETWORK_HPP__
+#define __MERCURYCAN_MODEL_CONFIGURATION_NETWORK_HPP__
+
+namespace Can::Model::Configuration
+{
+
+class Network
+{};
+
+}
+
+#endif //__MERCURYCAN_MODEL_CONFIGURATION_NETWORK_HPP__

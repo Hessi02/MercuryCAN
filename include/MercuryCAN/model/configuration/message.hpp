@@ -1,0 +1,12 @@
+#ifndef __MERCURYCAN_MODEL_CONFIGURATION_MESSAGE_HPP__
+#define __MERCURYCAN_MODEL_CONFIGURATION_MESSAGE_HPP__
+
+namespace Can::Model::Configuration
+{
+
+class Message
+{};
+
+}
+
+#endif //__MERCURYCAN_MODEL_CONFIGURATION_MESSAGE_HPP__
