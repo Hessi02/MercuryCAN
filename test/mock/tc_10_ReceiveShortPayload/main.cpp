@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
     );
 
     Can::Controller::Receiver rx;
-    rx.addCyclicMessage(rxFrame);
+    rx.addCyclicFrame(rxFrame);
 
     driver->injectRxFrame(
         identifier, 

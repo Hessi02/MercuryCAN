@@ -1,8 +1,8 @@
 /**
  * \file    main.cpp (tc_13_ReceiveWithTimeout)
- * \brief   Tests successful and expired Receiver::awaitMessage() timeouts.
+ * \brief   Tests successful and expired Receiver::awaitFrame() timeouts.
  * 
- * This testcase checks whether the timeout functionality of the awaitMessage()
+ * This testcase checks whether the timeout functionality of the awaitFrame()
  * method of the Receiver class works properly. Therfore a message is awaited 
  * and then received before the timeout is expired. In the next step a message
  * is awaited but not injected via mock class. This shall expect in the intended 
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
         );
     });
 
-    if (!rx.awaitMessage(rxFrame, 25)) {
+    if (!rx.awaitFrame(rxFrame, 25)) {
         injector.join();
         std::cerr << "Frame was not received before timeout!" << std::endl;
         return 1;
@@ -63,15 +63,15 @@ int main(int argc, char** argv) {
     constexpr uint32_t timeoutMs = 30;
     const auto start = std::chrono::steady_clock::now();
 
-    if (rx.awaitMessage(rxFrame, timeoutMs)) {
-        std::cerr << "awaitMessage() succeeded without receiving!" << std::endl;
+    if (rx.awaitFrame(rxFrame, timeoutMs)) {
+        std::cerr << "awaitFrame() succeeded without receiving!" << std::endl;
         return 3;
     }
 
     const auto elapsed = std::chrono::steady_clock::now() - start;
 
     if (elapsed < std::chrono::milliseconds(timeoutMs)) {
-        std::cerr << "awaitMessage() returned before timeout!" << std::endl;
+        std::cerr << "awaitFrame() returned before timeout!" << std::endl;
         return 4;
     }
 

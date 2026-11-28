@@ -1,9 +1,9 @@
 /**
  * \file    main.cpp (tc_01_ReceiveSingleShot)
- * \brief   Tests the Receiver::awaitMessage() method using mock driver class. 
+ * \brief   Tests the Receiver::awaitFrame() method using mock driver class.
  *
  * The test firstly initializes a typical Frame, a Receiver and get's the
- * singleton MockDriver class. Then the awaitMessage() method is called. Another
+ * singleton MockDriver class. Then the awaitFrame() method is called. Another
  * thread is injected beforehand, where 100 ms after the await method call a RX 
  * message gets injected. If the message is received correctly, the test returns 
  * successful - output to stderr if not.
@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
         );
     });
 
-    rx.awaitMessage(rxFrame);
+    rx.awaitFrame(rxFrame);
     injector.join();
 
     if (testData != byteToRecv) {

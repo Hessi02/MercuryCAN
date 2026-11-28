@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
         &secondSignal
     );
 
-    tx.sendMessage(frame);
+    tx.sendFrame(frame);
 
     constexpr std::array<uint8_t, 6> expectedPayload{
         0x12, 0x34, 0x89, 0xab, 0xcd, 0xef

@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
 
     connectNotifications(frame);
 
-    transmitter.addCyclicMessage(frame);
+    transmitter.addCyclicFrame(frame);
 
     const std::size_t initialTxCount = driver->txTrace.size();
 

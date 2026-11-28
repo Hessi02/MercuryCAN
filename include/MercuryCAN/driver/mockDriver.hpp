@@ -139,7 +139,7 @@ public:
      * \param   identifier passes an unused CAN identifier.
      * \param   length passes an unused expected payload length in bytes.
      */
-    virtual void addRxMessage(
+    virtual void addRxFrame(
         const uint16_t& identifier, 
         const uint8_t& length
     ) override final;
@@ -162,7 +162,7 @@ public:
      *
      * \param   identifier passes an unused CAN identifier.
      */
-    virtual void removeRxMessage(const uint16_t& identifier) override final;
+    virtual void removeRxFrame(const uint16_t& identifier) override final;
     
     /**
      * \brief   Starts the mock's 1-ms cyclic transmission timer.

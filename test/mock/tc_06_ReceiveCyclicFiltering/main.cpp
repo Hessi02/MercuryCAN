@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
     );
     
     Can::Controller::Receiver rx;
-    rx.addCyclicMessage(frame);
+    rx.addCyclicFrame(frame);
         
     constexpr uint16_t noiseIdentifier = 0x124;
     constexpr uint8_t noiseData = 0xaa;

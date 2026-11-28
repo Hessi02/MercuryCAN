@@ -53,7 +53,7 @@ public:
      *
      * \param   frame passes the frame to transmit.
      */
-    void sendMessage(Model::Runtime::Frame& frame) const;
+    void sendFrame(Model::Runtime::Frame& frame) const;
 
     /**
      * \brief   Registers a frame for cycle-based transmission.
@@ -68,7 +68,7 @@ public:
      *
      * \param   frame passes the cyclic frame to register.
      */
-    void addCyclicMessage(Model::Runtime::CyclicFrame& frame);
+    void addCyclicFrame(Model::Runtime::CyclicFrame& frame);
 
     /**
      * \brief   Returns the number of registered cyclic frames.
@@ -79,7 +79,7 @@ public:
      * 
      * \return  Number of frames in the transmitter's shared cyclic vector.
      */
-    std::size_t getMessageCount(void) const;
+    std::size_t getFrameCount(void) const;
 
     /**
      * \brief   Processes one periodic transmission cycle.
@@ -105,7 +105,7 @@ private:
      * \param   tickCountMs passes the current driver tick count.
      * \param   dueMessages passes the array in which the due status is stored.
      */
-    static void processMessage(
+    static void processFrame(
         const std::size_t& index,
         const uint32_t& tickCountMs,
         std::vector<bool>& dueMessages
@@ -123,7 +123,7 @@ private:
      * \param   index passes the index of the frame to transmit.
      * \param   dueMessages passes the due-status array for this cycle.
      */
-    static void transmitMessage(
+    static void transmitFrame(
         const std::size_t& index,
         const std::vector<bool>& dueMessages
     );
@@ -141,7 +141,7 @@ private:
      * \param   tickCountMs passes the tick count associated with this cycle.
      * \param   dueMessages passes the due-status array for this cycle.
      */
-    static void emitSentMessage(
+    static void emitSentFrame(
         const std::size_t& index,
         const uint32_t& tickCountMs,
         const std::vector<bool>& dueMessages

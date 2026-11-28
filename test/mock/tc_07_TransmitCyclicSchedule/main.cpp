@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
         }
     );
 
-    tx.addCyclicMessage(txFrame);
+    tx.addCyclicFrame(txFrame);
     const std::size_t initialTxCount = driver->txTrace.size();
 
     for (unsigned int cycle = 0; cycle < 4; cycle++)

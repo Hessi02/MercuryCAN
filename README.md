@@ -26,7 +26,7 @@ void sendXAxisData(volatile short xAcc, volatile short yAcc) {
     );
 
     static Can::Controller::Transmitter tx; 
-    tx.sendMessage(accelerations);
+    tx.sendFrame(accelerations);
 }
 ```
 
@@ -49,7 +49,7 @@ int main(void) {
     };
 
     Can::Controller::Transmitter tx;
-    tx.addCyclicMessage(powerMeasures);
+    tx.addCyclicFrame(powerMeasures);
 
     while (true) {
         voltage = measureVoltage();
@@ -96,7 +96,7 @@ int main(void) {
     );
 
     Can::Controller::Transmitter tx; 
-    tx.addCyclicMessage(measurement);
+    tx.addCyclicFrame(measurement);
         
     auto& driver = Can::Driver::DriverInterface::getInstance();
     driver.enterIdleSleep();
@@ -134,10 +134,10 @@ int main(void) {
     );
     
     Can::Controller::Receiver rx;
-    rx.addCyclicMessage(peerFrame);
+    rx.addCyclicFrame(peerFrame);
 
     Can::Controller::Transmitter tx;
-    tx.addCyclicMessage(repeatedFrame);
+    tx.addCyclicFrame(repeatedFrame);
 
     auto& driver = Can::Driver::DriverInterface::getInstance();
     driver.enterIdleSleep();
@@ -159,7 +159,7 @@ bool awaitTorqueMeasurement(volatile long& torque) {
     );
 
     static Receiver rx;
-    return rx.awaitMessage(trqMeas, 10);
+    return rx.awaitFrame(trqMeas, 10);
 }
 ```
 
@@ -197,7 +197,7 @@ int main(void) {
     );
 
     Receiver rx;
-    rx.addCyclicMessage(measRxFrame);
+    rx.addCyclicFrame(measRxFrame);
 
     while (true) {
         std::cout << conv.temperatureC << " °C => " << conv.temperatureF << " °F" << std::endl;
@@ -251,7 +251,7 @@ int main(void) {
     );
 
     Can::Controller::Receiver rx;
-    rx.addCyclicMessage(relayControl);
+    rx.addCyclicFrame(relayControl);
 }
 ```
 

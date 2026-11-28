@@ -189,7 +189,7 @@ public:
      *
      * The flag is not modified automatically by setPayloadData or by frame
      * transmission. Controllers and callers set it explicitly; the Receiver 
-     * sets it after processing a matching frame, and awaitMessage clears it
+     * sets it after processing a matching frame, and awaitFrame clears it
      * before waiting for a frame.
      *
      * \param   flag passes the new flag value.

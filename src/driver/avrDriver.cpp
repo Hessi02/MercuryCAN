@@ -49,7 +49,7 @@ void Can::Driver::AvrDriver::forwardReceiveFrame(
         _receiver->processRxData(identifier, data, payloadLength);
 }
 
-void Can::Driver::AvrDriver::addRxMessage(
+void Can::Driver::AvrDriver::addRxFrame(
     const uint16_t& identifier, 
     const uint8_t& length
 ) {
@@ -86,7 +86,7 @@ void Can::Driver::AvrDriver::enterIdleSleep(void) const {
     }
 }
 
-void Can::Driver::AvrDriver::removeRxMessage(
+void Can::Driver::AvrDriver::removeRxFrame(
     const uint16_t& identifier
 ) {
     for (uint8_t index = 0; index < _messageObjectCount; index++) {

@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
     );
 
     Can::Controller::Transmitter tx;
-    tx.addCyclicMessage(txFrame);
+    tx.addCyclicFrame(txFrame);
 
     const uint32_t startTick = driver->getTickCountMs();
     const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(3);

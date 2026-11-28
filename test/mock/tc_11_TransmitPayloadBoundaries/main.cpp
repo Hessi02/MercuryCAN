@@ -83,8 +83,8 @@ int main() {
     Can::Model::Runtime::Frame emptyFrame(emptyIdentifier);
     Can::Model::Runtime::Frame maximumFrame(maximumIdentifier, &payload);
     
-    tx.sendMessage(emptyFrame);
-    tx.sendMessage(maximumFrame);
+    tx.sendFrame(emptyFrame);
+    tx.sendFrame(maximumFrame);
 
     if (!verifyFrameCount(*driver))
         return 1;

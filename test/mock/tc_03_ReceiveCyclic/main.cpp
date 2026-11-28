@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
     );
 
     Can::Controller::Receiver rx;
-    rx.addCyclicMessage(rxFrame);
+    rx.addCyclicFrame(rxFrame);
 
     for (uint8_t i = 0; i < 0xff; i++) {
         driver->injectRxFrame(

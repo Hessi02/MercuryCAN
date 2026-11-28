@@ -108,7 +108,7 @@ public:
      * \param   identifier passes the CAN identifier to accept.
      * \param   length passes the expected payload length in bytes.
      */
-    virtual void addRxMessage(
+    virtual void addRxFrame(
         const uint16_t& identifier, 
         const uint8_t& length
     ) = 0;
@@ -134,7 +134,7 @@ public:
      *
      * \param   identifier passes the CAN identifier to remove.
      */
-    virtual void removeRxMessage(const uint16_t& identifier) = 0;
+    virtual void removeRxFrame(const uint16_t& identifier) = 0;
 
     /**
      * \brief   Starts the timer used to process cyclic transmissions.

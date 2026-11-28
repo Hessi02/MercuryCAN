@@ -48,12 +48,12 @@ public:
      *
      * \param   frame passes the frame whose update flag is awaited.
      */
-    void awaitMessage(Model::Runtime::Frame& frame);
+    void awaitFrame(Model::Runtime::Frame& frame);
 
     /**
      * \brief   Waits synchronously for a frame update until timeout expired.
      *
-     * Overloaded awaitMessage() method, returning with false when the frame
+     * Overloaded awaitFrame() method, returning with false when the frame
      * does not get updated until timeout expired. The method returns with true,
      * if the frame is received in time. The driver's millisecond timer is
      * activated when the timeout is nonzero.
@@ -61,7 +61,7 @@ public:
      * \param   frame passes the frame whose update flag is awaited.
      * \param   timeout passes the duration to wait for a frame update in ms.
      */
-    bool awaitMessage(Model::Runtime::Frame& frame, const uint32_t& timeout);
+    bool awaitFrame(Model::Runtime::Frame& frame, const uint32_t& timeout);
 
     /**
      * \brief   Registers a cyclic frame for reception.
@@ -73,7 +73,7 @@ public:
      *
      * \param   frame passes the cyclic frame to register.
      */
-    void addCyclicMessage(Model::Runtime::CyclicFrame& frame);
+    void addCyclicFrame(Model::Runtime::CyclicFrame& frame);
 
     /**
      * \brief   Applies received payload data to matching registered frames.
@@ -95,7 +95,7 @@ public:
 
 private:
     /**
-     * \brief   Frame currently awaited by awaitMessage(), if any.
+     * \brief   Frame currently awaited by awaitFrame(), if any.
      */
     Model::Runtime::Frame* volatile _awaitedMessage = nullptr;
 

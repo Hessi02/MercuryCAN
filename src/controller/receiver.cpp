@@ -18,7 +18,7 @@
 
 #include <MercuryCAN/driver/driverInterface.hpp>
 
-void Can::Controller::Receiver::awaitMessage(Model::Runtime::Frame& frame) {
+void Can::Controller::Receiver::awaitFrame(Model::Runtime::Frame& frame) {
     frame.setUpdateFlag(false);
 
     _awaitMessageReceived = false;
@@ -26,15 +26,15 @@ void Can::Controller::Receiver::awaitMessage(Model::Runtime::Frame& frame) {
     
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
     driver->setReceiverInstance(this);
-    driver->addRxMessage(frame.getIdentifier(), frame.getPayloadSize());
+    driver->addRxFrame(frame.getIdentifier(), frame.getPayloadSize());
 
     while (!_awaitMessageReceived);
 
     _awaitedMessage = nullptr;
-    driver->removeRxMessage(frame.getIdentifier());
+    driver->removeRxFrame(frame.getIdentifier());
 }
 
-bool Can::Controller::Receiver::awaitMessage(
+bool Can::Controller::Receiver::awaitFrame(
     Model::Runtime::Frame& frame,
     const uint32_t& timeoutMs
 ) {
@@ -45,7 +45,7 @@ bool Can::Controller::Receiver::awaitMessage(
 
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
     driver->setReceiverInstance(this);
-    driver->addRxMessage(frame.getIdentifier(), frame.getPayloadSize());
+    driver->addRxFrame(frame.getIdentifier(), frame.getPayloadSize());
 
     if (timeoutMs > 0)
         driver->activateTxTimer();
@@ -57,18 +57,18 @@ bool Can::Controller::Receiver::awaitMessage(
 
     const bool received = _awaitMessageReceived;
     _awaitedMessage = nullptr;
-    driver->removeRxMessage(frame.getIdentifier());
+    driver->removeRxFrame(frame.getIdentifier());
 
     return received;
 }
 
-void Can::Controller::Receiver::addCyclicMessage(
+void Can::Controller::Receiver::addCyclicFrame(
     Model::Runtime::CyclicFrame& frame
 ) {
     _cyclicMessages.push_back(&frame);
 
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
-    driver->addRxMessage(frame.getIdentifier(), frame.getPayloadSize());
+    driver->addRxFrame(frame.getIdentifier(), frame.getPayloadSize());
     driver->setReceiverInstance(this);
 }
 

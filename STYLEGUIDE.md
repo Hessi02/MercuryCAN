@@ -127,7 +127,7 @@ Method names should describe an action.
 ```cpp
 UserInfo loadUser();
 double calculateDistance();
-void sendMessage();
+void sendFrame();
 bool validate();
 bool checkPermission();
 ```

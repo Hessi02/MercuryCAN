@@ -25,7 +25,7 @@ Can::Controller::Transmitter::Transmitter(void) {
     driver->activateTxTimer();
 }
 
-void Can::Controller::Transmitter::sendMessage(Model::Runtime::Frame& frame) const {
+void Can::Controller::Transmitter::sendFrame(Model::Runtime::Frame& frame) const {
     Driver::DriverInterface* driver = Driver::DriverInterface::getInstance();
 
     driver->transmit(
@@ -37,7 +37,7 @@ void Can::Controller::Transmitter::sendMessage(Model::Runtime::Frame& frame) con
     emit frame.sent(driver->getTickCountMs());
 }
 
-void Can::Controller::Transmitter::addCyclicMessage(
+void Can::Controller::Transmitter::addCyclicFrame(
     Model::Runtime::CyclicFrame& frame
 ) {
     _cyclicMessages.push_back(&frame);
@@ -54,7 +54,7 @@ void Can::Controller::Transmitter::addCyclicMessage(
     _dueMessages.resize(_cyclicMessages.size(), false);
 }
 
-std::size_t Can::Controller::Transmitter::getMessageCount(void) const {
+std::size_t Can::Controller::Transmitter::getFrameCount(void) const {
     return _cyclicMessages.size();
 }
 
@@ -66,16 +66,16 @@ void Can::Controller::Transmitter::processTransmitCycle(void) {
     const std::size_t messageCount = _cyclicMessages.size();
 
     for (std::size_t index = 0; index < messageCount; index++)
-        processMessage(index, tickCountMs, _dueMessages);
+        processFrame(index, tickCountMs, _dueMessages);
 
     for (std::size_t index = 0; index < messageCount; index++)
-        transmitMessage(index, _dueMessages);
+        transmitFrame(index, _dueMessages);
 
     for (std::size_t index = 0; index < messageCount; index++)
-        emitSentMessage(index, tickCountMs, _dueMessages);
+        emitSentFrame(index, tickCountMs, _dueMessages);
 }
 
-void Can::Controller::Transmitter::processMessage(
+void Can::Controller::Transmitter::processFrame(
     const std::size_t& index,
     const uint32_t& tickCountMs,
     std::vector<bool>& dueMessages
@@ -92,7 +92,7 @@ void Can::Controller::Transmitter::processMessage(
     emit frame.preSend(tickCountMs);
 }
 
-void Can::Controller::Transmitter::transmitMessage(
+void Can::Controller::Transmitter::transmitFrame(
     const std::size_t& index,
     const std::vector<bool>& dueMessages
 ) {
@@ -108,7 +108,7 @@ void Can::Controller::Transmitter::transmitMessage(
     );
 }
 
-void Can::Controller::Transmitter::emitSentMessage(
+void Can::Controller::Transmitter::emitSentFrame(
     const std::size_t& index,
     const uint32_t& tickCountMs,
     const std::vector<bool>& dueMessages

@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
     );
 
     Can::Controller::Receiver rx;
-    rx.addCyclicMessage(rxFrame);
+    rx.addCyclicFrame(rxFrame);
 
     constexpr uint8_t payload[] = {0x12, 0x34, 0x89, 0xab, 0xcd, 0xef};
 

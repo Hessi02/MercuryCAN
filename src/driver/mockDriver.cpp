@@ -48,7 +48,7 @@ void Can::Driver::MockDriver::forwardReceiveFrame(
     rxTrace.push_back(event);
 }
 
-void Can::Driver::MockDriver::addRxMessage(
+void Can::Driver::MockDriver::addRxFrame(
     const uint16_t& identifier, const uint8_t& length
 ) {
 
@@ -59,7 +59,7 @@ void Can::Driver::MockDriver::enterIdleSleep(void) const {
     while (true); 
 }
 
-void Can::Driver::MockDriver::removeRxMessage(
+void Can::Driver::MockDriver::removeRxFrame(
     const uint16_t& identifier
 ) {
 

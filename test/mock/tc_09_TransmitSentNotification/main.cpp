@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
     );
 
     const uint32_t expectedTick = driver->getTickCountMs();
-    tx.sendMessage(frame);
+    tx.sendFrame(frame);
 
     if (1 != sentCount) {
         std::cerr << "Signal did not emit exactly once!" << std::endl;

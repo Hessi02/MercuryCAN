@@ -47,7 +47,7 @@ int main(void) {
     );
 
     Can::Controller::Receiver rx;
-    rx.addCyclicMessage(relayControl);
+    rx.addCyclicFrame(relayControl);
 
     auto* driver = Can::Driver::DriverInterface::getInstance();
     driver->enterIdleSleep();

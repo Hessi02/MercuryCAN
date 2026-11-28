@@ -1,9 +1,9 @@
 /**
  * \file    main.cpp (tc_02_TransmitSingleShot)
- * \brief   Tests the Transmitter::sendMessage() method using mock driver class. 
+ * \brief   Tests the Transmitter::sendFrame() method using mock driver class.
  *
  * The test firstly initializes a typical Frame, a Transmitter and get's the
- * singleton MockDriver class. Then the sendMessage() method is called. 
+ * singleton MockDriver class. Then the sendFrame() method is called.
  * Afterwards the identifier and payload are checked. If the message is sent 
  * correctly, the test returns successful - output to stderr if not.
  *
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
         &testData
     );
 
-    tx.sendMessage(txFrame);
+    tx.sendFrame(txFrame);
 
     if (0 == driver->txTrace.size()) {
         std::cerr << "No frame was sent!" << std::endl;
